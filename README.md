@@ -1,9 +1,7 @@
 # web-client
 This repository contains the user-facing frontend service for the minireipaz project. 
 
-# MiniReipaz Project
-
-## Estructura del proyecto
+## Repo Structure
 
 ```
 ├── definitionsapi ##### OpenAPI
