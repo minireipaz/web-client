@@ -10,13 +10,24 @@ This repository contains the user-facing frontend service for the minireipaz pro
 ├── api #### vercel function dep api
 │   └── index.go
 │
-├── pkg #### dep vercel function
+├── internal
 │   ├── common
 │   │   └── ping.go
+│   ├── config
+│   │   └── envs.go ### load, set envs
+│   ├── honeycomb
+│   │   ├── honey_setup.go ##### initial setup
+│   │   └── otel_setup.go
+│   ├── middlewares
+│   │   └── middle.go ## register middlewares
 │   ├── routes
-│   │   └── routes.go ### routes for gin
-│   └── users
-│       └── name.go
+│   │   └── routes.go
+│   ├── users
+│   │   └── name.go
+│   └── vaults
+│       ├── setup_vaults.go
+│       ├── vault_hashi.go
+│       └── vault_redis.go
 │
 ├── scripts ### scripts to automate tasks
 │   ├── lint.sh
