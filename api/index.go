@@ -1,30 +1,63 @@
 package api
 
 import (
-	"minireipaz/pkg/routes"
-	"net/http"
-
+	"context"
 	"github.com/gin-gonic/gin"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
+	"log"
+	"minireipaz/internal/config"
+	"minireipaz/internal/honeycomb"
+	"minireipaz/internal/middlewares"
+	"minireipaz/internal/routes"
+	"net/http"
 )
 
 var (
-	app *gin.Engine
+	app    *gin.Engine
+	tracer trace.Tracer
 )
 
 func init() {
-	gin.SetMode(gin.DebugMode)
-	app = gin.New()
-
-	// middlewares
-
-	// routes
-	routes.Register(app)
+	tracer = otel.Tracer("gdfsdfsdf")
+	Init()
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
 	app.ServeHTTP(w, r)
 }
 
-func LocalRun(addr string) error {
-	return app.Run(addr)
+func RunWebserver() {
+	addr := config.GetEnv("FRONTEND_ADDR", ":3010")
+	log.Printf("sss %s", addr)
+	err := app.Run(addr)
+	if err != nil {
+		log.Panicf("ERROR | Starting gin failed, %v", err)
+	}
+}
+
+func Init() {
+	log.Print("---- Init From LocalInit ----")
+	config.LoadEnvs()
+	ctx := context.Background()
+	tp, exp, err := honeycomb.SetupHoneyComb(ctx)
+
+	// Handle shutdown to ensure all sub processes are closed correctly and telemetry is exported
+	defer func() {
+		_ = exp.Shutdown(ctx)
+		_ = tp.Shutdown(ctx)
+	}()
+
+	if err != nil {
+		log.Panicf("ERROR | Failed to initialize OpenTelemetry: %v", err)
+	}
+	gin.SetMode(gin.DebugMode)
+	app = gin.New()
+	middlewares.Register(app)
+
+	routes.Register(app)
+	RunWebserver()
+}
+
+func Dummy() {
 }

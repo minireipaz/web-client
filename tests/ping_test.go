@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"minireipaz/pkg/common"
+	"minireipaz/internal/common"
 	"net/http/httptest"
 	"reflect"
 	"testing"

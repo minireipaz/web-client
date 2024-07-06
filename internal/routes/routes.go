@@ -1,8 +1,9 @@
 package routes
 
 import (
-	"minireipaz/pkg/common"
-	"minireipaz/pkg/users"
+	"minireipaz/internal/common"
+	"minireipaz/internal/users"
+
 	"net/http"
 
 	"github.com/gin-gonic/gin"
