@@ -2,24 +2,22 @@ package api
 
 import (
 	"context"
+
 	"github.com/gin-gonic/gin"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/trace"
+
 	"log"
-	"minireipaz/internal/config"
-	"minireipaz/internal/honeycomb"
-	"minireipaz/internal/middlewares"
-	"minireipaz/internal/routes"
+	"minireipaz/pkg/config"
+	"minireipaz/pkg/honeycomb"
+	"minireipaz/pkg/middlewares"
+	"minireipaz/pkg/routes"
 	"net/http"
 )
 
 var (
-	app    *gin.Engine
-	tracer trace.Tracer
+	app *gin.Engine
 )
 
 func init() {
-	tracer = otel.Tracer("gdfsdfsdf")
 	Init()
 }
 

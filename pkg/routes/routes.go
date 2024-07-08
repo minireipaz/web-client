@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"minireipaz/internal/common"
-	"minireipaz/internal/users"
+	"minireipaz/pkg/common"
+	"minireipaz/pkg/users"
 
 	"net/http"
 

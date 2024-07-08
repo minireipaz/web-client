@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"minireipaz/internal/users"
+	"minireipaz/pkg/users"
 	"net/http"
 	"net/http/httptest"
 	"reflect"

@@ -2,7 +2,7 @@ package config
 
 import (
 	"log"
-	"minireipaz/internal/vaults"
+	"minireipaz/pkg/vaults"
 	"os"
 
 	"github.com/joho/godotenv"
