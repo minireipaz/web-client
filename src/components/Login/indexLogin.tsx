@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 
-type Props = {
+interface Props {
   handleLogin: () => void;
   authenticated: boolean | null;
 };
@@ -11,11 +11,7 @@ export default function Login({ authenticated, handleLogin }: Props) {
       {authenticated === null && <div>Loading...</div>}
       {authenticated === false && (
         <div>
-          <button
-            onClick={() => {
-              handleLogin();
-            }}
-          >
+          <button onClick={handleLogin}>
             Login
           </button>
         </div>

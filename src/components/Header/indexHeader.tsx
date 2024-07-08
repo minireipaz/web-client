@@ -1,36 +1,13 @@
-import { useEffect, useState } from 'react'
-import { authConfig } from "../../authConfig.ts";
-import { createZitadelAuth } from "@zitadel/react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Login from "../Login/indexLogin.tsx";
 import Callback from "../Callback/indexCallback.tsx";
-
+import Dashboard from '../Dashboard/indexDashboard.tsx';
+import { useAuth } from "../AuthProvider/indexAuthProvider.tsx";
+import { UserManager } from 'oidc-client-ts';
 
 export function Header() {
-
-  const zitadel = createZitadelAuth(authConfig);
-
-  function login() {
-    zitadel.authorize();
-  }
-
-  function signout() {
-    zitadel.signout();
-  }
-
-  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    zitadel.userManager.getUser().then((user) => {
-      if (user) {
-        setAuthenticated(true);
-      } else {
-        setAuthenticated(false);
-      }
-    });
-  }, [zitadel]);
-
+  const { authenticated, setAuthenticated, handleLogin, handleLogout, userManager } = useAuth();
   return (
     <>
       <header className="">
@@ -39,20 +16,21 @@ export function Header() {
             <Route
               path="/"
               element={
-                <Login authenticated={authenticated} handleLogin={login} />
+                <Login authenticated={authenticated} handleLogin={handleLogin} />
               }
             />
             <Route
               path="/callback"
               element={
                 <Callback
-                  authenticated={authenticated}
+                  authenticated={authenticated as boolean}
                   setAuth={setAuthenticated}
-                  handleLogout={signout}
-                  userManager={zitadel.userManager}
+                  handleLogout={handleLogout}
+                  userManager={userManager as UserManager}
                 />
               }
             />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Routes>
         </BrowserRouter>
       </header>

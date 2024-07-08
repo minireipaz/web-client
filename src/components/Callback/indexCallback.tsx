@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
 import { UserManager, User } from "oidc-client-ts";
+import { useNavigate } from "react-router-dom";
 
-type Props = {
+interface Props {
   authenticated: boolean | null;
   setAuth: (authenticated: boolean | null) => void;
-  userManager: any;
+  userManager: UserManager;
   handleLogout: any;
 };
-export default function Callback({ authenticated, setAuth, userManager, handleLogout }: Props) {
+
+export default function Callback({ authenticated, setAuth, userManager }: Props) {
   const [userInfo, setUserInfo] = useState<User | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    handleAuthentication()
-  });
+    handleAuthentication();
+  }, [authenticated]);
 
   async function handleAuthentication() {
     if (authenticated === null) {
@@ -44,26 +47,14 @@ export default function Callback({ authenticated, setAuth, userManager, handleLo
     }
   }
 
-  if (authenticated === true && userInfo) {
-    return (
-      <div className="user">
-        <h2>Welcome, {userInfo.profile.name}!</h2>
-        <p className="description">Your ZITADEL Profile Information</p>
-        <p>Name: {userInfo.profile.name}</p>
-        <p>Email: {userInfo.profile.email}</p>
-        <p>Email Verified: {userInfo.profile.email_verified ? "Yes" : "No"}</p>
-        <p>
-          Roles:{" "}
-          {JSON.stringify(
-            userInfo.profile[
-            "urn:zitadel:iam:org:project:roles"
-            ]
-          )}
-        </p>
+  useEffect(() => {
+    if (authenticated === true && userInfo) {
+      navigate('/dashboard', { state: { userInfo } });
+    }
+  }, [authenticated, userInfo, navigate]);
 
-        <button onClick={handleLogout}>Log out</button>
-      </div>
-    );
+  if (authenticated === true && userInfo) {
+    return <div>Redirecting to dashboard...</div>;
   } else {
     return <div>Loading...</div>;
   }

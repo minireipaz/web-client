@@ -1,12 +1,14 @@
 import './App.css'
+import { AuthProvider } from './components/AuthProvider/indexAuthProvider.tsx';
 import { Header } from './components/Header/indexHeader.tsx';
 
 function App() {
 
-
   return (
     <>
-      <Header />
+      <AuthProvider>
+        <Header />
+      </AuthProvider>
     </>
   )
 }
