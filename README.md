@@ -62,6 +62,20 @@ This repository contains the user-facing frontend service for the minireipaz pro
 │   ├── App.tsx
 │   ├── assets
 │   │   └── react.svg
+│   ├── authConfig.ts ####### config auth provider
+│   ├── components
+│   │   ├── AuthProvider
+│   │   │   └── indexAuthProvider.tsx ### Context
+│   │   ├── Callback
+│   │   │   └── indexCallback.tsx 
+│   │   ├── Dashboard
+│   │   │   └── indexDashboard.tsx
+│   │   ├── Header
+│   │   │   └── indexHeader.tsx
+│   │   ├── Login
+│   │   │   └── indexLogin.tsx
+│   │   └── Logout
+│   │       └── indexLogout.tsx
 │   ├── index.css
 │   ├── main.tsx
 │   └── vite-env.d.ts

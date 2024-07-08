@@ -29,7 +29,6 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 func RunWebserver() {
 	addr := config.GetEnv("FRONTEND_ADDR", ":3010")
-	log.Printf("sss %s", addr)
 	err := app.Run(addr)
 	if err != nil {
 		log.Panicf("ERROR | Starting gin failed, %v", err)
