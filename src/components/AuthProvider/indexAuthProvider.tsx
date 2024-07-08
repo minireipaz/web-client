@@ -13,6 +13,7 @@ interface AuthContextProps {
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
+
 const zitadel = createZitadelAuth(authConfig);
 
 export function AuthProvider({ children }: any) {
