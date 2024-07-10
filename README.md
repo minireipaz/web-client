@@ -101,7 +101,6 @@ This repository contains the user-facing frontend service for the minireipaz pro
 
 The authorization code protocol is part of OAuth 2.0 (defined in [OAuth 2.0 RFC 7636](https://tools.ietf.org/html/rfc7636)). It involves the exchange of an authorization code for a token. This is the recommended authorization code flow in the [OAuth 2.1 draft](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-07#section-10).
 
-
 ```mermaid
 ---
 title: Authorization Code Grant with Proof Key for Code Exchange (PKCE)
@@ -128,12 +127,54 @@ sequenceDiagram
   App->>Your API: Request protected data with access token (5)
 ```
 
+## Why We Use Zitadel as Identity Manager
+Zitadel is a modern identity and access management solution designed to provide enhanced security and flexibility. Here are the key reasons for using Zitadel in our authorization process:
+
+- Security: Zitadel implements robust security protocols, including PKCE, which mitigates the risk of authorization code interception. By requiring a code_verifier and code_challenge, it ensures that the authorization code can only be exchanged by the legitimate client.
+
+- Scalability: Zitadel is built to handle a large number of authentication requests, making it suitable for applications with high traffic. Its architecture supports scalability without compromising performance.
+
+- User Experience: Zitadel provides a seamless user experience with customizable login pages and multi-factor authentication options. This helps in maintaining a consistent and secure user interface across applications.
+
+- Compliance: Zitadel ensures compliance with various regulations and standards, such as GDPR and OpenID Connect. This is crucial for applications dealing with sensitive user data and operating in regulated environments.
+
+- Integration: Zitadel offers easy integration with various applications and APIs. Its comprehensive documentation and support for standard protocols like OAuth 2.0 and OpenID Connect make it straightforward to implement in different environments.
+
+- Administration: Zitadel includes powerful administrative tools for managing users, roles, and permissions. This simplifies the process of maintaining and auditing access controls within the application.
+
+- Self-Hosted: By self-hosting Zitadel, organizations retain full control over their identity management system. Also allows for extensive customization to meet specific organizational needs, including custom login pages, workflows, and policies.
+
+
+## Reasons for Choosing Double-Writing Over CDC with Debezium or similar for Kafka Integration
+
+When integrating event-driven systems like Apache Kafka with databases, the "double-writing" approach—writing data both to the database and Kafka—can lead to potential consistency issues. However, in certain scenarios, such as relying on free SaaS (Software as a Service) solutions, double-writing might be the practical choice. Here are the reasons why double-writing is preferred in our situation:
+
+- Free SaaS Solutions: We depend on free SaaS offerings which provide necessary services at no cost. These services often do not support advanced features like change data capture (CDC) directly from their databases, limiting our ability to use solutions like Debezium.
+
+- Budget Limitations: Implementing Debezium or other CDC tools might require additional infrastructure, licensing, or cloud resources that go beyond our budget constraints.
+
+- Infrastructure Limitations: Running a CDC tool like Debezium requires dedicated infrastructure and resources to manage and maintain the setup. Given our current limitations in infrastructure and resource availability, double-writing becomes a more feasible option.
+
+- Quicker Implementation: Double-writing can be implemented more quickly compared to setting up a full CDC pipeline with Debezium. This allows us to achieve our integration goals faster, meeting immediate project deadlines and requirements.
+
+- Simplicity: Double-writing involves straightforward code changes to ensure data is written to both the database and Kafka, simplifying the implementation process without needing in-depth CDC expertise.
+Flexibility:
+
+- Adaptable to SaaS Limitations: Many free SaaS platforms have limitations on direct access to their databases or transaction logs. Double-writing allows us to bypass these limitations by writing data to Kafka directly from our application layer.
+
+- Custom Workflows: Double-writing enables us to create custom workflows tailored to our specific needs, which might not be fully supported by a standard CDC tool.
+
+- Short-Term Viability: Double-writing serves as a viable interim solution while we assess and plan for a more robust CDC implementation in the future. It allows us to meet current project requirements and maintain progress.
+
+- Evaluation Phase: This approach provides us with the opportunity to evaluate the actual requirements and benefits of a full CDC setup, ensuring that any future investment in Debezium or similar tools is well-justified.
+
 ## Code Scanning CodeQL Analysis
+
+To ensure the security and quality of the code, it is crucial to enable code scanning in the repository settings
+
 ```
   Error: Code scanning is not enabled for this repository. Please enable code scanning in the repository settings.
 ```
-
-
 
 ## Makefile
 
