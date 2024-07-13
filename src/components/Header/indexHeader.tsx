@@ -1,12 +1,9 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-
 import Login from "../Login/indexLogin.tsx";
 import Callback from "../Callback/indexCallback.tsx";
-// import Dashboard from '../Dashboard/indexDashboard.tsx';
 import Dashboard from "../../Pages/indexDashboard.tsx";
 import { useAuth } from "../AuthProvider/indexAuthProvider.tsx";
 import { UserManager } from 'oidc-client-ts';
-import { NavDashboard } from "../Dashboard/NavDashboard.tsx";
 import { Workflows } from "../../Pages/indexWorkflows.tsx";
 
 export function Header() {
