@@ -6,7 +6,7 @@ export default defineConfig(async ({ _, mode }: any) => {
   let envs = loadEnv(mode, process.cwd(), "");
   const remoteEnvs = await getRemoteEnvs(envs);
   envs = { ...remoteEnvs };
-
+  console.log("ENVS=" + JSON.stringify(envs));
   return {
     define: envs,
     plugins: [react()]
