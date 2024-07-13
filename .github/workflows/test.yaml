@@ -2,7 +2,7 @@ name: test
 on:
   push:
     branches:
-      - main 
+      - main
   pull_request:
 
 env:
@@ -31,6 +31,9 @@ jobs:
           go-version: ${{ matrix.go }}
       - name: Install dyff
         run: go install github.com/homeport/dyff/cmd/dyff@v1.5.8
+      - name: Set up environment variables
+        run: |
+          echo "VAULT_URI=${{ secrets.VAULT_URI }}" >> .env
       - name: Run tests
         run: make test
   docs:
@@ -58,6 +61,9 @@ jobs:
           go install github.com/mattn/goveralls@latest
           go install github.com/modocache/gover@latest
           go install github.com/mitchellh/gox@latest
+      - name: Set up environment variables
+        run: |
+          echo "VAULT_URI=${{ secrets.VAULT_URI }}" >> .env
       - name: Create .coverprofile for each targeted directory by re:running tests
         run: make test
       - name: Collect all .coverprofile files and save it to one file gover.coverprofile
