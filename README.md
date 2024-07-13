@@ -196,18 +196,10 @@ GitHub allows you to store secrets securely in your repository settings. These s
 ```yaml
 - name: Set up environment variables
   run: |
-    echo "REDIS_VAULT_URI=${{ secrets.REDIS_VAULT_URI }}" >> .env
+    echo "VAULT_URI=${{ secrets.VAULT_URI }}" >> .env
+    echo "VAULT_REST_URL=${{ secrets.VAULT_REST_URL }}" >> .env
+    echo "VAULT_REST_TOKEN=${{ secrets.VAULT_REST_TOKEN }}" >> .env
     echo "VAULT_KEY_FRONTEND_ENVS=${{ secrets.VAULT_KEY_FRONTEND_ENVS }}" >> .env
-    echo "FRONTEND_ADDR=${{ secrets.FRONTEND_ADDR }}" >> .env
-    echo "BACKEND_ADDR=${{ secrets.BACKEND_ADDR }}" >> .env
-    echo "USERS_ADDR=${{ secrets.USERS_ADDR }}" >> .env
-    echo "VITE_AUTHORITY=${{ secrets.VITE_AUTHORITY }}" >> .env
-    echo "VITE_CLIENT_ID=${{ secrets.VITE_CLIENT_ID }}" >> .env
-    echo "VITE_REDIRECT_URI=${{ secrets.VITE_REDIRECT_URI }}" >> .env
-    echo "VITE_RESPONSE_TYPE=${{ secrets.VITE_RESPONSE_TYPE }}" >> .env
-    echo "VITE_SCOPE=${{ secrets.VITE_SCOPE }}" >> .env
-    echo "VITE_POST_LOGOUT_REDIRECT_URI=${{ secrets.VITE_POST_LOGOUT_REDIRECT_URI }}" >> .env
-    echo "VITE_RESPONSE_MODE=${{ secrets.VITE_RESPONSE_MODE }}" >> .env
 ```
 
 2. Using Encrypted .env Files

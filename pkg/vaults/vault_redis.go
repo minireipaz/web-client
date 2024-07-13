@@ -16,11 +16,11 @@ const (
 )
 
 func GetAllEnvsFromRedis() string {
-	uriVault := os.Getenv("REDIS_VAULT_URI")
+	uriVault := os.Getenv("VAULT_URI")
 	vaulKeyFrontendEnvs := os.Getenv("VAULT_KEY_FRONTEND_ENVS")
 
 	if uriVault == "" || vaulKeyFrontendEnvs == "" {
-		log.Panic("ERROR | Cannot load initial REDIS_VAULT_URI")
+		log.Panic("ERROR | Cannot load initial VAULT_URI")
 	}
 	opt, err := redis.ParseURL(uriVault)
 	if err != nil {
