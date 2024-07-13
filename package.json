@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@upstash/redis": "^1.32.0",
     "@zitadel/react": "^1.0.3",
     "flowbite-react": "^0.10.1",
     "oidc-client-ts": "^3.0.1",
