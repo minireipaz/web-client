@@ -2,6 +2,9 @@ package routes
 
 import (
 	"minireipaz/pkg/common"
+	"minireipaz/pkg/interfaces/workflowcontrollers"
+
+	"minireipaz/pkg/middlewares"
 	"minireipaz/pkg/users"
 
 	"net/http"
@@ -14,6 +17,11 @@ func Register(app *gin.Engine) {
 	route := app.Group("/api")
 	{
 		route.GET("/ping", common.Ping)
+		route.POST("/workflows", middlewares.ValidateWorkflow(), workflowcontrollers.CreateWorkflow)
+		// route.GET("/workflows", controllers.GetAllWorkflows)
+		// route.GET("/workflows/:id", controllers.GetWorkflowByID)
+		// route.PUT("/workflows/:id", controllers.UpdateWorkflow)
+		// route.DELETE("/workflows/:id", controllers.DeleteWorkflow)
 		route.GET("/users/:name", users.HandleUsers)
 	}
 }
