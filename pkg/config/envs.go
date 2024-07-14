@@ -10,7 +10,9 @@ import (
 
 func LoadEnvs() {
 	if err := godotenv.Load(); err != nil {
-		log.Panic("ERROR | Initial LoadEnvs FAILED")
+		if err := godotenv.Load(".env.local"); err != nil {
+			log.Panic("ERROR | Initial LoadEnvs FAILED")
+		}
 	}
 	LoadEnvsFromVault()
 }

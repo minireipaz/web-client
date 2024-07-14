@@ -26,7 +26,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func RunWebserver() {
-	addr := config.GetEnv("FRONTEND_ADDR", ":3010")
+	addr := config.GetEnv("FRONTEND_ADDR", ":3020")
 	err := app.Run(addr)
 	if err != nil {
 		log.Panicf("ERROR | Starting gin failed, %v", err)
@@ -34,7 +34,7 @@ func RunWebserver() {
 }
 
 func Init() {
-	log.Print("---- Init From LocalInit ----")
+	log.Print("---- Init From Init ----")
 	config.LoadEnvs()
 	ctx := context.Background()
 	tp, exp, err := honeycomb.SetupHoneyComb(ctx)
