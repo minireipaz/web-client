@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"minireipaz/pkg/config"
@@ -18,7 +19,8 @@ func CreateWorkflow(workflow models.Workflow) models.Workflow {
 		log.Printf("Error marshalling workflow: %v", err)
 		return models.Workflow{}
 	}
-	uriBackend, err := validateURL(config.GetEnv("URI_BACKEND", ""))
+	baseURI := fmt.Sprintf("%s/api/workflows", config.GetEnv("URI_BACKEND", "http://localhost:4020"))
+	uriBackend, err := validateURL(baseURI)
 	if err != nil {
 		log.Printf("Error creating workflow: %v", err)
 		return models.Workflow{}

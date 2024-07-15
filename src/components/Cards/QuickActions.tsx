@@ -1,6 +1,7 @@
 import { Button, Modal, TextInput, Label, Select } from "flowbite-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthProvider/indexAuthProvider";
 
 interface Workflow {
   workflowName: string;
@@ -15,11 +16,12 @@ export function QuickActions() {
     directoryToSave: "home"
   });
   const navigate = useNavigate();
+  const { userInfo } = useAuth();
 
   function onChangeWorkflow(event: any) {
     setWorkflow({
       workflowName: event.target.value,
-      directoryToSave: workflow.directoryToSave
+      directoryToSave: workflow.directoryToSave,
     });
   }
 
@@ -64,6 +66,7 @@ export function QuickActions() {
       const body = {
         workflowname: workflow.workflowName,
         directorytosave: workflow.directoryToSave,
+        sub: userInfo?.profile.sub,
       };
       const [ok, uriFrontend] = getUriFrontend();
       if (!ok) {
