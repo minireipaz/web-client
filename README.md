@@ -1,6 +1,11 @@
 # web-client
 This repository contains the user-facing frontend service for the minireipaz project. 
 
+## Testing users
+
+ayilezt485@nic.edu.pl
+
+
 ## Repo Structure
 
 ```
@@ -144,6 +149,50 @@ Zitadel is a modern identity and access management solution designed to provide 
 >   App->>Your API: Request protected data with access token (5)
 > ```
 
+
+
+## Flow in Quick action new workflow
+
+```
+graph TD
+    A[Start] --> B[User clicks Create New Workflow]
+    B --> C[Modal Opens]
+    C --> D[User Enters Workflow Name]
+    D --> E[User Clicks Create]
+    E --> F{Is Workflow Name Valid?}
+    F -- Yes --> G[Send POST Request to /api/create-workflow]
+    G --> H{Request Successful?}
+    H -- Yes --> I[Receive Workflow Data]
+    I --> J[Close Modal]
+    J --> K[Redirect to New Workflow Page]
+    H -- No --> L[Show Error Message]
+    F -- No --> M[Show Alert for Missing Name]
+    L --> C
+    M --> C
+    K --> N[Fill Information on New Page]
+    N --> O[End]
+```
+
+### Flow Explanation
+
+1. **Start**: The process begins.
+2. **User clicks Create New Workflow**: The user initiates the creation of a new workflow by clicking a button.
+3. **Modal Opens**: A modal window opens up.
+4. **User Enters Workflow Name**: The user enters the name of the workflow in the provided input field.
+5. **User Clicks Create**: The user clicks the "Create" button to proceed.
+6. **Is Workflow Name Valid?**: The system checks if the entered workflow name is valid.
+    - **Yes**: If the name is valid, proceed to send a POST request to the API endpoint `/api/workflows`.
+    - **No**: If the name is not valid, show an alert indicating the name is missing or invalid and return to the modal.
+7. **Send POST Request to /api/workflows**: The system sends a request to create the workflow.
+8. **Request Successful?**: The system checks if the request was successful.
+    - **Yes**: If the request is successful, receive the workflow data.
+    - **No**: If the request fails, show an error message and return to the modal.
+9. **Receive Workflow Data**: The system receives the data of the newly created workflow.
+10. **Close Modal**: The modal window closes.
+11. **Redirect to New Workflow Page**: The system redirects the user to the page for the new workflow.
+12. **Show Alert for Missing Name**: If the workflow name was not provided, show an alert to the user and return to the modal.
+13. **Fill Information on New Page**: Populate the new workflow page with the received workflow information.
+14. **End**: The process ends.
 
 ## Notes on Choosing Confluent Cloud Kafka over Upstash Kafka
 
