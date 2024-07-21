@@ -2,26 +2,37 @@ import { Button, Modal, TextInput, Label, Select } from "flowbite-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthProvider/indexAuthProvider";
+import { ResponseGenerateWorkflow, Workflow } from "../../models/QuickActions";
 
-interface Workflow {
-  workflowName: string;
-  directoryToSave: string;
+// interface Workflow {
+//   workflowName: string;
+//   directoryToSave: string;
 
-}
+// }
 
 export function QuickActions() {
   const [openModal, setOpenModal] = useState(false);
   const [workflow, setWorkflow] = useState<Workflow>({
-    workflowName: "",
-    directoryToSave: "home"
+    workflowname: "",
+    directorytosave: "home",
+    uuid: "",
+    sub: "",
+    createdat: "",
+    updatedat: ""
   });
+
+  const failConnection: ResponseGenerateWorkflow = {
+    error: "Conexion error",
+    status: 500,
+  }
+
   const navigate = useNavigate();
   const { userInfo } = useAuth();
 
   function onChangeWorkflow(event: any) {
     setWorkflow({
-      workflowName: event.target.value,
-      directoryToSave: workflow.directoryToSave,
+      workflowname: event.target.value,
+      directorytosave: workflow.directorytosave,
     });
   }
 
@@ -31,10 +42,13 @@ export function QuickActions() {
     try {
       const [isOk, data] = await newWorkflow(workflow);
       if (!isOk) {
-        return showAlert("Error creating workflow");
+        if (data.error) {
+          return showAlert(data.error);
+        }
+        return showAlert("Cannot connect");
       }
       closeModal();
-      navigate(`/workflow/${data.id}`, { state: { workflow: data } });
+      navigate(`/workflow/${data?.workflow?.uuid}`, { state: { workflow: data } });
 
     } catch (error) {
       console.error('Error creating workflow:', error);
@@ -44,33 +58,34 @@ export function QuickActions() {
   }
 
   function checkValidations(workflow: Workflow) {
-    if (workflow.workflowName.trim() === "") {
+    if (workflow.workflowname.trim() === "") {
       showAlert("Workflow name is required");
       return false;
     }
 
-    if (workflow.workflowName.length < 3 || workflow.workflowName.length > 50) {
+    if (workflow.workflowname.length < 3 || workflow.workflowname.length > 50) {
       showAlert("Workflow name must be between 3 and 50 characters");
       return false;
     }
 
-    if (workflow.directoryToSave.trim() === "") {
-      return showAlert("Directory to save is required");
+    if (workflow.directorytosave.trim() === "") {
+      showAlert("Directory to save is required");
       return false;
     }
     return true;
   }
 
-  async function newWorkflow(workflow: Workflow): Promise<[boolean, any]> {
+  async function newWorkflow(workflow: Workflow): Promise<[boolean, ResponseGenerateWorkflow]> {
     try {
-      const body = {
-        workflowname: workflow.workflowName,
-        directorytosave: workflow.directoryToSave,
+      const body: Workflow = {
+        workflowname: workflow.workflowname,
+        directorytosave: workflow.directorytosave,
         sub: userInfo?.profile.sub,
       };
+
       const [ok, uriFrontend] = getUriFrontend();
       if (!ok) {
-        return [false, ""];
+        return [false, failConnection];
       }
       const response = await fetch(`${uriFrontend}`, {
         method: 'POST',
@@ -78,18 +93,22 @@ export function QuickActions() {
           'Content-Type': 'application/json',
         },
         credentials: "include",
-        mode: "no-cors",
         body: JSON.stringify(body),
       });
 
-      if (!response.ok) {
-        return [false, ""];
+
+      console.log("JSON=>" + JSON.stringify(response))
+      const data: ResponseGenerateWorkflow = await response.json();
+      if (!data) {
+        return [false, data]
       }
-      const data = await response.json();
+      if (data.status !== 200) {
+        return [false, data]
+      }
       return [true, data];
     } catch (error) {
       console.error('Error creating workflow:', error);
-      return [false, ""];
+      return [false, failConnection];
     }
   }
 
@@ -108,13 +127,13 @@ export function QuickActions() {
   }
 
   function showAlert(title: string) {
-    console.error("Alert title", title);
+    console.error("Alert title ", title);
   }
 
   function closeModal() {
     setWorkflow({
-      workflowName: "",
-      directoryToSave: "home"
+      workflowname: "",
+      directorytosave: "home"
     });
     setOpenModal(false);
   }
@@ -148,7 +167,7 @@ export function QuickActions() {
               <TextInput
                 id="workflow_name"
                 placeholder="Name of the workflow."
-                value={workflow.workflowName}
+                value={workflow.workflowname}
                 onChange={onChangeWorkflow}
                 required
               />
