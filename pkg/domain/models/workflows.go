@@ -14,3 +14,9 @@ type Workflow struct {
 	CreatedAt       time.Time `json:"createdat"`
 	UpdatedAt       time.Time `json:"updatedat"`
 }
+
+type ResponseWorkflow struct {
+	Error    string   `json:"error"`
+	Workflow Workflow `json:"workflow"`
+	Status   int      `json:"status"`
+}
