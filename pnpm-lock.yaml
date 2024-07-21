@@ -70,7 +70,7 @@ importers:
         specifier: ^35.1.0
         version: 35.1.0
       vite:
-        specifier: ^5.3.4
+        specifier: ^5.3.3
         version: 5.3.4(@types/node@20.14.11)
 
 packages:
