@@ -6,13 +6,13 @@ import (
 	"net/http"
 )
 
-type HttpClient interface {
+type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-type HttpClientImpl struct{}
+type ClientImpl struct{}
 
-func (c *HttpClientImpl) Do(req *http.Request) (*http.Response, error) {
+func (c *ClientImpl) Do(req *http.Request) (*http.Response, error) {
 	client := &http.Client{}
 	return client.Do(req)
 }

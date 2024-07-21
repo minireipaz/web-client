@@ -18,7 +18,7 @@ func Register(app *gin.Engine) {
 	authService := authContext.GetAuthService()
 
 	// client workflow
-	workflowHTTPClient := &httpclient.HttpClientImpl{}
+	workflowHTTPClient := &httpclient.ClientImpl{}
 	workflowRepo := httpclient.NewWorkflowRepository(workflowHTTPClient)
 	workflowService := services.NewWorkflowService(workflowRepo)
 	workflowController := controllers.NewWorkflowController(workflowService, authService)

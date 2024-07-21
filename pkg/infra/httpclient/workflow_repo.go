@@ -14,10 +14,10 @@ import (
 )
 
 type WorkflowRepository struct {
-	client HttpClient
+	client HTTPClient
 }
 
-func NewWorkflowRepository(client HttpClient) *WorkflowRepository {
+func NewWorkflowRepository(client HTTPClient) *WorkflowRepository {
 	return &WorkflowRepository{client: client}
 }
 
