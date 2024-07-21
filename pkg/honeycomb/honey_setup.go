@@ -8,10 +8,10 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
-func SetupHoneyComb(ctx context.Context) (*sdktrace.TracerProvider, *otlptrace.Exporter, error) {
+func SetupHoneyComb(ctx context.Context) (*sdktrace.TracerProvider, *otlptrace.Exporter) {
 	tp, exp, err := InitializeGlobalTracerProvider(ctx)
 	if err != nil {
 		log.Panicf("ERROR | Failed to initialize OpenTelemetry: %v", err)
 	}
-	return tp, exp, err
+	return tp, exp
 }
