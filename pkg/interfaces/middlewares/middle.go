@@ -9,7 +9,8 @@ import (
 func Register(app *gin.Engine) {
 	app.Use(otelgin.Middleware("server-frontend"))
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3020", "http://localhost:3010"},
+		AllowAllOrigins: true,
+		// AllowOrigins:     []string{"http://localhost:3020", "http://localhost:3010"},
 		AllowMethods:     []string{"POST", "GET", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
 		AllowCredentials: true,
