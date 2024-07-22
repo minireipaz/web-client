@@ -30,6 +30,7 @@ func NewTokenRepository(redisClient *redisclient.RedisClient) *TokenRepository {
 	}
 }
 
+// TODO: better control in case cannot get token auth
 func (r *TokenRepository) GetToken() (*Token, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -40,8 +41,17 @@ func (r *TokenRepository) GetToken() (*Token, error) {
 		}
 		return r.token, nil
 	}
-
-	data, err := r.redisClient.Get(r.key)
+	var data string
+	var err error
+	for i := 1; i <= 20; i++ {
+		data, err = r.redisClient.Get(r.key)
+		if data != "" {
+			break
+		}
+		waitTime := time.Duration(i*i*100) * time.Millisecond // Incremental wait time
+		log.Printf("WARNING | Failed to get token from vault, attempt %d: %v. Retrying in %v", i, err, waitTime)
+		time.Sleep(waitTime)
+	}
 	if err != nil {
 		return nil, err
 	}
