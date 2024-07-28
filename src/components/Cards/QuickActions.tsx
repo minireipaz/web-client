@@ -3,12 +3,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthProvider/indexAuthProvider";
 import { ResponseGenerateWorkflow, Workflow } from "../../models/QuickActions";
+import { getUriFrontend } from "../../utils/getUriFrontend";
 
-// interface Workflow {
-//   workflowName: string;
-//   directoryToSave: string;
-
-// }
 
 export function QuickActions() {
   const [openModal, setOpenModal] = useState(false);
@@ -83,7 +79,7 @@ export function QuickActions() {
         sub: userInfo?.profile.sub,
       };
 
-      const [ok, uriFrontend] = getUriFrontend();
+      const [ok, uriFrontend] = getUriFrontend("/api/workflows");
       if (!ok) {
         return [false, failConnection];
       }
@@ -109,20 +105,6 @@ export function QuickActions() {
     } catch (error) {
       console.error('Error creating workflow:', error);
       return [false, failConnection];
-    }
-  }
-
-  function getUriFrontend(): [boolean, string] {
-    try {
-      const uriBase = import.meta.env.VITE_FRONTEND_URI || "http://localhost:3020";
-      const uriComposed = `${uriBase}/api/workflows`;
-      const uriFrontend = new URL(uriComposed);
-      if (uriFrontend.href) {
-        return [true, uriFrontend.href]
-      }
-      return [false, ""]
-    } catch (error) {
-      return [false, ""];
     }
   }
 

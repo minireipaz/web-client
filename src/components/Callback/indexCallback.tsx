@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { UserManager, User } from "oidc-client-ts";
 import { useNavigate } from "react-router-dom";
+import { registerUserInBackend } from "./registerUserBackend";
 
 interface Props {
   authenticated: boolean | null;
@@ -49,6 +50,7 @@ export default function Callback({ authenticated, setAuth, userManager }: Props)
 
   useEffect(() => {
     if (authenticated === true && userInfo) {
+      registerUserInBackend(userInfo, navigate);
       navigate('/dashboard', { state: { userInfo } });
     }
   }, [authenticated, userInfo, navigate]);
