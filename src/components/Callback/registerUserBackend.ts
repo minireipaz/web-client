@@ -9,6 +9,9 @@ export async function registerUserInBackend(userInfo: User | null, navigate: Nav
     status: 500,
   };
 
+  if (!userInfo || !userInfo?.profile.sub || userInfo?.profile.sub == "") {
+    return [false, failConnection];
+  }
   try {
     const [ok, uriFrontend] = getUriFrontend("/api/users");
     if (!ok) {
