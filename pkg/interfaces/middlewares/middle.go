@@ -15,4 +15,5 @@ func Register(app *gin.Engine) {
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
 		AllowCredentials: true,
 	}))
+	// TODO: middleware users/clients auth
 }
