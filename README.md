@@ -3,7 +3,8 @@ This repository contains the user-facing frontend service for the minireipaz pro
 
 ## Testing users
 
-ayilezt485@nic.edu.pl
+Username: ayilezt485@nic.edu.pl
+Password: 123
 
 
 ## Repo Structure
