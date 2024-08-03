@@ -6,7 +6,6 @@ import (
 	"minireipaz/pkg/infra/httpclient"
 	"minireipaz/pkg/interfaces/controllers"
 	"minireipaz/pkg/interfaces/middlewares"
-	"minireipaz/pkg/users"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -23,6 +22,11 @@ func Register(app *gin.Engine) {
 	workflowService := services.NewWorkflowService(workflowRepo)
 	workflowController := controllers.NewWorkflowController(workflowService, authService)
 
+	userHTTPClient := &httpclient.ClientImpl{}
+	userRepo := httpclient.NewUserRepository(userHTTPClient)
+	userService := services.NewUserService(userRepo)
+	userController := controllers.NewUserController(userService, authService)
+
 	app.NoRoute(ErrRouter)
 	route := app.Group("/api")
 	{
@@ -32,7 +36,7 @@ func Register(app *gin.Engine) {
 		// route.GET("/workflows/:id", controllers.GetWorkflowByID)
 		// route.PUT("/workflows/:id", controllers.UpdateWorkflow)
 		// route.DELETE("/workflows/:id", controllers.DeleteWorkflow)
-		route.GET("/users/:name", users.HandleUsers)
+		route.POST("/users", middlewares.ValidateUser(), userController.SyncUser)
 	}
 }
 
