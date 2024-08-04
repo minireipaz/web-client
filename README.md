@@ -16,31 +16,61 @@ Password: 123
 ├── api #### vercel function dep api
 │   └── index.go
 │
-├── internal
+├── pkg
+│   ├── auth
+│   │   ├── jwt.generator.go
+│   │   └── token_client.go
 │   ├── common
 │   │   └── ping.go
 │   ├── config
-│   │   └── envs.go ### load, set envs
+│   │   ├── envs.go
+│   │   └── zitadel.go
+│   ├── domain
+│   │   ├── models
+│   │   │   ├── token.go
+│   │   │   ├── users.go
+│   │   │   └── workflows.go
+│   │   └── services
+│   │       ├── auth_service.go
+│   │       ├── users.go
+│   │       └── workflow_service.go
 │   ├── honeycomb
-│   │   ├── honey_setup.go ##### initial setup
+│   │   ├── honey_setup.go
 │   │   └── otel_setup.go
-│   ├── middlewares
-│   │   └── middle.go ## register middlewares
-│   ├── routes
-│   │   └── routes.go
-│   ├── users
-│   │   └── name.go
+│   ├── infra
+│   │   ├── httpclient
+│   │   │   ├── client.go
+│   │   │   ├── user.go
+│   │   │   ├── workflow_repo.go
+│   │   │   └── zitadel.go
+│   │   ├── redisclient
+│   │   │   └── redisclient.go
+│   │   └── tokenrepo
+│   │       └── token_repository.go
+│   ├── interfaces
+│   │   ├── controllers
+│   │   │   ├── auth.go
+│   │   │   ├── users.go
+│   │   │   └── workflow.go
+│   │   ├── middlewares
+│   │   │   ├── middle.go
+│   │   │   └── validations.go
+│   │   └── routes
+│   │       └── routes.go
 │   └── vaults
 │       ├── setup_vaults.go
 │       ├── vault_hashi.go
 │       └── vault_redis.go
 │
-├── scripts ### scripts to automate tasks
+│ ################ SCRIPTS ############
+├── scripts
 │   ├── lint.sh
 │   ├── openapi-http.sh
 │   ├── run_code.sh
 │   └── test.sh
+├── Makefile
 │
+│ ################ TESTS ############
 ├── tests ### testing for vercel function
 │   ├── name_test.go
 │   └── ping_test.go
@@ -51,8 +81,6 @@ Password: 123
 ├── gover.coverprofile
 │
 ├── localmain.go
-├── Makefile
-│
 │
 │ ################### react ######################
 ├── dist ####### DIST react
@@ -64,26 +92,46 @@ Password: 123
 │   └── vite.svg
 │
 ├── src
-│   ├── App.css
 │   ├── App.tsx
 │   ├── assets
 │   │   └── react.svg
-│   ├── authConfig.ts ####### config auth provider
+│   ├── authConfig.ts
 │   ├── components
 │   │   ├── AuthProvider
-│   │   │   └── indexAuthProvider.tsx ### Context
+│   │   │   └── indexAuthProvider.tsx
 │   │   ├── Callback
-│   │   │   └── indexCallback.tsx 
+│   │   │   ├── authUserBackend.ts
+│   │   │   └── indexCallback.tsx
+│   │   ├── Cards
+│   │   │   ├── FailedWorkflows.tsx
+│   │   │   ├── PendingWorkflows.tsx
+│   │   │   ├── QuickActions.tsx
+│   │   │   ├── RecentActivity.tsx
+│   │   │   ├── RecentWorkflows.tsx
+│   │   │   ├── SuccessWorkflows.tsx
+│   │   │   └── TotalWorkflows.tsx
 │   │   ├── Dashboard
-│   │   │   └── indexDashboard.tsx
+│   │   │   ├── HeaderDashboard.tsx
+│   │   │   ├── indexDashboard.tsx
+│   │   │   └── NavDashboard.tsx
 │   │   ├── Header
 │   │   │   └── indexHeader.tsx
 │   │   ├── Login
 │   │   │   └── indexLogin.tsx
-│   │   └── Logout
-│   │       └── indexLogout.tsx
+│   │   ├── Logout
+│   │   │   └── indexLogout.tsx
+│   │   └── MyAccount
+│   │       └── indexMyaccount.tsx
 │   ├── index.css
 │   ├── main.tsx
+│   ├── models
+│   │   ├── QuickActions.ts
+│   │   └── Users.ts
+│   ├── Pages
+│   │   ├── indexDashboard.tsx
+│   │   └── indexWorkflows.tsx
+│   ├── utils
+│   │   └── getUriFrontend.ts
 │   └── vite-env.d.ts
 │
 ├── index.html
@@ -96,6 +144,7 @@ Password: 123
 ├── tsconfig.node.json
 ├── vercel.json
 ├── vite.config.ts
+│
 │ ################ docs ############
 ├── LICENSE
 ├── README.md
