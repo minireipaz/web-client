@@ -35,12 +35,24 @@ func (r *TokenRepository) GetToken() (*Token, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	if r.token != nil {
-		if time.Now().After(r.token.ObtainedAt.Add(r.token.ExpiresIn * time.Second)) {
-			return nil, fmt.Errorf("token expired")
-		}
+	if r.token != nil && !r.token.IsExpired() {
 		return r.token, nil
 	}
+
+	// Token is expired or not found, try to get a new one
+	newToken, err := r.GetNewToken()
+	if err != nil {
+		return nil, err
+	}
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.token = newToken
+	return r.token, nil
+}
+
+func (r *TokenRepository) GetNewToken() (*Token, error) {
 	var data string
 	var err error
 	for i := 1; i <= 20; i++ {
@@ -53,45 +65,21 @@ func (r *TokenRepository) GetToken() (*Token, error) {
 		time.Sleep(waitTime)
 	}
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ERROR | Failed to retrieve token from Redis: %v", err)
 	}
 	if data == "" {
-		return nil, fmt.Errorf("no token found in redis")
+		return nil, fmt.Errorf("ERROR | With more than 20 retries, no token found in Redis")
 	}
 
 	var token Token
 	err = json.Unmarshal([]byte(data), &token)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ERROR | Failed to unmarshal token data: %v", err)
 	}
 
-	if time.Now().After(token.ObtainedAt.Add(token.ExpiresIn * time.Second)) {
-		return nil, fmt.Errorf("token expired")
-	}
-
-	r.token = &token
-	return r.token, nil
+	return &token, err
 }
 
-func (r *TokenRepository) SaveToken(token *Token) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	data, err := json.Marshal(token)
-	if err != nil {
-		return err
-	}
-
-	for i := 1; i <= 5; i++ {
-		err = r.redisClient.WatchToken(string(data), r.key, token.ExpiresIn)
-		if err == nil {
-			r.token = token
-			return nil
-		}
-		waitTime := time.Duration(i*i*100) * time.Millisecond // Incremental wait time
-		log.Printf("WARNING | Failed to save token, attempt %d: %v. Retrying in %v", i, err, waitTime)
-		time.Sleep(waitTime)
-	}
-	log.Printf("ERROR | Failed to save token, %v", err)
-	return err
+func (t *Token) IsExpired() bool {
+	return time.Now().After(t.ObtainedAt.Add(t.ExpiresIn * time.Second))
 }
