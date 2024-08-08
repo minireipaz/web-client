@@ -1,6 +1,6 @@
 import { User } from "oidc-client-ts";
 import { getUriFrontend } from "../../utils/getUriFrontend";
-// import { ResponseCreateUser } from "../../models/Users";
+import { ResponseSyncUser } from "../../models/Users";
 
 export async function ensureUserExists(userInfo: User | null): Promise<boolean> {
   if (!userInfo || !userInfo?.profile.sub || userInfo?.profile.sub == "" || userInfo.access_token == "") {
@@ -27,8 +27,12 @@ export async function ensureUserExists(userInfo: User | null): Promise<boolean> 
       return false;
     }
 
-    const data = await response.json();
+    const data: ResponseSyncUser = await response.json();
     console.log('User response:', JSON.stringify( data));
+    if (data.error !== "") {
+      return false;
+    }
+    return true;
   } catch (error) {
     console.error('Error registering user in backend:', error);
     return false;
