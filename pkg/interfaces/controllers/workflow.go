@@ -23,7 +23,7 @@ func NewWorkflowController(service *services.WorkflowService, authServ *services
 
 func (wc *WorkflowController) CreateWorkflow(c *gin.Context) {
 	newWorkflow := c.MustGet("workflow").(models.Workflow)
-	accessToken, err := wc.authService.GetAccessToken()
+	serviceUserToken, err := wc.authService.GetAccessToken()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":  fmt.Sprintf("Failed to authenticate: %v", err),
@@ -32,7 +32,7 @@ func (wc *WorkflowController) CreateWorkflow(c *gin.Context) {
 		return
 	}
 
-	createdWorkflow := wc.service.CreateWorkflow(newWorkflow, accessToken)
+	createdWorkflow := wc.service.CreateWorkflow(newWorkflow, serviceUserToken)
 
 	c.JSON(http.StatusOK, gin.H{
 		"error":    createdWorkflow.Error,
