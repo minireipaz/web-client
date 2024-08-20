@@ -20,7 +20,7 @@ func (r *WorkflowRepository) CreateWorkflow(workflow models.Workflow, accessToke
 		return models.ResponseWorkflow{Status: http.StatusInternalServerError}
 	}
 
-	body, err := r.client.DoRequest("POST", url, workflow, accessToken)
+	body, err := r.client.DoRequest("POST", url, accessToken, workflow)
 	if err != nil {
 		return models.ResponseWorkflow{Status: http.StatusInternalServerError}
 	}

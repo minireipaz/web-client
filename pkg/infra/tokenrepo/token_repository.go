@@ -26,7 +26,7 @@ type TokenRepository struct {
 func NewTokenRepository(redisClient *redisclient.RedisClient) *TokenRepository {
 	return &TokenRepository{
 		redisClient: redisClient,
-		key:         "auth:token",
+		key:         "serviceuser:token",
 	}
 }
 
@@ -44,9 +44,6 @@ func (r *TokenRepository) GetToken() (*Token, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	r.mu.Lock()
-	defer r.mu.Unlock()
 
 	r.token = newToken
 	return r.token, nil
