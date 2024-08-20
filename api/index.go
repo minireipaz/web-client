@@ -7,6 +7,7 @@ import (
 
 	"log"
 	"minireipaz/pkg/config"
+	"minireipaz/pkg/di"
 	"minireipaz/pkg/honeycomb"
 	"minireipaz/pkg/interfaces/middlewares"
 	"minireipaz/pkg/interfaces/routes"
@@ -47,9 +48,10 @@ func Init() {
 
 	gin.SetMode(gin.DebugMode)
 	app = gin.New()
-	middlewares.Register(app)
+	workflowController, authService, userController, dashboardController := di.InitDependencies()
+	middlewares.Register(app, authService)
 
-	routes.Register(app)
+	routes.Register(app, workflowController, authService, userController, dashboardController)
 	RunWebserver()
 }
 

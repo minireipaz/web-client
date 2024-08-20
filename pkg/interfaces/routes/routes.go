@@ -3,7 +3,6 @@ package routes
 import (
 	"minireipaz/pkg/common"
 	"minireipaz/pkg/domain/services"
-	"minireipaz/pkg/infra/httpclient"
 	"minireipaz/pkg/interfaces/controllers"
 	"minireipaz/pkg/interfaces/middlewares"
 	"net/http"
@@ -11,21 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Register(app *gin.Engine) {
-	authContext := controllers.NewAuthContext()
-	authContext.GetAuthController()
-	authService := authContext.GetAuthService()
-
-	// client workflow
-	workflowHTTPClient := &httpclient.ClientImpl{}
-	workflowRepo := httpclient.NewWorkflowRepository(workflowHTTPClient)
-	workflowService := services.NewWorkflowService(workflowRepo)
-	workflowController := controllers.NewWorkflowController(workflowService, authService)
-
-	userHTTPClient := &httpclient.ClientImpl{}
-	userRepo := httpclient.NewUserRepository(userHTTPClient)
-	userService := services.NewUserService(userRepo)
-	userController := controllers.NewUserController(userService, authService)
+func Register(app *gin.Engine, workflowController *controllers.WorkflowController, authService *services.AuthService, userController *controllers.UserController, dashboardController *controllers.DashboardController) {
 
 	app.NoRoute(ErrRouter)
 	route := app.Group("/api")
@@ -37,6 +22,7 @@ func Register(app *gin.Engine) {
 		// route.PUT("/workflows/:id", controllers.UpdateWorkflow)
 		// route.DELETE("/workflows/:id", controllers.DeleteWorkflow)
 		route.POST("/users", middlewares.ValidateUser(), userController.SyncUser)
+		route.GET("/dashboard/:id", dashboardController.GetUserDashboardByID)
 	}
 }
 
