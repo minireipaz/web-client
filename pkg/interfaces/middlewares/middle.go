@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"minireipaz/pkg/config"
+	"minireipaz/pkg/domain/services"
 	"strings"
 
 	"github.com/gin-contrib/cors"
@@ -9,7 +10,7 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
-func Register(app *gin.Engine) {
+func Register(app *gin.Engine, authService *services.AuthService) {
 	app.Use(otelgin.Middleware("server-frontend"))
 	allowedOriginsEnv := config.GetEnv("CORS_ALLOWED_ORIGINS", "http://localhost:3020,http://localhost:3010")
 	allowedOrigins := strings.Split(allowedOriginsEnv, ",")
@@ -17,8 +18,9 @@ func Register(app *gin.Engine) {
 		// AllowAllOrigins: true,
 		AllowOrigins:     allowedOrigins,
 		AllowMethods:     []string{"POST", "GET", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		AllowCredentials: true,
 	}))
-	// TODO: middleware users/clients auth
+	// Auth for users
+	app.Use(AuthMiddleware(authService))
 }

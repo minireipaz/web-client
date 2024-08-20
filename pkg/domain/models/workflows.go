@@ -8,6 +8,7 @@ import (
 
 type Workflow struct {
 	Sub             string    `json:"sub"`
+	UserToken       string    `json:"access_token"`
 	UUID            uuid.UUID `json:"uuid"`
 	WorkflowName    string    `json:"workflowname"`
 	DirectoryToSave string    `json:"directorytosave"`

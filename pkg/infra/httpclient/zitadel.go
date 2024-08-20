@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
+	"minireipaz/pkg/domain/models"
 	"minireipaz/pkg/infra/tokenrepo"
 	"net/http"
 	"time"
@@ -11,7 +13,7 @@ import (
 
 type ZitadelClient struct {
 	apiURL     string
-	client     *http.Client
+	client     ClientImpl
 	userID     string
 	privateKey []byte
 	keyID      string
@@ -30,7 +32,7 @@ type TokenResult struct {
 func NewZitadelClient(apiURL, userID, privateKey, keyID string) *ZitadelClient {
 	return &ZitadelClient{
 		apiURL:     apiURL,
-		client:     &http.Client{Timeout: 10 * time.Second},
+		client:     ClientImpl{}, // &http.Client{Timeout: 10 * time.Second},
 		userID:     userID,
 		privateKey: []byte(privateKey),
 		keyID:      keyID,
@@ -62,4 +64,24 @@ func (z *ZitadelClient) GetAccessToken(jwt string) (string, time.Duration, error
 	}
 
 	return result.AccessToken, result.ExpiresIn, nil
+}
+
+func (z *ZitadelClient) VerifyUserToken(userToken, authToken string) bool {
+	url, err := getBackendURL(fmt.Sprintf("/api/auth/verify/%s", userToken))
+	if err != nil {
+		return false
+	}
+
+	body, err := z.client.DoRequest("GET", url, authToken, nil)
+	if err != nil {
+		return false
+	}
+
+	var tokenValidation models.ResponseVerifyTokenUser
+	if err := json.Unmarshal(body, &tokenValidation); err != nil {
+		log.Printf("ERROR | error unmarshalling response: %v", err)
+		return false
+	}
+
+	return tokenValidation.Valid
 }

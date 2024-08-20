@@ -25,7 +25,7 @@ func (ur *UserRepository) CheckExistUser(user *models.Users, serviceUserAccessTo
 		}
 	}
 
-	body, err := ur.client.DoRequest("POST", url, user, *serviceUserAccessToken)
+	body, err := ur.client.DoRequest("POST", url, *serviceUserAccessToken, user)
 	if err != nil {
 		return models.ResponseExistUser{
 			Exist:   false,

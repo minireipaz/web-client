@@ -13,7 +13,7 @@ import (
 
 type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
-	DoRequest(method, url string, body interface{}, token string) ([]byte, error)
+	DoRequest(method, url, authToken string, body interface{}) ([]byte, error)
 }
 
 type ClientImpl struct{}
@@ -23,7 +23,7 @@ func (c *ClientImpl) Do(req *http.Request) (*http.Response, error) {
 	return client.Do(req)
 }
 
-func (c *ClientImpl) DoRequest(method, url string, body interface{}, token string) ([]byte, error) {
+func (c *ClientImpl) DoRequest(method, url, authToken string, body interface{}) ([]byte, error) {
 	jsonData, err := json.Marshal(body)
 	if err != nil {
 		return nil, fmt.Errorf("error marshalling data: %v", err)
@@ -34,7 +34,7 @@ func (c *ClientImpl) DoRequest(method, url string, body interface{}, token strin
 		return nil, fmt.Errorf("error creating request: %v", err)
 	}
 
-	c.setHeaders(req, token)
+	c.setHeaders(req, authToken)
 
 	resp, err := c.Do(req)
 	if err != nil {
