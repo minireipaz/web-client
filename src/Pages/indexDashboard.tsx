@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../components/AuthProvider/indexAuthProvider";
 import { NavDashboard } from "../components/Dashboard/NavDashboard";
@@ -10,18 +10,51 @@ import { SuccessWorkflows } from "../components/Cards/SuccessWorkflows";
 import { FailedWorkflows } from "../components/Cards/FailedWorkflows";
 import { PendingWorkflows } from "../components/Cards/PendingWorkflows";
 import { RecentWorkflows } from "../components/Cards/RecentWorkflows";
+import { DashboardData, simulatedDashboardData } from "../models/Dashboard";
+import { getUriFrontend } from "../utils/getUriFrontend";
+
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { userInfo } = useAuth();
+  const { authenticated, userInfo } = useAuth();
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
 
   useEffect(() => {
-    if (!userInfo) {
+    if (!authenticated || !userInfo) {
       navigate("/");
+    } else {
+      fetchDashboardData();
     }
-  }, [userInfo, navigate]);
+  }, [authenticated, userInfo, navigate]);
 
-  if (!userInfo) {
+  async function fetchDashboardData() {
+    try {
+      const [ok, uriFrontend] = getUriFrontend(`/api/dashboard/${userInfo?.profile.sub}`);
+      if (!ok) {
+        return;
+      }
+      const response = await fetch(uriFrontend, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${userInfo?.access_token}`,
+        },
+      });
+
+      if (!response.ok) {
+        // TODO: better redirect
+        setDashboardData(simulatedDashboardData);
+        return;
+      }
+
+      const data: DashboardData = await response.json();
+      setDashboardData(simulatedDashboardData);
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    }
+  }
+
+  if (!authenticated || !userInfo) {
     return <div>Redirecting...</div>;
   }
 
@@ -38,12 +71,12 @@ export default function Dashboard() {
             </div>
             <div className="grid gap-6" >
               <div className="grid grid-cols-2 gap-6" >
-                <TotalWorkflows />
-                <SuccessWorkflows />
-                <FailedWorkflows />
-                <PendingWorkflows />
+                <TotalWorkflows dashboardData={dashboardData} />
+                <SuccessWorkflows dashboardData={dashboardData} />
+                <FailedWorkflows dashboardData={dashboardData} />
+                <PendingWorkflows dashboardData={dashboardData} />
               </div>
-              <RecentWorkflows />
+              <RecentWorkflows dashboardData={dashboardData} />
             </div>
           </div>
         </div>

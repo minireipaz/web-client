@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { UserManager, User } from "oidc-client-ts";
-import { NavigateFunction, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ensureUserExists } from "./authUserBackend";
 
 interface Props {
@@ -15,9 +15,6 @@ export default function Callback({ authenticated, setAuth, userManager }: Props)
   const navigate = useNavigate();
 
   useEffect(() => {
-    // if (authenticated === null) {
-    //   handleAuthentication();
-    // }
     handleAuthentication();
   }, [authenticated]);
 
@@ -55,20 +52,7 @@ export default function Callback({ authenticated, setAuth, userManager }: Props)
     if (authenticated === true && userInfo) {
       checkUserExist(userInfo);
     }
-    // checkUserExist(authenticated, userInfo, navigate)
   }, [authenticated, userInfo, navigate]);
-
-  // async function checkUserExist(authenticated: boolean | null, userInfo: User | null, navigate: NavigateFunction) {
-  //   if (authenticated === true && userInfo) {
-  //     const isOk = await userAutenticate(userInfo);;
-  //     if (!isOk) {
-  //       authenticated = false;
-  //       return;
-  //     }
-  //     navigate('/dashboard', { state: { userInfo } });
-  //   }
-
-  // }
 
   async function checkUserExist(user: User) {
     const isOk = await ensureUserExists(user);

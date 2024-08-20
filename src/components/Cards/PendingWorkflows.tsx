@@ -1,4 +1,16 @@
-export function PendingWorkflows() {
+import { useMemo } from "react";
+import { DashboardData } from "../../models/Dashboard";
+
+interface ContainerProps {
+  dashboardData: DashboardData | null
+}
+
+export function PendingWorkflows(props: ContainerProps) {
+  const pendingWorkflows = props.dashboardData?.workflowCounts.pending_workflows;
+
+  const displayPendingWorkflows = useMemo(() => {
+    return Number.isInteger(pendingWorkflows) ? pendingWorkflows : "--";
+  }, [pendingWorkflows]);
   return (
     <>
       <div className="rounded-lg border bg-card text-card-foreground shadow-sm" >
@@ -7,7 +19,7 @@ export function PendingWorkflows() {
           <p className="text-sm text-muted-foreground" >Workflows that are currently running</p>
         </div>
         <div className="p-6 flex items-center justify-between" >
-          <div className="text-4xl font-bold" >12</div>
+          <div className="text-4xl font-bold" >{displayPendingWorkflows}</div>
         </div>
       </div>
     </>

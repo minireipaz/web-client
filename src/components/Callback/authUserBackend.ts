@@ -12,9 +12,10 @@ export async function ensureUserExists(userInfo: User | null): Promise<boolean> 
       return false;
     }
     const response = await fetch(uriFrontend, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${userInfo?.access_token}`,
       },
       body: JSON.stringify({
         sub: userInfo?.profile.sub,
@@ -28,13 +29,13 @@ export async function ensureUserExists(userInfo: User | null): Promise<boolean> 
     }
 
     const data: ResponseSyncUser = await response.json();
-    console.log('User response:', JSON.stringify( data));
+    console.log("User response:", JSON.stringify( data));
     if (data.error !== "") {
       return false;
     }
     return true;
   } catch (error) {
-    console.error('Error registering user in backend:', error);
+    console.error("Error registering user in backend:", error);
     return false;
   }
   return false;

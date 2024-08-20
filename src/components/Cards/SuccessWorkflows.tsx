@@ -1,5 +1,17 @@
-export function SuccessWorkflows() {
-  return(
+import { useMemo } from "react";
+import { DashboardData } from "../../models/Dashboard";
+
+interface ContainerProps {
+  dashboardData: DashboardData | null
+}
+
+export function SuccessWorkflows(props: ContainerProps) {
+  const successWorkflows = props.dashboardData?.workflowCounts.successful_workflows;
+
+  const displaySuccessWorkflows = useMemo(() => {
+    return Number.isInteger(successWorkflows) ? successWorkflows : "--";
+  }, [successWorkflows]);
+  return (
     <>
       <div className="rounded-lg border bg-card text-card-foreground shadow-sm" >
         <div className="flex flex-col space-y-1.5 p-6" >
@@ -7,7 +19,7 @@ export function SuccessWorkflows() {
           <p className="text-sm text-muted-foreground" >Workflows that completed successfully</p>
         </div>
         <div className="p-6 flex items-center justify-between" >
-          <div className="text-4xl font-bold" >102</div>
+          <div className="text-4xl font-bold" >{displaySuccessWorkflows}</div>
         </div>
       </div>
     </>

@@ -47,7 +47,7 @@ export function QuickActions() {
       navigate(`/workflow/${data?.workflow?.uuid}`, { state: { workflow: data } });
 
     } catch (error) {
-      console.error('Error creating workflow:', error);
+      console.error("Error creating workflow:", error);
       return showAlert("Error creating workflow");
     }
 
@@ -84,9 +84,10 @@ export function QuickActions() {
         return [false, failConnection];
       }
       const response = await fetch(`${uriFrontend}`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${userInfo?.access_token}`,
         },
         credentials: "include",
         body: JSON.stringify(body),
@@ -103,7 +104,7 @@ export function QuickActions() {
       }
       return [true, data];
     } catch (error) {
-      console.error('Error creating workflow:', error);
+      console.error("Error creating workflow:", error);
       return [false, failConnection];
     }
   }

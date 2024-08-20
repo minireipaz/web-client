@@ -1,4 +1,17 @@
-export function FailedWorkflows() {
+import { useMemo } from "react";
+import { DashboardData } from "../../models/Dashboard";
+
+interface ContainerProps {
+  dashboardData: DashboardData | null
+}
+
+export function FailedWorkflows(props: ContainerProps) {
+  const failedWorkflows = props.dashboardData?.workflowCounts.pending_workflows;
+
+  const displayFailedWorkflows = useMemo(() => {
+    return Number.isInteger(failedWorkflows) ? failedWorkflows : "--";
+  }, [failedWorkflows]);
+
   return (
     <>
       <div className="rounded-lg border bg-card text-card-foreground shadow-sm" >
@@ -7,7 +20,7 @@ export function FailedWorkflows() {
           <p className="text-sm text-muted-foreground" >Workflows that failed to complete</p>
         </div>
         <div className="p-6 flex items-center justify-between" >
-          <div className="text-4xl font-bold" >22</div>
+          <div className="text-4xl font-bold" >{displayFailedWorkflows}</div>
         </div>
       </div>
     </>
