@@ -6,6 +6,16 @@ const (
 	UserCannotGenerate   = "error checking Stub existence"
 	UserNameCannotCreate = "error checking username existence"
 	UsertNameNotGenerate = "cannot create new user"
+	UserSubExist         = "Sub already exists"
+	UserSubIsRequired    = "Sub is required"
+
+	UserSubInvalid         = "Sub must be a numeric string with max length of 50"
+	UserAccessTokenInvalid = "Access token must be a valid JWT with max length of 1000"
+	UserSubRequired        = "Sub user is required"
+	UserSubMustBe          = "Sub user must greater than 3 characters"
+	UserInvalidStatus      = "Invalid status"
+	UserInvalidRole        = "Invalid role ID"
+	AuthInvalid            = "Authorization header is required"
 )
 
 type Users struct {
@@ -42,4 +52,25 @@ type ResponseExistUser struct {
 	Error   string `json:"error"`
 	Created bool   `json:"created"`
 	Status  int    `json:"status"`
+}
+
+type UnauthorizedError struct {
+	Error string `json:"error"`
+}
+
+type InvalidRequestError struct {
+	Error string `json:"error"`
+}
+
+type UnsupportedMediaTypeError struct {
+	Error string `json:"error"`
+}
+
+type TooManyRequestsError struct {
+	Error string `json:"error"`
+}
+
+type ResponseVerifyTokenUser struct {
+	Valid bool   `json:"valid"`
+	Error string `json:"error"`
 }
