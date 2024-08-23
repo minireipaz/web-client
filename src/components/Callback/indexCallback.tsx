@@ -37,14 +37,27 @@ export default function Callback({ authenticated, setAuth, userManager }: Props)
       try {
         const user: User = await userManager.getUser() as User;
         if (user) {
-          setAuth(true);
-          setUserInfo(user);
+          if (user.expired) {
+            await renewToken();
+          } else {
+            setAuth(true);
+            setUserInfo(user);
+          }
         } else {
           setAuth(false);
         }
       } catch (error) {
         setAuth(false);
       }
+    }
+  }
+
+  async function renewToken() {
+    try {
+      // await userManager.signinRedirect(); //
+      await userManager.removeUser();
+    } catch (error) {
+      setAuth(false);
     }
   }
 
