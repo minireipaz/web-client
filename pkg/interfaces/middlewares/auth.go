@@ -10,35 +10,35 @@ import (
 )
 
 func AuthMiddleware(authService *services.AuthService) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if c.ContentType() != "application/json" {
-			c.JSON(http.StatusUnsupportedMediaType, NewUnsupportedMediaTypeError("Only application/json is supported"))
-			c.Abort()
+	return func(ctx *gin.Context) {
+		if ctx.ContentType() != "application/json" {
+			ctx.JSON(http.StatusUnsupportedMediaType, NewUnsupportedMediaTypeError("Only application/json is supported"))
+			ctx.Abort()
 			return
 		}
 
-		authHeader := c.GetHeader("Authorization")
+		authHeader := ctx.GetHeader("Authorization")
 		if authHeader == "" {
-			c.JSON(http.StatusUnauthorized, NewUnauthorizedError(models.AuthInvalid))
-			c.Abort()
+			ctx.JSON(http.StatusUnauthorized, NewUnauthorizedError(models.AuthInvalid))
+			ctx.Abort()
 			return
 		}
 
 		token := strings.TrimPrefix(authHeader, "Bearer ")
 		if token == "" {
-			c.JSON(http.StatusUnauthorized, NewUnauthorizedError(models.AuthInvalid))
-			c.Abort()
+			ctx.JSON(http.StatusUnauthorized, NewUnauthorizedError(models.AuthInvalid))
+			ctx.Abort()
 			return
 		}
 
 		valid := verifyUserToken(authService, token)
 		if !valid {
-			c.JSON(http.StatusUnauthorized, NewUnauthorizedError(models.AuthInvalid))
-			c.Abort()
+			ctx.JSON(http.StatusUnauthorized, NewUnauthorizedError(models.AuthInvalid))
+			ctx.Abort()
 			return
 		}
-
-		c.Next()
+		ctx.Set("usertoken", token)
+		ctx.Next()
 	}
 }
 

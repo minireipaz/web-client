@@ -8,65 +8,80 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ValidateWorkflowAndUser() gin.HandlerFunc {
-	return func(c *gin.Context) {
-	}
-}
-
 func ValidateWorkflow() gin.HandlerFunc {
-	return func(c *gin.Context) {
+	return func(ctx *gin.Context) {
 		var workflow models.Workflow
-		if err := c.ShouldBindJSON(&workflow); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
-			c.Abort()
+		if err := ctx.ShouldBindJSON(&workflow); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+			ctx.Abort()
 			return
 		}
 
 		if strings.TrimSpace(workflow.WorkflowName) == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Workflow name is required"})
-			c.Abort()
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Workflow name is required"})
+			ctx.Abort()
 			return
 		}
 
 		if len(workflow.WorkflowName) < 3 || len(workflow.WorkflowName) > 50 {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Workflow name must be between 3 and 50 characters"})
-			c.Abort()
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Workflow name must be between 3 and 50 characters"})
+			ctx.Abort()
 			return
 		}
 
 		if strings.TrimSpace(workflow.DirectoryToSave) == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Directory to save is required"})
-			c.Abort()
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Directory to save is required"})
+			ctx.Abort()
 			return
 		}
 
-		c.Set("workflow", workflow)
-		c.Next()
+		ctx.Set("workflow", workflow)
+		ctx.Next()
 	}
 }
 
 func ValidateUser() gin.HandlerFunc {
-	return func(c *gin.Context) {
+	return func(ctx *gin.Context) {
 		var currentUser models.Users
-		if err := c.ShouldBindJSON(&currentUser); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
-			c.Abort()
+		if err := ctx.ShouldBindJSON(&currentUser); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+			ctx.Abort()
 			return
 		}
 
 		if strings.TrimSpace(currentUser.Sub) == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Stub user is required"})
-			c.Abort()
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Stub user is required"})
+			ctx.Abort()
 			return
 		}
 
 		if len(currentUser.Sub) < 3 {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Stub user must greater than 3 characters"})
-			c.Abort()
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Stub user must greater than 3 characters"})
+			ctx.Abort()
 			return
 		}
 
-		c.Set("user", currentUser)
-		c.Next()
+		ctx.Set("user", currentUser)
+		ctx.Next()
+	}
+}
+
+func ValidateSub() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		idUser := ctx.Param("iduser")
+
+		if strings.TrimSpace(idUser) == "" {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Stub user is required"})
+			ctx.Abort()
+			return
+		}
+
+		if len(idUser) < 3 {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Stub user must greater than 3 characters"})
+			ctx.Abort()
+			return
+		}
+
+		ctx.Next()
 	}
 }

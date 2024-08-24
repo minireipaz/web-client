@@ -1,7 +1,7 @@
 package controllers
 
 import (
-  "minireipaz/pkg/config"
+	"minireipaz/pkg/config"
 	"minireipaz/pkg/domain/services"
 	"minireipaz/pkg/infra/httpclient"
 	"minireipaz/pkg/infra/redisclient"
@@ -24,8 +24,8 @@ func NewAuthContext() *AuthContext {
 
 func (ac *AuthContext) GetAuthController() *AuthController {
 	ac.once.Do(func() {
-    configZitadel := config.NewZitaldelEnvConfig()
-    zitadelClient := httpclient.NewZitadelClient(
+		configZitadel := config.NewZitaldelEnvConfig()
+		zitadelClient := httpclient.NewZitadelClient(
 			configZitadel.GetZitadelURI(),
 			configZitadel.GetZitadelKeyUserID(),
 			configZitadel.GetZitadelKeyPrivate(),

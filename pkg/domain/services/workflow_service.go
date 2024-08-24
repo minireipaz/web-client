@@ -13,6 +13,6 @@ func NewWorkflowService(repo *httpclient.WorkflowRepository) *WorkflowService {
 	return &WorkflowService{workflowRepo: repo}
 }
 
-func (s *WorkflowService) CreateWorkflow(workflow models.Workflow, serviceUserToken string) models.ResponseWorkflow {
-	return s.workflowRepo.CreateWorkflow(workflow, serviceUserToken)
+func (s *WorkflowService) CreateWorkflow(workflow models.Workflow, serviceUserToken *string) models.ResponseWorkflow {
+	return s.workflowRepo.CreateWorkflow(workflow, *serviceUserToken)
 }

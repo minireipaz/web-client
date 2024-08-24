@@ -21,11 +21,11 @@ func NewWorkflowController(service *services.WorkflowService, authServ *services
 	}
 }
 
-func (wc *WorkflowController) CreateWorkflow(c *gin.Context) {
-	newWorkflow := c.MustGet("workflow").(models.Workflow)
-	serviceUserToken, err := wc.authService.GetAccessToken()
+func (wc *WorkflowController) CreateWorkflow(ctx *gin.Context) {
+	newWorkflow := ctx.MustGet("workflow").(models.Workflow)
+	serviceUserToken, err := wc.authService.GetServiceUserAccessToken()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
+		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":  fmt.Sprintf("Failed to authenticate: %v", err),
 			"status": http.StatusInternalServerError,
 		})
@@ -34,7 +34,7 @@ func (wc *WorkflowController) CreateWorkflow(c *gin.Context) {
 
 	createdWorkflow := wc.service.CreateWorkflow(newWorkflow, serviceUserToken)
 
-	c.JSON(http.StatusOK, gin.H{
+	ctx.JSON(http.StatusOK, gin.H{
 		"error":    createdWorkflow.Error,
 		"workflow": createdWorkflow.Workflow,
 		"status":   createdWorkflow.Status,

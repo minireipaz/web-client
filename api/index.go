@@ -51,7 +51,7 @@ func Init() {
 	workflowController, authService, userController, dashboardController := di.InitDependencies()
 	middlewares.Register(app, authService)
 
-	routes.Register(app, workflowController, authService, userController, dashboardController)
+	routes.Register(app, workflowController, userController, dashboardController)
 	RunWebserver()
 }
 

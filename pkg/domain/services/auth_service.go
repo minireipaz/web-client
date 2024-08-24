@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"log"
 	"minireipaz/pkg/infra/httpclient"
 	"minireipaz/pkg/infra/tokenrepo"
@@ -19,11 +20,20 @@ func NewAuthService(newTokenRepo *tokenrepo.TokenRepository, newZitadelClient *h
 	}
 }
 
-func (s *AuthService) GetAccessToken() (string, error) {
+func (s *AuthService) GetServiceUserAccessToken() (*string, error) {
+	serviceUserAccessToken, err := s.getAccessToken()
+	if err != nil || serviceUserAccessToken == "" {
+		return nil, fmt.Errorf("authentication failed")
+	}
+	return &serviceUserAccessToken, nil
+}
+
+func (s *AuthService) getAccessToken() (string, error) {
 	existingToken, err := s.tokenRepo.GetToken()
 	if err != nil {
 		// TODO: better control in case cannot get token auth
 		log.Panicf("ERROR | Cannot get token to auth")
+		return "", fmt.Errorf("ERROR | Cannot get token to auth")
 	}
 
 	if existingToken != nil {
@@ -38,7 +48,7 @@ func (s *AuthService) GetAccessToken() (string, error) {
 }
 
 func (s *AuthService) VerifyUserToken(userToken string) bool {
-  authToken, err := s.GetAccessToken()
+	authToken, err := s.getAccessToken()
 	if err != nil {
 		return false
 	}
