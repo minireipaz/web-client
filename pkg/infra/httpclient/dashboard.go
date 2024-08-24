@@ -1,10 +1,10 @@
 package httpclient
 
 import (
-// "encoding/json"
-// "fmt"
-// "log"
-// "minireipaz/pkg/domain/models"
+	"encoding/json"
+	"fmt"
+	"log"
+	"minireipaz/pkg/domain/models"
 )
 
 type DashboardRepository struct {
@@ -13,4 +13,30 @@ type DashboardRepository struct {
 
 func NewDashboardRepository(client HTTPClient) *DashboardRepository {
 	return &DashboardRepository{client: client}
+}
+
+func (d *DashboardRepository) GetDashboardInfoByUserID(user *models.Users, serviceUserAccessToken *string) models.ResponseInfoDashboard {
+	url, err := getBackendURL(fmt.Sprintf("/api/dashboard/%s", user.Sub))
+	if err != nil {
+		return models.ResponseInfoDashboard{
+			Error: err.Error(),
+		}
+	}
+
+	body, err := d.client.DoRequest("GET", url, *serviceUserAccessToken, nil)
+	if err != nil {
+		return models.ResponseInfoDashboard{
+			Error: err.Error(),
+		}
+	}
+
+	var infoDashboard models.ResponseInfoDashboard
+	if err := json.Unmarshal(body, &infoDashboard); err != nil {
+		log.Printf("ERROR | error unmarshalling response: %v", err)
+		return models.ResponseInfoDashboard{
+			Error: fmt.Sprintf("ERROR | error unmarshalling response: %v", err),
+		}
+	}
+
+	return infoDashboard
 }

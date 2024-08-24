@@ -24,7 +24,7 @@ func InitDependencies() (*controllers.WorkflowController, *services.AuthService,
 
 	dashboardHTTPClient := &httpclient.ClientImpl{}
 	dashboardRepo := httpclient.NewDashboardRepository(dashboardHTTPClient)
-	dashboardService := services.NewDashboardService(dashboardRepo)
+	dashboardService := services.NewDashboardService(dashboardRepo, userService)
 	dashboardController := controllers.NewDashboardController(dashboardService, authService)
 
 	return workflowController, authService, userController, dashboardController
