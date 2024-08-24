@@ -13,28 +13,28 @@ export function RecentActivity() {
               </span>
               <div >
                 <div className="font-medium" >John Doe</div>
-                <div className="text-sm text-muted-foreground" >Created new workflow</div>
+                <div className="text-sm" >Created new workflow</div>
               </div>
             </div>
-            <div className="text-sm text-muted-foreground" >2 hours ago</div>
+            <div className="text-sm" >2 hours ago</div>
           </div>
           <div className="flex items-center justify-between" >
             <div className="flex items-center gap-2" ><span className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full" ><img className="aspect-square h-full w-full" src="/placeholder-user.jpg" /></span>
               <div >
                 <div className="font-medium" >Jane Smith</div>
-                <div className="text-sm text-muted-foreground" >Uploaded a file</div>
+                <div className="text-sm" >Uploaded a file</div>
               </div>
             </div>
-            <div className="text-sm text-muted-foreground" >4 hours ago</div>
+            <div className="text-sm" >4 hours ago</div>
           </div>
           <div className="flex items-center justify-between" >
-            <div className="flex items-center gap-2" ><span className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full" ><img className="aspect-square h-full w-full" src="/placeholder-user.jpg" /></span>
+            <div className="flex items-center gap-2" ><span className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full" ><img className="aspect-square h-full w-full" src="/placeholder.jpg" /></span>
               <div >
                 <div className="font-medium" >Michael Johnson</div>
-                <div className="text-sm text-muted-foreground" >Downloaded a report</div>
+                <div className="text-sm" >Downloaded a report</div>
               </div>
             </div>
-            <div className="text-sm text-muted-foreground" >1 day ago</div>
+            <div className="text-sm" >1 day ago</div>
           </div>
         </div>
       </div>

@@ -10,7 +10,7 @@ import { SuccessWorkflows } from "../components/Cards/SuccessWorkflows";
 import { FailedWorkflows } from "../components/Cards/FailedWorkflows";
 import { PendingWorkflows } from "../components/Cards/PendingWorkflows";
 import { RecentWorkflows } from "../components/Cards/RecentWorkflows";
-import { DashboardData, simulatedDashboardData } from "../models/Dashboard";
+import { DashboardData } from "../models/Dashboard";
 import { getUriFrontend } from "../utils/getUriFrontend";
 
 
@@ -40,16 +40,16 @@ export default function Dashboard() {
           "Authorization": `Bearer ${userInfo?.access_token}`,
         },
       });
-
       if (!response.ok) {
         // TODO: better redirect
-        setDashboardData(simulatedDashboardData);
+        setDashboardData(null);
         return;
       }
 
       const data: DashboardData = await response.json();
-      setDashboardData(simulatedDashboardData);
+      setDashboardData(data);
     } catch (error) {
+      setDashboardData(null);
       console.error("Error fetching dashboard data:", error);
     }
   }
