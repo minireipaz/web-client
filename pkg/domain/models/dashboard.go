@@ -1,7 +1,5 @@
 package models
 
-import ()
-
 // ResponseInfoDashboard represents response containing workflow counts
 // also a list of the most recent workflows
 type ResponseInfoDashboard struct {

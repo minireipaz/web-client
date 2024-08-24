@@ -26,12 +26,12 @@ func (d *DashboardService) GetDashboardInfoByUserID(sub string, serviceUserAcces
 	}
 	responseExistUser := d.userService.ExistUser(defaultUser, serviceUserAccessToken)
 	if responseExistUser.Error != "" {
-    infoDashboard.Error = fmt.Sprintf("%s", responseExistUser.Error)
+		infoDashboard.Error = responseExistUser.Error
 		return infoDashboard
 	}
 
 	if !responseExistUser.Exist {
-    infoDashboard.Error = fmt.Sprintf("ERROR | User not exist %s %s", sub, *userToken)
+		infoDashboard.Error = fmt.Sprintf("ERROR | User not exist %s %s", sub, *userToken)
 		return infoDashboard
 	}
 

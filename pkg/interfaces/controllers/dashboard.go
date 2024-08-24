@@ -2,9 +2,10 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"minireipaz/pkg/domain/services"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type DashboardController struct {
