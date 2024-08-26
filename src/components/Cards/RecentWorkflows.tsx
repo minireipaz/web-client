@@ -29,11 +29,11 @@ export function RecentWorkflows(props: ContainerProps) {
           <h3 className="whitespace-nowrap text-2xl font-semibold leading-none tracking-tight" >Recent Workflows</h3>
           <p className="text-sm" >View the latest workflows</p>
         </div>
-        <div className="p-6" >
+        <div className="pt-0 pr-4 pl-4 pb-4" >
           <div className="relative w-full overflow-auto">
             <table className="w-full caption-bottom text-sm" >
               <thead className="" >
-                <tr className="border-b transition-colors hover:bg-muted/50" >
+                <tr className="border-b transition-colors" >
                   <th className="h-12 px-4 text-left align-middle font-medium" >Name</th>
                   <th className="h-12 px-4 text-left align-middle font-medium" >Status</th>
                   <th className="h-12 px-4 text-left align-middle font-medium" >Started</th>
@@ -44,7 +44,7 @@ export function RecentWorkflows(props: ContainerProps) {
               <tbody className="" >
                 {recentWorkflows && recentWorkflows.length > 0 ?
                   recentWorkflows?.map((workflow, index) => (
-                    <tr key={index} className="border-b transition-colors hover:bg-muted/50" >
+                    <tr key={index} className="border-b transition-colors" >
                       <td className="p-4 align-middle">
                         <div className="font-medium" >{workflow.workflow_name}</div>
                         <div className="text-sm" >{workflow.workflow_description}</div>
@@ -65,9 +65,12 @@ export function RecentWorkflows(props: ContainerProps) {
                     </tr>
                   ))
                   :
-                  <div className="flex text-sm">No data</div>
+                  <tr className="border-b transition-colors" >
+                    <td className="p-2 align-middle">
+                      <div className="font-medium">No data</div>
+                      </td>
+                  </tr>
                 }
-
               </tbody>
             </table>
           </div>

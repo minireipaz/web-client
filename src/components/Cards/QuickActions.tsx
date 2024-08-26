@@ -16,6 +16,7 @@ export function QuickActions() {
     createdat: "",
     updatedat: ""
   });
+  const [errorTitle, setErrorTitle] = useState<string>("");
 
   const failConnection: ResponseGenerateWorkflow = {
     error: "Conexion error",
@@ -41,8 +42,10 @@ export function QuickActions() {
         if (data.error) {
           return showAlert(data.error);
         }
+        setErrorTitle("Cannot connect")
         return showAlert("Cannot connect");
       }
+      setErrorTitle("")
       closeModal();
       navigate(`/workflow/${data?.workflow?.uuid}`, { state: { workflow: data } });
 
@@ -93,13 +96,12 @@ export function QuickActions() {
         body: JSON.stringify(body),
       });
 
-
       console.log("JSON=>" + JSON.stringify(response))
       const data: ResponseGenerateWorkflow = await response.json();
       if (!data) {
         return [false, data]
       }
-      if (data.status !== 200) {
+      if (data.status !== 200 && data.status !== 201) {
         return [false, data]
       }
       return [true, data];
@@ -170,8 +172,8 @@ export function QuickActions() {
         <Modal.Footer>
           <div className="flex flex-row justify-between items-center w-full">
             <Button color="gray" onClick={closeModal}>Close</Button>
+            <div className="text-black text-xs">{errorTitle}</div>
             <Button onClick={onClickCreateWorkflow}>Create</Button>
-
           </div>
         </Modal.Footer>
       </Modal>

@@ -54,8 +54,10 @@ export default function Callback({ authenticated, setAuth, userManager }: Props)
 
   async function renewToken() {
     try {
-      // await userManager.signinRedirect(); //
+      // Drastical can be resolved in better way
+      setAuth(false);
       await userManager.removeUser();
+      navigate('/');
     } catch (error) {
       setAuth(false);
     }
