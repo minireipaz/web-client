@@ -6,7 +6,8 @@ interface ContainerProps {
 
 export function RecentWorkflows(props: ContainerProps) {
 
-  function formatDuration(duration: number | null): string {
+  function formatDuration(durationStr: string | null): string {
+    const duration = Number.parseInt(durationStr as string);
     if (duration === null || duration === undefined || !Number.isInteger(duration)) {
       return "N/A";
     }
@@ -20,7 +21,14 @@ export function RecentWorkflows(props: ContainerProps) {
     return `${duration}s`;
   }
 
-  const recentWorkflows = props.dashboardData?.recent_workflows;
+  function formatStartTime(startTime: string): string {
+    if (startTime === "1970-01-01 00:00:00") {
+      return "Not Started";
+    }
+    return new Date(startTime).toLocaleString();
+  }
+
+  const recentWorkflows = props.dashboardData?.workflows_recents;
 
   return (
     <>
@@ -50,11 +58,11 @@ export function RecentWorkflows(props: ContainerProps) {
                         <div className="text-sm" >{workflow.workflow_description}</div>
                       </td>
                       <td className="p-4 align-middle" >
-                        <div className={`${statusMap[workflow.execution_status].class} inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground`} >
-                          {statusMap[workflow.execution_status].text}
+                        <div className={`${statusMap[Number.parseInt(workflow.execution_status)].class} inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground`} >
+                          {statusMap[Number.parseInt(workflow.execution_status)].text}
                         </div>
                       </td>
-                      <td className="p-4 align-middle">{new Date(workflow.start_time).toLocaleString()}</td>
+                      <td className="p-4 align-middle">{formatStartTime(workflow.start_time)}</td>
                       <td className="p-4 align-middle">{formatDuration(workflow.duration)}</td>
                       <td className="p-4 align-middle">
                         <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10" type="button" >

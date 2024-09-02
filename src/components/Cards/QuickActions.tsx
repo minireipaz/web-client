@@ -17,6 +17,7 @@ export function QuickActions() {
     updatedat: ""
   });
   const [errorTitle, setErrorTitle] = useState<string>("");
+  const [disabledButtonCreateWorkflow, setDisabledButtonCreateWorkflow] = useState(false);
 
   const failConnection: ResponseGenerateWorkflow = {
     error: "Conexion error",
@@ -26,18 +27,31 @@ export function QuickActions() {
   const navigate = useNavigate();
   const { userInfo } = useAuth();
 
-  function onChangeWorkflow(event: any) {
+  function onChangeWorkflowName(event: any) {
     setWorkflow({
       workflowname: event.target.value,
+      description: workflow.description,
       directorytosave: workflow.directorytosave,
     });
   }
+
+
+  function onChangeWorkflowDescription(event: any) {
+    setWorkflow({
+      workflowname: workflow.workflowname,
+      description: event.target.value,
+      directorytosave: workflow.directorytosave,
+    });
+  }
+
 
   async function onClickCreateWorkflow() {
     if (!checkValidations(workflow)) return;
 
     try {
+      setDisabledButtonCreateWorkflow(true);
       const [isOk, data] = await newWorkflow(workflow);
+      setDisabledButtonCreateWorkflow(false);
       if (!isOk) {
         if (data.error) {
           return showAlert(data.error);
@@ -78,6 +92,7 @@ export function QuickActions() {
     try {
       const body: Workflow = {
         workflowname: workflow.workflowname,
+        description: workflow.description,
         directorytosave: workflow.directorytosave,
         sub: userInfo?.profile.sub,
       };
@@ -153,10 +168,21 @@ export function QuickActions() {
                 id="workflow_name"
                 placeholder="Name of the workflow."
                 value={workflow.workflowname}
-                onChange={onChangeWorkflow}
+                onChange={onChangeWorkflowName}
                 required
               />
               <p className="text-xs text-black ">Enter the name of the workflow.</p>
+            </div>
+            <div className="flex flex-col gap-y-1">
+              <Label className="text-black">Workflow Description</Label>
+              <TextInput
+                id="description"
+                placeholder="Description of the workflow."
+                value={workflow.description}
+                onChange={onChangeWorkflowDescription}
+                required
+              />
+              <p className="text-xs text-black ">Enter description of the workflow.</p>
             </div>
             <div className=" flex flex-col gap-y-1 ">
               <Label className=" text-black">Select Folder</Label>
@@ -173,7 +199,7 @@ export function QuickActions() {
           <div className="flex flex-row justify-between items-center w-full">
             <Button color="gray" onClick={closeModal}>Close</Button>
             <div className="text-black text-xs">{errorTitle}</div>
-            <Button onClick={onClickCreateWorkflow}>Create</Button>
+            <Button onClick={onClickCreateWorkflow} disabled={disabledButtonCreateWorkflow}>Create</Button>
           </div>
         </Modal.Footer>
       </Modal>

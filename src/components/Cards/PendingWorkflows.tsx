@@ -6,7 +6,7 @@ interface ContainerProps {
 }
 
 export function PendingWorkflows(props: ContainerProps) {
-  const pendingWorkflows = props.dashboardData?.workflow_counts.pending_workflows;
+  const pendingWorkflows = props.dashboardData?.workflow_counts[0].pending_workflows;
 
   const displayPendingWorkflows = useMemo(() => {
     return Number.isInteger(pendingWorkflows) ? pendingWorkflows : "--";
