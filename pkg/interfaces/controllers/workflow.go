@@ -34,9 +34,5 @@ func (wc *WorkflowController) CreateWorkflow(ctx *gin.Context) {
 
 	createdWorkflow := wc.service.CreateWorkflow(newWorkflow, serviceUserToken)
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"error":    createdWorkflow.Error,
-		"workflow": createdWorkflow.Workflow,
-		"status":   createdWorkflow.Status,
-	})
+	ctx.JSON(http.StatusOK, createdWorkflow)
 }
