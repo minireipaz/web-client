@@ -97,7 +97,6 @@ func (z *ZitadelClient) GetServiceUserAccessToken(jwt string) (string, time.Dura
 
 func (z *ZitadelClient) VerifyUserToken(userToken, serviceUserToken string) bool {
 	url, err := getBackendURL(fmt.Sprintf("/api/auth/verify/%s", userToken))
-	log.Printf("2 ERROR | verify user token %v url: %s", err, url)
 	if err != nil {
 		log.Printf("ERROR | cannot format correctly with %s error: %v ", url, err)
 		return false

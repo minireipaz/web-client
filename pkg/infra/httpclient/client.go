@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"minireipaz/pkg/config"
 	"net/http"
 	"net/url"
@@ -53,7 +52,6 @@ func (c *ClientImpl) setHeaders(req *http.Request, token string) {
 
 // general functions
 func getBackendURL(endpoint string) (string, error) {
-	log.Printf("URI_BACKEND %s", config.GetEnv("URI_BACKEND", "http://localhost:4020"))
 	baseURI := fmt.Sprintf("%s%s", config.GetEnv("URI_BACKEND", "http://localhost:4020"), endpoint)
 	return validateURL(baseURI)
 }

@@ -15,7 +15,7 @@ const (
 )
 
 type AuthService struct {
-  jwtGenerator  *auth.JWTGenerator
+	jwtGenerator  *auth.JWTGenerator
 	tokenRepo     *tokenrepo.TokenRepository
 	zitadelClient *httpclient.ZitadelClient
 }
@@ -39,10 +39,10 @@ func (s *AuthService) GetServiceUserAccessToken() (*string, error) {
 func (s *AuthService) getAccessToken() (string, error) {
 	existingToken, err := s.tokenRepo.GetToken()
 	if err != nil {
-    log.Printf("ERROR getaccesstoken %v", err)
+		log.Printf("ERROR getaccesstoken %v", err)
 		// TODO: better control in case cannot get token auth
 		if err.Error() == "no token found" {
-      log.Printf("getting new accestoken %v", err)
+			log.Printf("getting new accestoken %v", err)
 			existingToken, err = s.GenerateNewToken()
 		}
 	}
@@ -57,17 +57,14 @@ func (s *AuthService) getAccessToken() (string, error) {
 			// TODO: better control in case cannot get token auth
 			log.Panicf("ERROR | Cannot get token new token expired")
 		}
-    log.Printf("accestoken=%s", existingToken.AccessToken)
 		return existingToken.AccessToken, nil
 	}
-  log.Printf("ERROR getaccesstoken is '' ")
 	// TODO: better control in case cannot get token auth
 	return "", nil
 }
 
 func (s *AuthService) VerifyUserToken(userToken string) bool {
 	serviceUserToken, err := s.getAccessToken()
-  log.Printf("1 ERROR | verify user token %v", err)
 	if err != nil {
 		return false
 	}
