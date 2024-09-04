@@ -17,7 +17,11 @@ const (
 
 func GetAllEnvsFromRedis() string {
 	uriVault := os.Getenv("VAULT_URI")
-	vaulKeyFrontendEnvs := os.Getenv("VAULT_KEY_FRONTEND_ENVS")
+	log.Print("uriVault " + uriVault)
+	vaulKeyFrontendEnvs := os.Getenv("VAULT_KEY_FRONTEND_ENVS_PROD")
+	if os.Getenv("GO_ENV") == "dev" {
+		vaulKeyFrontendEnvs = os.Getenv("VAULT_KEY_FRONTEND_ENVS_DEV")
+	}
 
 	if uriVault == "" || vaulKeyFrontendEnvs == "" {
 		log.Panic("ERROR | Cannot load initial VAULT_URI")

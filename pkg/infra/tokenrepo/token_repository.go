@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"minireipaz/pkg/domain/models"
 	"minireipaz/pkg/infra/redisclient"
 	"sync"
 	"time"
@@ -39,33 +40,37 @@ func (r *TokenRepository) GetToken() (*Token, error) {
 		return r.token, nil
 	}
 
-	// Token is expired or not found, try to get a new one
-	newToken, err := r.GetNewToken()
+	// Local Token is expired or not found, try to get cached token
+	cachedToken, err := r.GetCachedToken()
 	if err != nil {
 		return nil, err
 	}
 
-	r.token = newToken
+	r.token = cachedToken
 	return r.token, nil
 }
 
-func (r *TokenRepository) GetNewToken() (*Token, error) {
+func (r *TokenRepository) GetCachedToken() (*Token, error) {
 	var data string
 	var err error
-	for i := 1; i <= 20; i++ {
+	for i := 1; i <= models.MaxAttempts; i++ {
 		data, err = r.redisClient.Get(r.key)
 		if data != "" {
 			break
 		}
+		if data == "" {
+			// time to obtain new token for service user that expire every 2 days
+			return nil, fmt.Errorf("no token found")
+		}
 		waitTime := time.Duration(i*i*100) * time.Millisecond // Incremental wait time
-		log.Printf("WARNING | Failed to get token from vault, attempt %d: %v. Retrying in %v", i, err, waitTime)
+		log.Printf("WARNING | Failed to get token from vault, attempt %d error: %v. Retrying in %v", i, err, waitTime)
 		time.Sleep(waitTime)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("ERROR | Failed to retrieve token from Redis: %v", err)
 	}
 	if data == "" {
-		return nil, fmt.Errorf("ERROR | With more than 20 retries, no token found in Redis")
+		return nil, fmt.Errorf("ERROR | With more than 10 retries, no token found in Redis")
 	}
 
 	var token Token

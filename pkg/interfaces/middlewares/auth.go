@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"log"
 	"minireipaz/pkg/domain/models"
 	"minireipaz/pkg/domain/services"
 	"net/http"
@@ -19,6 +20,7 @@ func AuthMiddleware(authService *services.AuthService) gin.HandlerFunc {
 
 		authHeader := ctx.GetHeader("Authorization")
 		if authHeader == "" {
+			log.Printf("%s", authHeader)
 			ctx.JSON(http.StatusUnauthorized, NewUnauthorizedError(models.AuthInvalid))
 			ctx.Abort()
 			return
@@ -26,6 +28,7 @@ func AuthMiddleware(authService *services.AuthService) gin.HandlerFunc {
 
 		token := strings.TrimPrefix(authHeader, "Bearer ")
 		if token == "" {
+			log.Printf("%s", token)
 			ctx.JSON(http.StatusUnauthorized, NewUnauthorizedError(models.AuthInvalid))
 			ctx.Abort()
 			return
@@ -33,6 +36,7 @@ func AuthMiddleware(authService *services.AuthService) gin.HandlerFunc {
 
 		valid := verifyUserToken(authService, token)
 		if !valid {
+			log.Printf("%v", valid)
 			ctx.JSON(http.StatusUnauthorized, NewUnauthorizedError(models.AuthInvalid))
 			ctx.Abort()
 			return

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"minireipaz/pkg/auth"
 	"minireipaz/pkg/config"
 	"minireipaz/pkg/domain/services"
 	"minireipaz/pkg/infra/httpclient"
@@ -27,14 +28,27 @@ func (ac *AuthContext) GetAuthController() *AuthController {
 		configZitadel := config.NewZitaldelEnvConfig()
 		zitadelClient := httpclient.NewZitadelClient(
 			configZitadel.GetZitadelURI(),
-			configZitadel.GetZitadelKeyUserID(),
-			configZitadel.GetZitadelKeyPrivate(),
-			configZitadel.GetZitadelKeyID(),
+			configZitadel.GetZitadelServiceUserID(),
+			configZitadel.GetZitadelServiceUserKeyPrivate(),
+			configZitadel.GetZitadelServiceUserKeyID(),
+			configZitadel.GetZitadelProjectID(),
+			configZitadel.GetZitadelKeyClientID(),
 		)
+
+		jwtGenerator := auth.NewJWTGenerator(auth.JWTGeneratorConfig{
+			ServiceUser: auth.ServiceUserConfig{
+				UserID:     configZitadel.GetZitadelServiceUserID(),
+				PrivateKey: []byte(configZitadel.GetZitadelServiceUserKeyPrivate()),
+				KeyID:      configZitadel.GetZitadelServiceUserKeyID(),
+			},
+			APIURL:    configZitadel.GetZitadelURI(),
+			ProjectID: configZitadel.GetZitadelProjectID(),
+			ClientID:  configZitadel.GetZitadelKeyClientID(),
+		})
 
 		redisClient := redisclient.NewRedisClient()
 		tokenRepo := tokenrepo.NewTokenRepository(redisClient)
-		authService := services.NewAuthService(tokenRepo, zitadelClient)
+		authService := services.NewAuthService(tokenRepo, zitadelClient, jwtGenerator)
 		ac.authController = &AuthController{authService: authService}
 	})
 	return ac.authController

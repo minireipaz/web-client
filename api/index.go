@@ -2,9 +2,6 @@ package api
 
 import (
 	"context"
-
-	"github.com/gin-gonic/gin"
-
 	"log"
 	"minireipaz/pkg/config"
 	"minireipaz/pkg/di"
@@ -12,18 +9,59 @@ import (
 	"minireipaz/pkg/interfaces/middlewares"
 	"minireipaz/pkg/interfaces/routes"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 var (
 	app *gin.Engine
 )
 
+// Init initializes the application without starting the server.
 func init() {
-	Init()
+	InitApp()
 }
 
+// InitApp initializes the Gin application.
+func InitApp() {
+	log.Print("---- Initializing App ----")
+	config.LoadEnvs(".")
+
+	// Setup OpenTelemetry
+	ctx := context.Background()
+	tp, exp, err := honeycomb.SetupHoneyComb(ctx)
+	if err != nil {
+		log.Panicf("ERROR | Failed to initialize OpenTelemetry: %v", err)
+	}
+
+	// Ensure sub processes and telemetry are exported correctly.
+	defer func() {
+		_ = exp.Shutdown(ctx)
+		_ = tp.Shutdown(ctx)
+	}()
+
+	// Initialize Gin app
+	gin.SetMode(gin.DebugMode)
+	app = gin.New()
+
+	// Dependency injection and routes setup
+	worflowcontroller, authService, userController, dashboardController := di.InitDependencies()
+	middlewares.Register(app, authService)
+	routes.Register(app, worflowcontroller, userController, dashboardController)
+}
+
+// Handler is the main function that Vercel calls to handle HTTP requests.
 func Handler(w http.ResponseWriter, r *http.Request) {
+	// If app is not initialized, initialize it
+	if app == nil {
+		InitApp()
+	}
+	// Use Gin to serve the HTTP request
 	app.ServeHTTP(w, r)
+}
+
+func Dummy() {
+	RunWebserver()
 }
 
 func RunWebserver() {
@@ -32,28 +70,4 @@ func RunWebserver() {
 	if err != nil {
 		log.Panicf("ERROR | Starting gin failed, %v", err)
 	}
-}
-
-func Init() {
-	log.Print("---- Init From Init ----")
-	config.LoadEnvs()
-	ctx := context.Background()
-	tp, exp := honeycomb.SetupHoneyComb(ctx)
-
-	// Handle shutdown to ensure all sub processes are closed correctly and telemetry is exported
-	defer func() {
-		_ = exp.Shutdown(ctx)
-		_ = tp.Shutdown(ctx)
-	}()
-
-	gin.SetMode(gin.DebugMode)
-	app = gin.New()
-	workflowController, authService, userController, dashboardController := di.InitDependencies()
-	middlewares.Register(app, authService)
-
-	routes.Register(app, workflowController, userController, dashboardController)
-	RunWebserver()
-}
-
-func Dummy() {
 }

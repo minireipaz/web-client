@@ -53,7 +53,14 @@ func (r *RedisClient) Hexists(key string, field string) bool {
 }
 
 func (r *RedisClient) Get(key string) (string, error) {
-	return r.Client.Get(r.Ctx, key).Result()
+	result, err := r.Client.Get(r.Ctx, key).Result()
+	if err == redis.Nil {
+		return "", nil
+	}
+	if err != nil {
+		return "", err
+	}
+	return result, nil
 }
 
 func (r *RedisClient) WatchToken(data string, key string, expiresIn time.Duration) error {
