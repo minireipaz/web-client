@@ -6,7 +6,12 @@ interface ContainerProps {
 }
 
 export function FailedWorkflows(props: ContainerProps) {
-  const failedWorkflows = props.dashboardData?.workflow_counts[0].pending_workflows;
+  const failedWorkflows = useMemo(() => {
+    if (!props.dashboardData?.workflow_counts?.length) {
+      return 0;
+    }
+    return props.dashboardData?.workflow_counts[0].failed_workflows as number;
+  }, [props.dashboardData]);
 
   const displayFailedWorkflows = useMemo(() => {
     return Number.isInteger(failedWorkflows) ? failedWorkflows : "--";

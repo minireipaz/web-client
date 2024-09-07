@@ -107,7 +107,6 @@ export function QuickActions() {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${userInfo?.access_token}`,
         },
-        credentials: "include",
         body: JSON.stringify(body),
       });
 
