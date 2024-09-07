@@ -113,6 +113,8 @@ func (z *ZitadelClient) VerifyUserToken(userToken, serviceUserToken string) bool
 		log.Printf("ERROR | error unmarshalling response: %v %s", err, string(body))
 		return false
 	}
-
+	if tokenValidation.Error != "" {
+		log.Printf("ERROR | %s", tokenValidation.Error)
+	}
 	return tokenValidation.Valid
 }
