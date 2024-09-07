@@ -36,7 +36,7 @@ func AuthMiddleware(authService *services.AuthService) gin.HandlerFunc {
 
 		valid := verifyUserToken(authService, token)
 		if !valid {
-			log.Printf("%v", valid)
+			// log.Printf("WARN | usertoken is not valid. token to verify %s", token)
 			ctx.JSON(http.StatusUnauthorized, NewUnauthorizedError(models.AuthInvalid))
 			ctx.Abort()
 			return

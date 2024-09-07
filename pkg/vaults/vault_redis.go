@@ -17,7 +17,6 @@ const (
 
 func GetAllEnvsFromRedis() string {
 	uriVault := os.Getenv("VAULT_URI")
-	log.Print("uriVault " + uriVault)
 	vaulKeyFrontendEnvs := os.Getenv("VAULT_KEY_FRONTEND_ENVS_PROD")
 	if os.Getenv("GO_ENV") == "dev" {
 		vaulKeyFrontendEnvs = os.Getenv("VAULT_KEY_FRONTEND_ENVS_DEV")
@@ -40,7 +39,7 @@ func GetAllEnvsFromRedis() string {
 
 	envsStr, err := getEnvsFromRedis(ctx, redisClient, vaulKeyFrontendEnvs)
 	if err != nil {
-		log.Panicf("ERROR | Cannot load VAULT_KEY_FRONTEND_ENVS %v", err)
+		log.Panicf("ERROR | Cannot load VAULT_KEY_FRONTEND_ENVS %v DEV? %s", err, os.Getenv("GO_ENV"))
 	}
 	return envsStr
 }
