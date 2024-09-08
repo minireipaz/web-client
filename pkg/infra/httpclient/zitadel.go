@@ -95,26 +95,29 @@ func (z *ZitadelClient) GetServiceUserAccessToken(jwt string) (string, time.Dura
 	return result.AccessToken, result.ExpiresIn, nil
 }
 
-func (z *ZitadelClient) VerifyUserToken(userToken, serviceUserToken string) bool {
+func (z *ZitadelClient) VerifyUserToken(userToken, serviceUserToken string) (bool, error) {
 	url, err := getBackendURL(fmt.Sprintf("/api/auth/verify/%s", userToken))
 	if err != nil {
-		log.Printf("ERROR | cannot format correctly with %s error: %v ", url, err)
-		return false
+		log.Printf("ERROR | error formatting url: %v", err)
+		return false, fmt.Errorf("error formatting url")
 	}
 
 	body, err := z.client.DoRequest("GET", url, serviceUserToken, nil)
 	if err != nil {
-		log.Printf("ERROR | cannot connect with %s error: %v ", url, err)
-		return false
+		log.Printf("ERROR | connection error %v", err)
+		return false, fmt.Errorf("connection error")
 	}
 
 	var tokenValidation models.ResponseVerifyTokenUser
 	if err := json.Unmarshal(body, &tokenValidation); err != nil {
-		log.Printf("ERROR | error unmarshalling response: %v %s", err, string(body))
-		return false
+		log.Printf("ERROR | error unmarshalling response %v", err)
+		return false, fmt.Errorf("error unmarshalling response")
 	}
+
 	if tokenValidation.Error != "" {
-		log.Printf("ERROR | %s", tokenValidation.Error)
+		log.Printf("token validation error: %s", tokenValidation.Error)
+		return false, fmt.Errorf("token validation error")
 	}
-	return tokenValidation.Valid
+
+	return tokenValidation.Valid, nil
 }

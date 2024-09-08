@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"minireipaz/pkg/auth"
+	"minireipaz/pkg/common"
 	"minireipaz/pkg/domain/models"
 	"minireipaz/pkg/infra/httpclient"
 	"minireipaz/pkg/infra/tokenrepo"
@@ -42,8 +43,12 @@ func (s *AuthService) getAccessToken() (string, error) {
 		log.Printf("ERROR getaccesstoken %v", err)
 		// TODO: better control in case cannot get token auth
 		if err.Error() == "no token found" {
-			log.Printf("getting new accestoken %v", err)
+			log.Printf("WARN | no token found, generating new one")
 			existingToken, err = s.GenerateNewToken()
+			if err != nil {
+				log.Printf("WARN | failed to generate a new one token, try to read a new one")
+				existingToken, err = s.tokenRepo.GetToken()
+			}
 		}
 	}
 
@@ -68,8 +73,23 @@ func (s *AuthService) VerifyUserToken(userToken string) bool {
 	if err != nil {
 		return false
 	}
-	isValid := s.zitadelClient.VerifyUserToken(userToken, serviceUserToken)
-	return isValid
+	for i := 1; i < models.MaxAttempts; i++ {
+		isValid, err := s.zitadelClient.VerifyUserToken(userToken, serviceUserToken)
+		if err != nil {
+			if err.Error() == "connection error" {
+				waitTime := common.RandomDuration(models.MaxRangeSleepDuration, models.MinRangeSleepDuration, i)
+				log.Printf("WARNING | Connection error (attempt %d) error: %v. Retrying in %v", i, err, waitTime)
+				time.Sleep(waitTime)
+				continue
+			}
+			log.Printf("ERROR | cannot verify user token: %v", err)
+			return false
+		}
+
+		return isValid
+	}
+	log.Printf("ERROR | Failed to verify user token after %d attempts", models.MaxAttempts)
+	return false
 }
 
 func (s *AuthService) GenerateNewToken() (*tokenrepo.Token, error) {
@@ -88,6 +108,12 @@ func (s *AuthService) GenerateNewToken() (*tokenrepo.Token, error) {
 		AccessToken: accessToken,
 		ExpiresIn:   expiresIn - models.SaveOffset, // -10 seconds
 		ObtainedAt:  time.Now(),
+	}
+
+	err = s.tokenRepo.SaveToken(token)
+	if err != nil {
+		log.Printf("ERROR | Failed to save token, %v", err)
+		return nil, fmt.Errorf("ERROR | Failed to save token, %v", err)
 	}
 
 	return token, nil

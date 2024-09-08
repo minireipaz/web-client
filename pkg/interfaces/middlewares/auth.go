@@ -20,7 +20,6 @@ func AuthMiddleware(authService *services.AuthService) gin.HandlerFunc {
 
 		authHeader := ctx.GetHeader("Authorization")
 		if authHeader == "" {
-			log.Printf("%s", authHeader)
 			ctx.JSON(http.StatusUnauthorized, NewUnauthorizedError(models.AuthInvalid))
 			ctx.Abort()
 			return
@@ -36,7 +35,7 @@ func AuthMiddleware(authService *services.AuthService) gin.HandlerFunc {
 
 		valid := verifyUserToken(authService, token)
 		if !valid {
-			// log.Printf("WARN | usertoken is not valid. token to verify %s", token)
+			log.Printf("WARN | usertoken is not valid. token to verify %s", token)
 			ctx.JSON(http.StatusUnauthorized, NewUnauthorizedError(models.AuthInvalid))
 			ctx.Abort()
 			return

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"minireipaz/pkg/common"
 	"minireipaz/pkg/domain/models"
 	"minireipaz/pkg/infra/redisclient"
 	"sync"
@@ -84,4 +85,30 @@ func (r *TokenRepository) GetCachedToken() (*Token, error) {
 
 func (t *Token) IsExpired() bool {
 	return time.Now().After(t.ObtainedAt.Add(t.ExpiresIn * time.Second))
+}
+
+func (r *TokenRepository) SaveToken(token *Token) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	data, err := json.Marshal(token)
+	if err != nil {
+		return err
+	}
+
+	for i := 1; i <= models.MaxAttempts; i++ {
+		err = r.redisClient.WatchToken(string(data), r.key, (token.ExpiresIn)*time.Second)
+		if err == nil {
+			r.token = token
+			return nil
+		}
+		// if err == redis.Nil { // in really rare xtreme cases
+		//   r.redisClient.Set(r.key, "")
+		// }
+		waitTime := common.RandomDuration(models.MaxRangeSleepDuration, models.MinRangeSleepDuration, i)
+		log.Printf("WARNING | Failed to save token, attempt %d: %v. Retrying in %v", i, err, waitTime)
+		time.Sleep(waitTime)
+	}
+	log.Printf("ERROR | Failed to save token, %v", err)
+	return err
 }
