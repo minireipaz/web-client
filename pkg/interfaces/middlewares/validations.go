@@ -17,13 +17,13 @@ func ValidateWorkflow() gin.HandlerFunc {
 			return
 		}
 
-		if strings.TrimSpace(workflow.WorkflowName) == "" {
+		if strings.TrimSpace(workflow.Name) == "" {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Workflow name is required"})
 			ctx.Abort()
 			return
 		}
 
-		if len(workflow.WorkflowName) < 3 || len(workflow.WorkflowName) > 50 {
+		if len(workflow.Name) < 3 || len(workflow.Name) > 50 {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Workflow name must be between 3 and 50 characters"})
 			ctx.Abort()
 			return

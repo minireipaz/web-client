@@ -6,15 +6,26 @@ import (
 	"github.com/google/uuid"
 )
 
+type IsActive uint8
+
+const (
+	Active IsActive = iota + 1 // Active = 1
+	Draft                      // Draft = 2
+	Paused                     // Paused = 3
+)
+
 type Workflow struct {
-	Sub             string    `json:"sub"`
-	UserToken       string    `json:"access_token"`
-	UUID            uuid.UUID `json:"uuid"`
-	WorkflowName    string    `json:"workflowname"`
-	Description     string    `json:"description"`
-	DirectoryToSave string    `json:"directorytosave"`
-	CreatedAt       time.Time `json:"createdat"`
-	UpdatedAt       time.Time `json:"updatedat"`
+	Sub               string    `json:"sub,omitempty"`
+	UserToken         string    `json:"access_token,omitempty"`
+	Name              string    `json:"name" binding:"required,alphanum,max=255"`
+	Description       string    `json:"description,omitempty"`
+	IsActive          IsActive  `json:"is_active,omitempty"` // Enum8('active' = 1, 'draft' = 2, 'paused' = 3) DEFAULT 'active'
+	UUID              uuid.UUID `json:"id,omitempty"`
+	CreatedAt         string    `json:"created_at,omitempty"`
+	UpdatedAt         string    `json:"updated_at,omitempty"`
+	WorkflowInit      time.Time `json:"workflow_init,omitempty"`
+	WorkflowCompleted time.Time `json:"workflow_completed,omitempty"`
+	DirectoryToSave   string    `json:"directory_to_save" binding:"required,alphanum,max=255"`
 }
 
 type ResponseWorkflow struct {
