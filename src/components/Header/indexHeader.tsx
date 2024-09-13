@@ -5,6 +5,7 @@ import Dashboard from "../../Pages/indexDashboard.tsx";
 import { useAuth } from "../AuthProvider/indexAuthProvider.tsx";
 import { UserManager } from 'oidc-client-ts';
 import { Workflows } from "../../Pages/indexWorkflows.tsx";
+import { WorkflowDetails } from "../../Pages/indexWorkflowDetail.tsx";
 
 export function Header() {
   const { authenticated, setAuthenticated, handleLogin, handleLogout, userManager } = useAuth();
@@ -15,6 +16,7 @@ export function Header() {
           <Routes>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/workflows" element={<Workflows />} />
+            <Route path="/workflow/:uuid" element={<WorkflowDetails />} />
             <Route path="/" element={<Login authenticated={authenticated} handleLogin={handleLogin} />} />
             <Route path="/callback" element={
               <Callback

@@ -5,17 +5,19 @@ import { useAuth } from "../AuthProvider/indexAuthProvider";
 import { ResponseGenerateWorkflow, Workflow } from "../../models/QuickActions";
 import { getUriFrontend } from "../../utils/getUriFrontend";
 
+const emptyWorkflow: Workflow = {
+  name: "",
+  description: "",
+  directory_to_save: "home",
+  id: "",
+  sub: "",
+  created_at: "",
+  updated_at: ""
+}
 
 export function QuickActions() {
   const [openModal, setOpenModal] = useState(false);
-  const [workflow, setWorkflow] = useState<Workflow>({
-    workflowname: "",
-    directorytosave: "home",
-    uuid: "",
-    sub: "",
-    createdat: "",
-    updatedat: ""
-  });
+  const [workflow, setWorkflow] = useState<Workflow>(emptyWorkflow);
   const [errorTitle, setErrorTitle] = useState<string>("");
   const [disabledButtonCreateWorkflow, setDisabledButtonCreateWorkflow] = useState(false);
 
@@ -28,20 +30,18 @@ export function QuickActions() {
   const { userInfo } = useAuth();
 
   function onChangeWorkflowName(event: any) {
-    setWorkflow({
-      workflowname: event.target.value,
-      description: workflow.description,
-      directorytosave: workflow.directorytosave,
-    });
+    setWorkflow(prevState => ({
+      ...prevState,
+      name: event.target.value
+    }));
   }
 
 
   function onChangeWorkflowDescription(event: any) {
-    setWorkflow({
-      workflowname: workflow.workflowname,
-      description: event.target.value,
-      directorytosave: workflow.directorytosave,
-    });
+    setWorkflow(prevState => ({
+      ...prevState,
+      description: event.target.value
+    }));
   }
 
 
@@ -61,7 +61,7 @@ export function QuickActions() {
       }
       setErrorTitle("")
       closeModal();
-      navigate(`/workflow/${data?.workflow?.uuid}`, { state: { workflow: data } });
+      navigate(`/workflow/${data?.workflow?.id}`, { state: { workflow: data } });
 
     } catch (error) {
       console.error("Error creating workflow:", error);
@@ -71,17 +71,17 @@ export function QuickActions() {
   }
 
   function checkValidations(workflow: Workflow) {
-    if (workflow.workflowname.trim() === "") {
+    if (workflow.name.trim() === "") {
       showAlert("Workflow name is required");
       return false;
     }
 
-    if (workflow.workflowname.length < 3 || workflow.workflowname.length > 50) {
+    if (workflow.name.length < 3 || workflow.name.length > 50) {
       showAlert("Workflow name must be between 3 and 50 characters");
       return false;
     }
 
-    if (workflow.directorytosave.trim() === "") {
+    if (workflow.directory_to_save.trim() === "") {
       showAlert("Directory to save is required");
       return false;
     }
@@ -91,9 +91,9 @@ export function QuickActions() {
   async function newWorkflow(workflow: Workflow): Promise<[boolean, ResponseGenerateWorkflow]> {
     try {
       const body: Workflow = {
-        workflowname: workflow.workflowname,
+        name: workflow.name,
         description: workflow.description,
-        directorytosave: workflow.directorytosave,
+        directory_to_save: workflow.directory_to_save,
         sub: userInfo?.profile.sub,
       };
 
@@ -130,10 +130,7 @@ export function QuickActions() {
   }
 
   function closeModal() {
-    setWorkflow({
-      workflowname: "",
-      directorytosave: "home"
-    });
+    setWorkflow(emptyWorkflow);
     setOpenModal(false);
   }
 
@@ -166,8 +163,9 @@ export function QuickActions() {
               <TextInput
                 id="workflow_name"
                 placeholder="Name of the workflow."
-                value={workflow.workflowname}
+                value={workflow.name}
                 onChange={onChangeWorkflowName}
+                maxLength={255}
                 required
               />
               <p className="text-xs text-black ">Enter the name of the workflow.</p>
@@ -179,7 +177,7 @@ export function QuickActions() {
                 placeholder="Description of the workflow."
                 value={workflow.description}
                 onChange={onChangeWorkflowDescription}
-                required
+                maxLength={255}
               />
               <p className="text-xs text-black ">Enter description of the workflow.</p>
             </div>

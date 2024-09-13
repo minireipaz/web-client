@@ -1,11 +1,11 @@
 export interface Workflow {
   sub?: string
-	uuid?: string
-	workflowname: string
+	id?: string
+	name: string
   description?: string
-	directorytosave: string
-	createdat?: string
-	updatedat?: string
+  directory_to_save: string
+	created_at?: string
+	updated_at?: string
 }
 
 

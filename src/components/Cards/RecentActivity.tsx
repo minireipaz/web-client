@@ -9,7 +9,7 @@ export function RecentActivity() {
           <div className="flex items-center justify-between" >
             <div className="flex items-center gap-2" >
               <span className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full" >
-                <img className="aspect-square h-full w-full" src="/placeholder-user.jpg" />
+                <img className="aspect-square h-full w-full" src="https://picsum.photos/40" />
               </span>
               <div >
                 <div className="font-medium" >John Doe</div>
@@ -19,7 +19,7 @@ export function RecentActivity() {
             <div className="text-sm" >2 hours ago</div>
           </div>
           <div className="flex items-center justify-between" >
-            <div className="flex items-center gap-2" ><span className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full" ><img className="aspect-square h-full w-full" src="/placeholder-user.jpg" /></span>
+            <div className="flex items-center gap-2" ><span className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full" ><img className="aspect-square h-full w-full" src="https://picsum.photos/40" /></span>
               <div >
                 <div className="font-medium" >Jane Smith</div>
                 <div className="text-sm" >Uploaded a file</div>
@@ -28,7 +28,7 @@ export function RecentActivity() {
             <div className="text-sm" >4 hours ago</div>
           </div>
           <div className="flex items-center justify-between" >
-            <div className="flex items-center gap-2" ><span className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full" ><img className="aspect-square h-full w-full" src="/placeholder.jpg" /></span>
+            <div className="flex items-center gap-2" ><span className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full" ><img className="aspect-square h-full w-full" src="https://picsum.photos/40" /></span>
               <div >
                 <div className="font-medium" >Michael Johnson</div>
                 <div className="text-sm" >Downloaded a report</div>
