@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { DashboardData } from "../../models/Dashboard";
+import { Spinner } from "flowbite-react";
 
 interface ContainerProps {
   dashboardData: DashboardData | null
@@ -24,7 +25,7 @@ export function PendingWorkflows(props: ContainerProps) {
           <p className="text-sm" >Workflows that are currently running</p>
         </div>
         <div className="p-6 flex items-center justify-between" >
-          <div className="text-4xl font-bold" >{displayPendingWorkflows}</div>
+          <div className="text-4xl font-bold" >{props.dashboardData ? displayPendingWorkflows : <Spinner />}</div>
         </div>
       </div>
     </>

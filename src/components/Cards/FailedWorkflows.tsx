@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { DashboardData } from "../../models/Dashboard";
+import { Spinner } from "flowbite-react";
 
 interface ContainerProps {
   dashboardData: DashboardData | null
@@ -25,7 +26,7 @@ export function FailedWorkflows(props: ContainerProps) {
           <p className="text-sm " >Workflows that failed to complete</p>
         </div>
         <div className="p-6 flex items-center justify-between" >
-          <div className="text-4xl font-bold" >{displayFailedWorkflows}</div>
+          <div className="text-4xl font-bold" >{props.dashboardData ? displayFailedWorkflows : <Spinner />}</div>
         </div>
       </div>
     </>

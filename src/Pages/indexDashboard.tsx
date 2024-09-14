@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../components/AuthProvider/indexAuthProvider";
 import { NavDashboard } from "../components/Dashboard/NavDashboard";
 import { HeaderDashboard } from "../components/Dashboard/HeaderDashboard";
@@ -17,24 +17,21 @@ let isFetchingData = false;
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { authenticated, userInfo } = useAuth();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  // const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchDashboardData = useCallback(async () => {
     if (!authenticated || !userInfo) {
-      navigate("/");
-    } else {
-      if (!isFetchingData) {
-        isFetchingData = true;
-        fetchDashboardData();
-      }
+      return;
     }
-  }, [authenticated, userInfo, navigate]);
 
-  async function fetchDashboardData() {
+    // setIsLoading(true);
     try {
       const [ok, uriFrontend] = getUriFrontend(`/api/dashboard/${userInfo?.profile.sub}`);
       if (!ok) {
+        console.log("ERROR | cannot get uri frontend");
         return;
       }
       const response = await fetch(uriFrontend, {
@@ -44,6 +41,7 @@ export default function Dashboard() {
           "Authorization": `Bearer ${userInfo?.access_token}`,
         },
       });
+      // setIsLoading(false);
       if (!response.ok) {
         // TODO: better redirect
         setDashboardData(null);
@@ -58,13 +56,34 @@ export default function Dashboard() {
       let convertedDashboard: DashboardData = convertDashboardData(data);
       setDashboardData(convertedDashboard);
     } catch (error) {
+      // setIsLoading(false);
       setDashboardData(null);
       console.error("Error fetching dashboard data:", error);
     }
-  }
+  }, [authenticated, userInfo]);
+
+  useEffect(() => {
+    if (!authenticated || !userInfo) {
+      navigate("/");
+    } else {
+      fetchDashboardData();
+    }
+  }, [authenticated, userInfo, navigate, fetchDashboardData]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      fetchDashboardData();
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [fetchDashboardData]);
 
   function convertDashboardData(responseData: ResponseDashboardData): DashboardData {
-    let dashboard: DashboardData =  {
+    let dashboard: DashboardData = {
       workflow_counts: [],
       workflows_recents: [],
     }
@@ -114,7 +133,7 @@ export default function Dashboard() {
               <RecentActivity />
             </div>
             <div className="grid gap-6" >
-              <div className="grid grid-cols-2 gap-6" >
+              <div className="grid grid-cols-2 gap-6">
                 <TotalWorkflows dashboardData={dashboardData} />
                 <SuccessWorkflows dashboardData={dashboardData} />
                 <FailedWorkflows dashboardData={dashboardData} />
