@@ -82,11 +82,13 @@ export default function Dashboard() {
         if (!values) continue;
 
         let workflows: RecenWorkflows = {
-          workflow_name: values[0],
-          workflow_description: values[1],
-          execution_status: values[2],
-          start_time: values[3],
-          duration: values[4],
+          id: values[0],
+          workflow_name: values[1],
+          workflow_description: values[2],
+          status: values[3],
+          is_active: values[4],
+          start_time: values[5],
+          duration: values[6],
         };
         dashboard.workflows_recents.push(workflows);
       }
