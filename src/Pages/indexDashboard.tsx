@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../components/AuthProvider/indexAuthProvider";
 import { NavDashboard } from "../components/Dashboard/NavDashboard";
 import { HeaderDashboard } from "../components/Dashboard/HeaderDashboard";
@@ -13,21 +13,16 @@ import { RecentWorkflows } from "../components/Cards/RecentWorkflows";
 import { DashboardData, RecenWorkflows, ResponseDashboardData, WorkflowCounts } from "../models/Dashboard";
 import { getUriFrontend } from "../utils/getUriFrontend";
 
-let isFetchingData = false;
-
 export default function Dashboard() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { authenticated, userInfo } = useAuth();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
-  // const [isLoading, setIsLoading] = useState(true);
 
   const fetchDashboardData = useCallback(async () => {
     if (!authenticated || !userInfo) {
       return;
     }
 
-    // setIsLoading(true);
     try {
       const [ok, uriFrontend] = getUriFrontend(`/api/dashboard/${userInfo?.profile.sub}`);
       if (!ok) {
@@ -41,7 +36,6 @@ export default function Dashboard() {
           "Authorization": `Bearer ${userInfo?.access_token}`,
         },
       });
-      // setIsLoading(false);
       if (!response.ok) {
         // TODO: better redirect
         setDashboardData(null);
@@ -56,7 +50,6 @@ export default function Dashboard() {
       let convertedDashboard: DashboardData = convertDashboardData(data);
       setDashboardData(convertedDashboard);
     } catch (error) {
-      // setIsLoading(false);
       setDashboardData(null);
       console.error("Error fetching dashboard data:", error);
     }
