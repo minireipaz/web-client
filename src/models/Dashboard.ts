@@ -49,7 +49,7 @@ export const statusMap: Record<number, Record<string, string>> = {
 };
 
 export const activeMap: Record<number, Record<string, string>> = {
-  1: { text: 'Active', class: 'text-[#03ffbe]' },
-  2: { text: 'Draft', class: 'text-gray-800' },
-  3: { text: 'Paused', class: 'text-red-800' },
+  1: { text: '#27F795' },
+  2: { text: '#eff727' },
+  3: { text: '#f7272f' },
 }

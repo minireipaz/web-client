@@ -1,10 +1,15 @@
 import { Link } from 'react-router-dom';
 import { DashboardData, statusMap, activeMap } from "../../models/Dashboard";
+import { CustomFlowbiteTheme, Dropdown, Tooltip } from 'flowbite-react';
 
 
 interface ContainerProps {
   dashboardData: DashboardData | null
 }
+
+const customTooltipTheme: CustomFlowbiteTheme["tooltip"] = {
+  target: "w-[-webkit-fill-available]"
+};
 
 export function RecentWorkflows(props: ContainerProps) {
 
@@ -33,17 +38,16 @@ export function RecentWorkflows(props: ContainerProps) {
   function formatTextIsActive(isActive: string) {
     let activeText = activeMap[Number.parseInt(isActive)].text;
     if (!activeText) {
-      activeText = "N/A";
+      activeText = activeMap[3].text;
     }
     return activeText;
   }
 
-  function formatClassIsActive(isActive: string) {
-    let activeClass = activeMap[Number.parseInt(isActive)].class;
-    if (!activeClass) {
-      activeClass = activeMap[3].class;
+  function formatDescription(desp: string) {
+    if (!desp || desp === null) {
+      return "--";
     }
-    return activeClass;
+    return desp;
   }
 
   const recentWorkflows = props.dashboardData?.workflows_recents;
@@ -59,8 +63,8 @@ export function RecentWorkflows(props: ContainerProps) {
           <div className="relative w-full overflow-auto">
             {/* Header */}
             <div className="grid grid-cols-6 gap-4 font-medium text-sm border-b py-2">
-              <div className="px-4">Active</div>
               <div className="px-4">Name</div>
+              <div className="px-4">Description</div>
               <div className="px-4">Status</div>
               <div className="px-4">Started</div>
               <div className="px-4">Duration</div>
@@ -72,41 +76,44 @@ export function RecentWorkflows(props: ContainerProps) {
               {recentWorkflows && recentWorkflows.length > 0 ? (
                 recentWorkflows.map((workflow, index) => (
                   <li key={index} className="border-b last:border-b-0">
-                    <Link
-                      to={`/workflow/${workflow.id}`}
-                      state={workflow}
-                      className="block hover:bg-blue-800 transition-colors"
-                    >
-                      <div className="grid grid-cols-6 gap-4 py-4">
-                        <div className="px-4">
-                          <div className={`text-sm ${formatClassIsActive(workflow.is_active)}`} >{formatTextIsActive(workflow.is_active)}</div>
-                        </div>
-                        <div className="px-4">
-                          <div className="font-medium">{workflow.workflow_name}</div>
-                          <div className="text-sm">{workflow.workflow_description}</div>
-                        </div>
-                        <div className="px-4 flex items-center">
-                          <div className={`${statusMap[Number.parseInt(workflow.status)].class} inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground`}>
-                            {statusMap[Number.parseInt(workflow.status)].text}
-                          </div>
-                        </div>
-                        <div className="px-4 flex items-center">{formatStartTime(workflow.start_time)}</div>
-                        <div className="px-4 flex items-center">{formatDuration(workflow.duration)}</div>
-                        <div className="px-4 flex items-center">
-                          <button
-                            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10"
-                            type="button"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-                              <polyline points="18 8 22 12 18 16"></polyline>
-                              <polyline points="6 8 2 12 6 16"></polyline>
-                              <line x1="2" x2="22" y1="12" y2="12"></line>
+                    <div className="grid grid-cols-6 gap-4 py-2 items-center">
+                      <div className="px-4">
+                        <Link
+                          to={`/workflow/${workflow.id}`}
+                          state={workflow}
+                          className="w-fit font-medium flex flex-shrink-0 cursor-pointer items-center underline underline-offset-4 "
+                        >
+                          <span>
+                            <svg width="8" height="8" viewBox="0 0 50 50" fill="none" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
+                              <circle cx="25" cy="25" r="25" fill={formatTextIsActive(workflow.is_active)}></circle>
                             </svg>
-                            <span className="sr-only">Actions</span>
-                          </button>
+                          </span>
+                          <span title={workflow.workflow_name} className='overflow-ellipsis overflow-hidden whitespace-nowrap ml-2  '>
+                            {workflow.workflow_name}
+                          </span>
+                        </Link>
+                      </div>
+                      <div className="px-4 flex items-center">
+                        <Tooltip theme={customTooltipTheme} placement="top" content={formatDescription(workflow.workflow_description)}>
+                          <div className="text-sm overflow-ellipsis overflow-hidden whitespace-nowrap">{formatDescription(workflow.workflow_description)}</div>
+                        </Tooltip>
+                      </div>
+                      <div className="px-4 flex items-center">
+                        <div className={`${statusMap[Number.parseInt(workflow.status)].class} inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground`}>
+                          {statusMap[Number.parseInt(workflow.status)].text}
                         </div>
                       </div>
-                    </Link>
+                      <div className="px-4 flex items-center">{formatStartTime(workflow.start_time)}</div>
+                      <div className="px-4 flex items-center">{formatDuration(workflow.duration)}</div>
+                      <div className="px-4 flex items-center">
+                        <Dropdown label="More" dismissOnClick={false}>
+                          <Dropdown.Item>Option 1</Dropdown.Item>
+                          <Dropdown.Item>Option 2</Dropdown.Item>
+                          <Dropdown.Item>Option 3</Dropdown.Item>
+                          <Dropdown.Item>Option 4</Dropdown.Item>
+                        </Dropdown>
+                      </div>
+                    </div>
                   </li>
                 ))
               ) : (
@@ -117,7 +124,7 @@ export function RecentWorkflows(props: ContainerProps) {
             </ul>
           </div>
         </div>
-      </div>
+      </div >
     </>
   );
 }
