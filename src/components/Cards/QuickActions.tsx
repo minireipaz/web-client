@@ -2,8 +2,9 @@ import { Button, Modal, TextInput, Label, Select } from "flowbite-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthProvider/indexAuthProvider";
-import { ResponseGenerateWorkflow, Workflow } from "../../models/QuickActions";
+import { ResponseGenerateWorkflow } from "../../models/QuickActions";
 import { getUriFrontend } from "../../utils/getUriFrontend";
+import { Workflow } from "../../models/Dashboard";
 
 const emptyWorkflow: Workflow = {
   name: "",
@@ -12,7 +13,11 @@ const emptyWorkflow: Workflow = {
   id: "",
   sub: "",
   created_at: "",
-  updated_at: ""
+  updated_at: "",
+  status: "",
+  start_time: "",
+  duration: 0,
+  is_active: "",
 }
 
 export function QuickActions() {
@@ -30,7 +35,7 @@ export function QuickActions() {
   const { userInfo } = useAuth();
 
   function onChangeWorkflowName(event: any) {
-    setWorkflow(prevState => ({
+    setWorkflow((prevState: any) => ({
       ...prevState,
       name: event.target.value
     }));
@@ -38,7 +43,7 @@ export function QuickActions() {
 
 
   function onChangeWorkflowDescription(event: any) {
-    setWorkflow(prevState => ({
+    setWorkflow((prevState: any) => ({
       ...prevState,
       description: event.target.value
     }));
@@ -95,6 +100,12 @@ export function QuickActions() {
         description: workflow.description,
         directory_to_save: workflow.directory_to_save,
         sub: userInfo?.profile.sub,
+        // ?
+        id: "",
+        status: "",
+        start_time: "",
+        duration: 0,
+        is_active: ""
       };
 
       const [ok, uriFrontend] = getUriFrontend("/api/workflows");
