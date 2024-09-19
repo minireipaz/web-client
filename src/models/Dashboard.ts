@@ -1,12 +1,18 @@
 
 export interface Workflow {
-  workflow_id: string;
-  workflow_name: string;
-  workflow_description: string;
-  workflow_status: string;
-  execution_status: 1 | 2 | 3 | 4; // 1: pending, 2: processing, 3: completed, 4: failed;
+  id: string;
+  name: string;
+  description: string;
+  status: string;
+  // execution_status: 1 | 2 | 3 | 4; // 1: pending, 2: processing, 3: completed, 4: failed;
   start_time: string;
   duration: number | null;
+  sub?: string
+  directory_to_save: string
+  created_at?: string
+  updated_at?: string
+  is_active: string;
+
 }
 
 export interface ResponseDashboardData {

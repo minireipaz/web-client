@@ -1,12 +1,4 @@
-export interface Workflow {
-  sub?: string
-	id?: string
-	name: string
-  description?: string
-  directory_to_save: string
-	created_at?: string
-	updated_at?: string
-}
+import { Workflow } from "./Dashboard"
 
 
 export interface ResponseGenerateWorkflow {
