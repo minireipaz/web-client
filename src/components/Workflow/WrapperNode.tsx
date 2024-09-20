@@ -2,14 +2,26 @@ import { Handle, Position } from '@xyflow/react';
 
 interface WrapperNodeProps {
   data: {
+    id: string;
     label: string;
     description: string;
     options: string;
-    onOpenDrawer: () => void;
+    onClickFromNode: (posX: number, posY: number, nodeID: string) => void;
   };
 }
 
+
+const offsetRight = 200;
+const offsetBottom = -50;
+
 export function WrapperNode(props: WrapperNodeProps) {
+
+  function handleClick(event: any) {
+    event.preventDefault();
+    const { clientX, clientY } = 'changedTouches' in event ? event.changedTouches[0] : event;
+    props.data.onClickFromNode(clientX + offsetRight, clientY + offsetBottom, props.data.id);
+  }
+
   return (
     <div className="relative w-[50px] h-[50px] border border-gray-300 bg-white text-black group">
       {/* Options Node */}
@@ -47,7 +59,7 @@ export function WrapperNode(props: WrapperNodeProps) {
 
       {/* "+" button */}
       <div className="absolute bottom-[-3%] right-[-1px]">
-        <button onClick={props.data.onOpenDrawer} className=" w-3 h-3 bg-green-500 text-white flex items-center justify-center" >
+        <button onClick={handleClick} className=" w-3 h-3 bg-green-500 text-white flex items-center justify-center" >
           <span className='text-[10px] leading-normal'>+</span>
         </button>
       </div>

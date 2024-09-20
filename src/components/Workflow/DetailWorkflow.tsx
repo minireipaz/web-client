@@ -11,7 +11,7 @@ import {
   NodeTypes,
   Connection,
   Edge,
-  useReactFlow,
+  useReactFlow
 } from '@xyflow/react';
 import { Workflow } from '../../models/Dashboard';
 import '@xyflow/react/dist/style.css';
@@ -38,17 +38,22 @@ const edgeTypes = {
   buttonedge: ButtonEdge,
 };
 
+const offsetRight = 80;
+const offsetBottom = -20;
+
 export function DetailWorkflow(_: ContainerProps) {
+
   const initialNodes: Node[] = [
     {
       id: 'initial-node',
       type: 'wrapperNode',
       position: { x: 2, y: 0 },
       data: {
+        id: "initial-node",
         label: 'Start Point',
         options: 'Initial Options',
         description: 'This is the starting point of your workflow',
-        onOpenDrawer: () => setIsDrawerOpen(true),
+        onClickFromNode: () => handleClickFromNode(flowToScreenPosition({ x: 100, y: 0 }).x, flowToScreenPosition({ x: 100, y: 0 }).y, 'initial-node'),  //setIsDrawerOpen(true),
       },
     },
   ];
@@ -58,7 +63,7 @@ export function DetailWorkflow(_: ContainerProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const closeDrawer = () => setIsDrawerOpen(false);
   const [clickPosition, setClickPosition] = useState({ x: 0, y: 0 });
-  const { screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition, flowToScreenPosition } = useReactFlow();
   const [lastNodeID, setLastNodeID] = useState("");
 
   const onConnect = useCallback(
@@ -74,16 +79,24 @@ export function DetailWorkflow(_: ContainerProps) {
     (event: any, connectionState: any) => {
       if (!connectionState.isValid) {
         setLastNodeID(connectionState.fromNode.id);
-        const { clientX, clientY } = 'changedTouches' in event ? event.changedTouches[0] : event;
+        let { clientX, clientY } = 'changedTouches' in event ? event.changedTouches[0] : event;
+        clientX += offsetRight;
+        clientY += offsetBottom;
         setClickPosition({ x: clientX, y: clientY });
         setIsDrawerOpen(true);
       }
     }, [screenToFlowPosition])
 
+    const handleClickFromNode = useCallback( (posX: number, posY: number, nodeID: string) => {
+      setIsDrawerOpen(true);
+      setLastNodeID(nodeID);
+      setClickPosition({ x: posX, y: posY });
+    }, [isDrawerOpen, setIsDrawerOpen])
+
   const handleClickDrawer = useCallback((event: any, nodeData: NodeData) => {
     event.preventDefault();
     const position = screenToFlowPosition({
-      x: clickPosition.x + 150,
+      x: clickPosition.x,
       y: clickPosition.y,
     });
     const nodeID = `${nodeData.type}-${nodes.length + 1}`;
@@ -92,10 +105,11 @@ export function DetailWorkflow(_: ContainerProps) {
       type: 'wrapperNode',
       position,
       data: {
+        id: nodeID,
         label: nodeData.label,
         options: nodeData.options || 'Default Options',
         description: nodeData.description || 'Default Description',
-        onOpenDrawer: () => setIsDrawerOpen(true),
+        onClickFromNode: (posX: number, posY: number, nodeID: string) => handleClickFromNode(posX, posY, nodeID),
       },
     };
 
@@ -118,7 +132,9 @@ export function DetailWorkflow(_: ContainerProps) {
         onConnect={onConnect}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        fitView
+        fitView={true}
+        minZoom={0}
+        maxZoom={1}
         colorMode='dark'
         nodeOrigin={[2, 0]}
       >
