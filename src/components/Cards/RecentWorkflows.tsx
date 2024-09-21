@@ -13,8 +13,8 @@ const customTooltipTheme: CustomFlowbiteTheme["tooltip"] = {
 
 export function RecentWorkflows(props: ContainerProps) {
 
-  function formatDuration(durationStr: string | null): string {
-    const duration = Number.parseInt(durationStr as string);
+  function formatDuration(durati: number): string {
+    const duration = Number.parseInt(durati.toString() as string);
     if (duration === null || duration === undefined || !Number.isInteger(duration)) {
       return "N/A";
     }
@@ -35,8 +35,9 @@ export function RecentWorkflows(props: ContainerProps) {
     return new Date(startTime).toLocaleString();
   }
 
-  function formatTextIsActive(isActive: string) {
-    let activeText = activeMap[Number.parseInt(isActive)].text;
+  function formatTextIsActive(isActive: Number) {
+    const index: string = isActive.toString();
+    let activeText = activeMap[Number.parseInt(index)].text;
     if (!activeText) {
       activeText = activeMap[3].text;
     }
@@ -88,14 +89,14 @@ export function RecentWorkflows(props: ContainerProps) {
                               <circle cx="25" cy="25" r="25" fill={formatTextIsActive(workflow.is_active)}></circle>
                             </svg>
                           </span>
-                          <span title={workflow.workflow_name} className='overflow-ellipsis overflow-hidden whitespace-nowrap ml-2  '>
-                            {workflow.workflow_name}
+                          <span title={workflow.name} className='overflow-ellipsis overflow-hidden whitespace-nowrap ml-2  '>
+                            {workflow.name}
                           </span>
                         </Link>
                       </div>
                       <div className="px-4 flex items-center">
-                        <Tooltip theme={customTooltipTheme} placement="top" content={formatDescription(workflow.workflow_description)}>
-                          <div className="text-sm overflow-ellipsis overflow-hidden whitespace-nowrap">{formatDescription(workflow.workflow_description)}</div>
+                        <Tooltip theme={customTooltipTheme} placement="top" content={formatDescription(workflow.description)}>
+                          <div className="text-sm overflow-ellipsis overflow-hidden whitespace-nowrap">{formatDescription(workflow.description)}</div>
                         </Tooltip>
                       </div>
                       <div className="px-4 flex items-center">
@@ -104,7 +105,7 @@ export function RecentWorkflows(props: ContainerProps) {
                         </div>
                       </div>
                       <div className="px-4 flex items-center">{formatStartTime(workflow.start_time)}</div>
-                      <div className="px-4 flex items-center">{formatDuration(workflow.duration)}</div>
+                      <div className="px-4 flex items-center">{formatDuration(workflow.duration as number)}</div>
                       <div className="px-4 flex items-center">
                         <Dropdown label="More" dismissOnClick={false}>
                           <Dropdown.Item>Option 1</Dropdown.Item>
