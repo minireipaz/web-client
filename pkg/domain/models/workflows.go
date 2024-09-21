@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type IsActive uint8
@@ -20,7 +18,7 @@ type Workflow struct {
 	Name              string    `json:"name" binding:"required,alphanum,max=255"`
 	Description       string    `json:"description,omitempty"`
 	IsActive          IsActive  `json:"is_active,omitempty"` // Enum8('active' = 1, 'draft' = 2, 'paused' = 3) DEFAULT 'active'
-	UUID              uuid.UUID `json:"id,omitempty"`
+	UUID              string    `json:"id,omitempty"`
 	CreatedAt         string    `json:"created_at,omitempty"`
 	UpdatedAt         string    `json:"updated_at,omitempty"`
 	WorkflowInit      time.Time `json:"workflow_init,omitempty"`

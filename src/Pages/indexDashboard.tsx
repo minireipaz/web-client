@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../components/AuthProvider/indexAuthProvider";
 import { NavDashboard } from "../components/Dashboard/NavDashboard";
 import { HeaderDashboard } from "../components/Dashboard/HeaderDashboard";
-import { DashboardData, RecenWorkflows, ResponseDashboardData, WorkflowCounts } from "../models/Dashboard";
+import { DashboardData, Workflow, ResponseDashboardData, WorkflowCounts } from "../models/Dashboard";
 import { getUriFrontend } from "../utils/getUriFrontend";
 import { ContentDashboard } from "../components/Dashboard/ContentDashboard";
 
@@ -87,14 +87,15 @@ export default function Dashboard() {
         const values = responseData?.data[i]?.recent_workflows![j];
         if (!values) continue;
 
-        let workflows: RecenWorkflows = {
+        let workflows: Workflow = {
           id: values[0],
-          workflow_name: values[1],
-          workflow_description: values[2],
+          name: values[1],
+          description: values[2],
           status: values[3],
-          is_active: values[4],
+          is_active: Number.parseInt(values[4]) as 1 | 2 | 3,
           start_time: values[5],
-          duration: values[6],
+          duration: Number.parseInt(values[6]),
+          directory_to_save: "home"
         };
         dashboard.workflows_recents.push(workflows);
       }

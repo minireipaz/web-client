@@ -17,7 +17,7 @@ const emptyWorkflow: Workflow = {
   status: "",
   start_time: "",
   duration: 0,
-  is_active: "",
+  is_active: 1,
 }
 
 export function QuickActions() {
@@ -66,7 +66,7 @@ export function QuickActions() {
       }
       setErrorTitle("")
       closeModal();
-      navigate(`/workflow/${data?.workflow?.id}`, { state: { workflow: data } });
+      navigate(`/workflow/${data?.workflow?.id}`, { state: data.workflow });
 
     } catch (error) {
       console.error("Error creating workflow:", error);
@@ -105,7 +105,7 @@ export function QuickActions() {
         status: "",
         start_time: "",
         duration: 0,
-        is_active: ""
+        is_active: 1
       };
 
       const [ok, uriFrontend] = getUriFrontend("/api/workflows");

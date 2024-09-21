@@ -1,4 +1,3 @@
-
 export interface Workflow {
   id: string;
   name: string;
@@ -11,8 +10,7 @@ export interface Workflow {
   directory_to_save: string
   created_at?: string
   updated_at?: string
-  is_active: string;
-
+  is_active: 1 | 2 | 3; // Active = 1 // Draft = 2 // Paused = 3
 }
 
 export interface ResponseDashboardData {
@@ -30,19 +28,19 @@ export interface WorkflowCounts {
   recent_workflows?: string[][];
 }
 
-export interface RecenWorkflows {
-  id: string;
-  workflow_name: string;
-  workflow_description: string;
-  status: string;
-  is_active: string;
-  start_time: string;
-  duration: string;
-}
+// export interface RecenWorkflows {
+//   id: string;
+//   workflow_name: string;
+//   workflow_description: string;
+//   status: string;
+//   is_active: string;
+//   start_time: string;
+//   duration: string;
+// }
 
 export interface DashboardData {
   workflow_counts: WorkflowCounts[];
-  workflows_recents: RecenWorkflows[];
+  workflows_recents: Workflow[];
 }
 
 export const statusMap: Record<number, Record<string, string>> = {

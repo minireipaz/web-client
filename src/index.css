@@ -26,3 +26,10 @@
   cursor: pointer;
   border-radius: 50%;
 }
+
+.renameworkflowname{
+  background-color: transparent !important;
+  color: white !important;
+  border: 1px solid transparent !important;
+  cursor: pointer !important;
+}

@@ -10,7 +10,7 @@ export function MyAccount() {
 
   return (
     <>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 z-50">
         <Dropdown label="My Account" className="">
           <Dropdown.Header className="flex flex-col gap-y-1">
             <span className="block italic text-xs">Name: {name}</span>
