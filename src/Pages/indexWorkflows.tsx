@@ -1,8 +1,3 @@
-// import { FailedWorkflows } from "../components/Cards/FailedWorkflows";
-// import { PendingWorkflows } from "../components/Cards/PendingWorkflows";
-// import { RecentWorkflows } from "../components/Cards/RecentWorkflows";
-// import { SuccessWorkflows } from "../components/Cards/SuccessWorkflows";
-// import { TotalWorkflows } from "../components/Cards/TotalWorkflows";
 import { HeaderDashboard } from "../components/Dashboard/HeaderDashboard";
 import { NavDashboard } from "../components/Dashboard/NavDashboard";
 

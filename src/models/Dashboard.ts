@@ -1,17 +1,6 @@
-export interface Workflow {
-  id: string;
-  name: string;
-  description: string;
-  status: string;
-  // execution_status: 1 | 2 | 3 | 4; // 1: pending, 2: processing, 3: completed, 4: failed;
-  start_time: string;
-  duration: number | null;
-  sub?: string
-  directory_to_save: string
-  created_at?: string
-  updated_at?: string
-  is_active: 1 | 2 | 3; // Active = 1 // Draft = 2 // Paused = 3
-}
+import { Workflow } from "./Workflow";
+
+
 
 export interface ResponseDashboardData {
   status: number;
@@ -27,16 +16,6 @@ export interface WorkflowCounts {
   pending_workflows: number;
   recent_workflows?: string[][];
 }
-
-// export interface RecenWorkflows {
-//   id: string;
-//   workflow_name: string;
-//   workflow_description: string;
-//   status: string;
-//   is_active: string;
-//   start_time: string;
-//   duration: string;
-// }
 
 export interface DashboardData {
   workflow_counts: WorkflowCounts[];
