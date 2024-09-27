@@ -19,7 +19,7 @@ export default function Callback({ authenticated, setAuth, userManager }: Props)
   }, [authenticated]);
 
   async function handleAuthentication() {
-    if (authenticated === null) {
+    if (authenticated === null || authenticated === false) {
       try {
         const user: User = await userManager.signinRedirectCallback();
         if (user) {
