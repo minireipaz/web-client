@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../components/AuthProvider/indexAuthProvider";
 import { NavDashboard } from "../components/Dashboard/NavDashboard";
 import { HeaderDashboard } from "../components/Dashboard/HeaderDashboard";
-import { DashboardData, Workflow, ResponseDashboardData, WorkflowCounts } from "../models/Dashboard";
+import { DashboardData, ResponseDashboardData, WorkflowCounts } from "../models/Dashboard";
 import { getUriFrontend } from "../utils/getUriFrontend";
 import { ContentDashboard } from "../components/Dashboard/ContentDashboard";
+import { Workflow } from "../models/Workflow";
 
 export default function Dashboard() {
-  const navigate = useNavigate();
   const { authenticated, userInfo } = useAuth();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
 
@@ -50,16 +49,18 @@ export default function Dashboard() {
   }, [authenticated, userInfo]);
 
   useEffect(() => {
-    if (!authenticated || !userInfo) {
-      navigate("/");
-    } else {
-      fetchDashboardData();
+    if (authenticated && userInfo) {
+      if (!dashboardData) {
+        fetchDashboardData();
+      }
     }
-  }, [authenticated, userInfo, navigate, fetchDashboardData]);
+  }, [authenticated, userInfo]);
 
   useEffect(() => {
     const handlePopState = () => {
-      fetchDashboardData();
+      if (!dashboardData) {
+        fetchDashboardData();
+      }
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -94,8 +95,10 @@ export default function Dashboard() {
           status: values[3],
           is_active: Number.parseInt(values[4]) as 1 | 2 | 3,
           start_time: values[5],
-          duration: Number.parseInt(values[6]),
-          directory_to_save: "home"
+          duration: Number.parseInt(values[6]) || 0,
+          directory_to_save: "home",
+          nodes: [],
+          edges: [],
         };
         dashboard.workflows_recents.push(workflows);
       }
@@ -106,7 +109,7 @@ export default function Dashboard() {
   }
 
   if (!authenticated || !userInfo) {
-    return <div>Redirecting...</div>;
+    return <div>Redirecting dasboard...</div>;
   }
 
   return (
@@ -121,143 +124,3 @@ export default function Dashboard() {
     </>
   );
 }
-
-
-// import React, { useEffect, useState, createContext, useContext, useMemo, ReactNode } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import { SWRConfig } from 'swr';
-// import { NavDashboard } from '../components/Dashboard/NavDashboard';
-// import { HeaderDashboard } from '../components/Dashboard/HeaderDashboard';
-// import { QuickActions } from '../components/Cards/QuickActions';
-// import { RecentActivity } from '../components/Cards/RecentActivity';
-// import { TotalWorkflows } from '../components/Cards/TotalWorkflows';
-// import { SuccessWorkflows } from '../components/Cards/SuccessWorkflows';
-// import { FailedWorkflows } from '../components/Cards/FailedWorkflows';
-// import { PendingWorkflows } from '../components/Cards/PendingWorkflows';
-// import { RecentWorkflows } from '../components/Cards/RecentWorkflows';
-// import { DashboardData, UserInfo } from '../models/Dashboard';
-// import { getUriFrontend } from '../utils/getUriFrontend';
-
-// // Tipos
-// type QueryError = {
-//   status: number;
-//   message: string;
-// };
-
-// type AuthContextType = {
-//   authenticated: boolean;
-//   userInfo: UserInfo | null;
-// };
-
-// type DashboardContextType = {
-//   dashboardData: DashboardData | null;
-//   error: QueryError | null;
-//   setError: (error: QueryError | null) => void;
-// };
-
-// // Contextos
-// const AuthContext = createContext<AuthContextType | null>(null);
-// const DashboardContext = createContext<DashboardContextType | null>(null);
-
-// // Hooks personalizados
-// const useAuth = () => {
-//   const context = useContext(AuthContext);
-//   if (!context) throw new Error('useAuth must be used within an AuthProvider');
-//   return context;
-// };
-
-// const useDashboard = () => {
-//   const context = useContext(DashboardContext);
-//   if (!context) throw new Error('useDashboard must be used within a DashboardProvider');
-//   return context;
-// };
-
-// // Componente principal
-// const Dashboard: React.FC = () => {
-//   const navigate = useNavigate();
-//   const { authenticated, userInfo } = useAuth();
-//   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
-//   const [error, setError] = useState<QueryError | null>(null);
-
-//   const dashboardContextValue = useMemo(() => ({ dashboardData, error, setError }), [dashboardData, error]);
-
-//   useEffect(() => {
-//     if (!authenticated || !userInfo) {
-//       navigate('/');
-//     } else {
-//       fetchDashboardData();
-//     }
-//   }, [authenticated, userInfo, navigate]);
-
-//   const fetchDashboardData = async () => {
-//     try {
-//       const [ok, uriFrontend] = getUriFrontend(`/api/dashboard/${userInfo?.profile.sub}`);
-//       if (!ok) return;
-
-//       const response = await fetch(uriFrontend, {
-//         method: 'GET',
-//         headers: {
-//           'Content-Type': 'application/json',
-//           'Authorization': `Bearer ${userInfo?.access_token}`,
-//         },
-//       });
-
-//       if (!response.ok) {
-//         throw new Error(`HTTP error! status: ${response.status}`);
-//       }
-
-//       const data: DashboardData = await response.json();
-//       setDashboardData(data);
-//     } catch (error) {
-//       setDashboardData(null);
-//       setError({ status: 500, message: 'Error fetching dashboard data' });
-//       console.error('Error fetching dashboard data:', error);
-//     }
-//   };
-
-//   if (!authenticated || !userInfo) {
-//     return <div>Redirecting...</div>;
-//   }
-
-//   return (
-//     <SWRConfig
-//       value={{
-//         revalidateOnFocus: false,
-//         refreshInterval: 120000,
-//         dedupingInterval: 0,
-//         revalidateOnMount: true,
-//         onError: (error: QueryError) => {
-//           if (error.status === 401 || error.status === 403) {
-//             setError(error);
-//           }
-//         },
-//       }}
-//     >
-//       <DashboardContext.Provider value={dashboardContextValue}>
-//         <div className="grid min-h-screen w-full grid-cols-[240px_1fr] overflow-hidden">
-//           <NavDashboard />
-//           <div className="flex flex-col">
-//             <HeaderDashboard title="Dashboard" />
-//             <div className="flex-1 grid grid-cols-[240px_1fr] gap-6 p-6">
-//               <div className="flex flex-col gap-6">
-//                 <QuickActions />
-//                 <RecentActivity />
-//               </div>
-//               <div className="grid gap-6">
-//                 <div className="grid grid-cols-2 gap-6">
-//                   <TotalWorkflows />
-//                   <SuccessWorkflows />
-//                   <FailedWorkflows />
-//                   <PendingWorkflows />
-//                 </div>
-//                 <RecentWorkflows />
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       </DashboardContext.Provider>
-//     </SWRConfig>
-//   );
-// };
-
-// export default Dashboard;
