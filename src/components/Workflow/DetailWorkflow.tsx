@@ -46,26 +46,34 @@ export function DetailWorkflow(props: ContainerProps) {
 
   useEffect(() => {
     if (props.workflow && props.workflow.nodes) {
-      const transformedNodes = props.workflow.nodes.map(node => ({
-        ...node,
-        data: {
-          ...node.data,
-          onClickFromNode: (posX: number, posY: number, nodeID: string) =>
-            // handleClickFromNode(flowToScreenPosition({ x: 100, y: 0 }).x, flowToScreenPosition({ x: 100, y: 0 }).y
-            // let { clientX, clientY } = 'changedTouches' in event ? event.changedTouches[0] : event;
-            // clientX += offsetRight;
-            // clientY += offsetBottom;
-            handleClickFromNode(
-              flowToScreenPosition({ x: node.position.x + 200, y: node.position.y }).x,
-              flowToScreenPosition({ x: node.position.x + 200, y: node.position.y }).y,
-              nodeID
-            ),
-        },
-      }));
+      const transformedNodes = transformNodes(props.workflow.nodes);
       setNodes(transformedNodes);
       setEdges(props.workflow.edges || []);
     }
   }, [props.workflow, flowToScreenPosition, handleClickFromNode]);
+
+  function transformNodes(nodes: Node[]) {
+    const transformedNodes = [];
+    for (const node of nodes) {
+      const posX = node.position.x + 200;
+      const posY = node.position.y;
+
+      transformedNodes.push({
+        ...node,
+        data: {
+          ...node.data,
+          onClickFromNode: () => {
+            handleClickFromNode(
+              flowToScreenPosition({ x: posX, y: posY }).x,
+              flowToScreenPosition({ x: posX, y: posY }).y,
+              node.id
+            );
+          },
+        },
+      });
+    }
+    return transformedNodes;
+  }
 
   const onConnect = useCallback(
     function (params: Connection) {
