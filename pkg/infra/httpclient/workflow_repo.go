@@ -2,6 +2,8 @@ package httpclient
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
 	"minireipaz/pkg/domain/models"
 	"net/http"
 )
@@ -31,4 +33,56 @@ func (r *WorkflowRepository) CreateWorkflow(workflow models.Workflow, serviceUse
 	}
 
 	return createdWorkflow
+}
+
+func (r *WorkflowRepository) GetWorkflow(userID, workflowID, userToken, serviceUserAccessToken *string) models.ResponseWorkflow {
+	url, err := getBackendURL(fmt.Sprintf("/api/workflows/%s/%s", *userID, *workflowID))
+	if err != nil {
+		log.Printf("ERROR | %v", err)
+		return models.ResponseWorkflow{
+			Status:   http.StatusInternalServerError,
+			Error:    fmt.Sprintf("ERROR | %v", err),
+			Workflow: models.Workflow{},
+		}
+	}
+
+	body, err := r.client.DoRequest("GET", url, *serviceUserAccessToken, nil)
+	if err != nil {
+		log.Printf("ERROR | %v", err)
+		return models.ResponseWorkflow{
+			Status:   http.StatusInternalServerError,
+			Error:    fmt.Sprintf("ERROR | %v", err),
+			Workflow: models.Workflow{},
+		}
+	}
+
+	var newResponse models.ResponseWorkflow
+	if err := json.Unmarshal(body, &newResponse); err != nil {
+		return models.ResponseWorkflow{
+			Status:   http.StatusInternalServerError,
+			Error:    "Not valid URL",
+			Workflow: models.Workflow{},
+		}
+	}
+
+	return newResponse
+}
+
+func (r *WorkflowRepository) UpdateWorkflow(workflow models.Workflow, serviceUserAccessToken string) models.ResponseUpdatedWorkflow {
+	url, err := getBackendURL(fmt.Sprintf("/api/workflows/%s", workflow.UUID))
+	if err != nil {
+		return models.ResponseUpdatedWorkflow{Status: http.StatusInternalServerError}
+	}
+
+	body, err := r.client.DoRequest("PUT", url, serviceUserAccessToken, workflow)
+	if err != nil {
+		return models.ResponseUpdatedWorkflow{Status: http.StatusInternalServerError}
+	}
+
+	var updatedWorkflow models.ResponseUpdatedWorkflow
+	if err := json.Unmarshal(body, &updatedWorkflow); err != nil {
+		return models.ResponseUpdatedWorkflow{Status: http.StatusInternalServerError}
+	}
+
+	return updatedWorkflow
 }

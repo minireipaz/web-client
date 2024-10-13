@@ -1,9 +1,8 @@
 package models
 
 const (
-	UserStubExist        = "Stub already exists"
 	UserNameExist        = "username already exists"
-	UserCannotGenerate   = "error checking Stub existence"
+	UserCannotGenerate   = "error checking Sub existence"
 	UserNameCannotCreate = "error checking username existence"
 	UsertNameNotGenerate = "cannot create new user"
 	UserSubExist         = "Sub already exists"
@@ -25,7 +24,7 @@ type Users struct {
 	Scope       string  `json:"scope,omitempty"`
 	Profile     Profile `json:"profile,omitempty"`
 	ExpiresAt   int64   `json:"expires_at,omitempty"`
-	Sub         string  `json:"sub,omitempty"`
+	UserID      string  `json:"user_id,omitempty"`
 }
 
 type Profile struct {

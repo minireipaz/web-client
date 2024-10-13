@@ -21,7 +21,7 @@ func NewDashboardController(dashboardServ *services.DashboardService, authServ *
 }
 
 func (d *DashboardController) GetUserDashboardByID(ctx *gin.Context) {
-	sub := ctx.Param("iduser")
+	userID := ctx.Param("iduser")
 	userToken := ctx.MustGet("usertoken").(string)
 	serviceUserAccessToken, err := d.authService.GetServiceUserAccessToken()
 	if err != nil {
@@ -31,7 +31,7 @@ func (d *DashboardController) GetUserDashboardByID(ctx *gin.Context) {
 		})
 		return
 	}
-	infoDashboard := d.service.GetDashboardInfoByUserID(sub, serviceUserAccessToken, &userToken)
+	infoDashboard := d.service.GetDashboardInfoByUserID(userID, serviceUserAccessToken, &userToken)
 	if infoDashboard.Error != "" {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":  infoDashboard.Error,
