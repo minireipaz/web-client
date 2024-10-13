@@ -101,9 +101,9 @@ func ValidateGetWorkflow() gin.HandlerFunc {
 			return
 		}
 
-    idWorkflow := ctx.Param("idworkflow")
+		idWorkflow := ctx.Param("idworkflow")
 
-    if strings.TrimSpace(idWorkflow) == "" {
+		if strings.TrimSpace(idWorkflow) == "" {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID workflow user is required"})
 			ctx.Abort()
 			return

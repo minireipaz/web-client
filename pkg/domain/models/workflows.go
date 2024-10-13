@@ -85,8 +85,8 @@ type RequestUpdateWorkflow struct {
 }
 
 type RequestInfoWorkflow struct {
-	UserID           string   `json:"user_id"`
-	AccessToken      string   `json:"access_token"`
+	UserID      string `json:"user_id"`
+	AccessToken string `json:"access_token"`
 }
 
 //
@@ -130,7 +130,7 @@ type Position struct {
 }
 
 type Viewport struct {
-	X    *float64   `json:"x,omitempty"`
+	X    *float64 `json:"x,omitempty"`
 	Y    *float64 `json:"y,omitempty"`
-	Zoom *float64   `json:"zoom,omitempty"`
+	Zoom *float64 `json:"zoom,omitempty"`
 }
