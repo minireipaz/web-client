@@ -21,17 +21,23 @@ Password: 1234
 │   │   ├── jwt.generator.go
 │   │   └── token_client.go
 │   ├── common
-│   │   └── ping.go
+│   │   ├── ping.go
+│   │   └── randnum.go
 │   ├── config
 │   │   ├── envs.go
 │   │   └── zitadel.go
+│   ├── di
+│   │   └── di.go
 │   ├── domain
 │   │   ├── models
+│   │   │   ├── dashboard.go
+│   │   │   ├── general.go
 │   │   │   ├── token.go
 │   │   │   ├── users.go
 │   │   │   └── workflows.go
 │   │   └── services
 │   │       ├── auth_service.go
+│   │       ├── dashboard.go
 │   │       ├── users.go
 │   │       └── workflow_service.go
 │   ├── honeycomb
@@ -40,6 +46,7 @@ Password: 1234
 │   ├── infra
 │   │   ├── httpclient
 │   │   │   ├── client.go
+│   │   │   ├── dashboard.go
 │   │   │   ├── user.go
 │   │   │   ├── workflow_repo.go
 │   │   │   └── zitadel.go
@@ -50,9 +57,12 @@ Password: 1234
 │   ├── interfaces
 │   │   ├── controllers
 │   │   │   ├── auth.go
+│   │   │   ├── dashboard.go
 │   │   │   ├── users.go
 │   │   │   └── workflow.go
 │   │   ├── middlewares
+│   │   │   ├── auth.go
+│   │   │   ├── func_errors.go
 │   │   │   ├── middle.go
 │   │   │   └── validations.go
 │   │   └── routes
@@ -98,6 +108,7 @@ Password: 1234
 │   ├── authConfig.ts
 │   ├── components
 │   │   ├── AuthProvider
+│   │   │   ├── Approuter.tsx
 │   │   │   └── indexAuthProvider.tsx
 │   │   ├── Callback
 │   │   │   ├── authUserBackend.ts
@@ -111,8 +122,8 @@ Password: 1234
 │   │   │   ├── SuccessWorkflows.tsx
 │   │   │   └── TotalWorkflows.tsx
 │   │   ├── Dashboard
+│   │   │   ├── ContentDashboard.tsx
 │   │   │   ├── HeaderDashboard.tsx
-│   │   │   ├── indexDashboard.tsx
 │   │   │   └── NavDashboard.tsx
 │   │   ├── Header
 │   │   │   └── indexHeader.tsx
@@ -120,15 +131,25 @@ Password: 1234
 │   │   │   └── indexLogin.tsx
 │   │   ├── Logout
 │   │   │   └── indexLogout.tsx
-│   │   └── MyAccount
-│   │       └── indexMyaccount.tsx
+│   │   ├── MyAccount
+│   │   │   └── indexMyaccount.tsx
+│   │   └── Workflow
+│   │       ├── ButtonEdge.tsx
+│   │       ├── DetailWorkflow.tsx
+│   │       ├── HeaderWorkflow.tsx
+│   │       ├── WorkflowDrawer.tsx
+│   │       └── WrapperNode.tsx
 │   ├── index.css
 │   ├── main.tsx
 │   ├── models
+│   │   ├── Dashboard.ts
 │   │   ├── QuickActions.ts
-│   │   └── Users.ts
+│   │   ├── Users.ts
+│   │   └── Workflow.ts
 │   ├── Pages
 │   │   ├── indexDashboard.tsx
+│   │   ├── indexdashboard.tsx.local
+│   │   ├── indexWorkflowDetail.tsx
 │   │   └── indexWorkflows.tsx
 │   ├── utils
 │   │   └── getUriFrontend.ts
