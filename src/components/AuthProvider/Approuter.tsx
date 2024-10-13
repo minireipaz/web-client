@@ -25,7 +25,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 export function AppRouter() {
-  const { authenticated, setAuthenticated, handleLogin, handleLogout, userManager, loading } = useAuth();
+  const { authenticated, setAuthenticated, handleLogin, handleLogout, userManager, loading, userInfo } = useAuth();
 
   if (loading) {
     return (
@@ -36,7 +36,7 @@ export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login authenticated={authenticated} handleLogin={handleLogin} />} />
+        <Route path="/" element={<Login userInfo={userInfo} authenticated={authenticated} handleLogin={handleLogin} />} />
         <Route path="/callback" element={
           <Callback
             authenticated={authenticated as boolean}
@@ -53,6 +53,11 @@ export function AppRouter() {
         <Route path="/workflows" element={
           <ProtectedRoute>
             <Workflows />
+          </ProtectedRoute>
+        } />
+        <Route path="/workflow/" element={
+          <ProtectedRoute>
+            <WorkflowDetails />
           </ProtectedRoute>
         } />
         <Route path="/workflow/:uuid" element={
