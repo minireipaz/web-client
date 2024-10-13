@@ -1,0 +1,80 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base"
+  ],
+  "languageSettings": [
+    {
+      "language": "golang",
+      "enabled": true,
+      "fileMatch": [
+        "^go\\.mod$",
+        "^go\\.sum$"
+      ],
+      "packageRules": [
+        {
+          "managers": [
+            "gomod"
+          ],
+          "groupName": "Go dependencies",
+          "schedule": [
+            "at any time"
+          ]
+        }
+      ]
+    },
+    {
+      "language": "javascript",
+      "enabled": true,
+      "fileMatch": [
+        "^package\\.json$",
+        "^package-lock\\.json$",
+        "^yarn\\.lock$",
+        "^pnpm-lock\\.yaml$"
+      ],
+      "packageRules": [
+        {
+          "managers": [
+            "npm",
+            "yarn",
+            "pnpm"
+          ],
+          "groupName": "JavaScript dependencies",
+          "schedule": [
+            "at any time"
+          ]
+        },
+        {
+          "packagePatterns": [
+            "^react"
+          ],
+          "groupName": "React dependencies"
+        },
+        {
+          "packagePatterns": [
+            "^typescript",
+            "^@types"
+          ],
+          "groupName": "TypeScript dependencies"
+        }
+      ]
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "groupName": "Development dependencies"
+    }
+  ],
+  "dependencyDashboard": true,
+  "timezone": "UTC",
+  "schedule": [
+    "before 3am on Monday"
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "automerge": false
+}
