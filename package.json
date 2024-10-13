@@ -10,29 +10,29 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@upstash/redis": "^1.34.0",
-    "@xyflow/react": "^12.3.0",
+    "@upstash/redis": "^1.34.3",
+    "@xyflow/react": "^12.3.2",
     "@zitadel/react": "^1.0.3",
-    "flowbite-react": "^0.10.1",
-    "oidc-client-ts": "^3.0.1",
+    "flowbite-react": "^0.10.2",
+    "oidc-client-ts": "^3.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.2"
+    "react-router-dom": "^6.27.0"
   },
   "devDependencies": {
-    "@types/node": "^22.5.5",
-    "@types/react": "^18.3.5",
-    "@types/react-dom": "^18.3.0",
-    "@typescript-eslint/eslint-plugin": "^8.5.0",
-    "@typescript-eslint/parser": "^8.5.0",
-    "@vitejs/plugin-react": "^4.3.1",
+    "@types/node": "^22.7.5",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.8.1",
+    "@typescript-eslint/parser": "^8.8.1",
+    "@vitejs/plugin-react": "^4.3.2",
     "autoprefixer": "^10.4.20",
-    "eslint": "^9.10.0",
-    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint": "^9.12.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.12",
-    "tailwindcss": "^3.4.11",
-    "typescript": "^5.6.2",
-    "vercel": "^37.4.2",
-    "vite": "^5.4.5"
+    "tailwindcss": "^3.4.13",
+    "typescript": "^5.6.3",
+    "vercel": "^37.8.0",
+    "vite": "^5.4.8"
   }
 }
