@@ -42,6 +42,7 @@ export default function Callback({ authenticated, setAuth, userManager }: Props)
           } else {
             setAuth(true);
             setUserInfo(user);
+            checkUserExist(user);
           }
         } else {
           setAuth(false);
@@ -49,6 +50,9 @@ export default function Callback({ authenticated, setAuth, userManager }: Props)
       } catch (error) {
         setAuth(false);
       }
+    }
+    if (authenticated === true && userInfo) {
+      checkUserExist(userInfo);
     }
   }
 
@@ -63,16 +67,11 @@ export default function Callback({ authenticated, setAuth, userManager }: Props)
     }
   }
 
-  useEffect(() => {
-    if (authenticated === true && userInfo) {
-      checkUserExist(userInfo);
-    }
-  }, [authenticated, userInfo, navigate]);
-
   async function checkUserExist(user: User) {
     const isOk = await ensureUserExists(user);
     if (isOk) {
       navigate('/dashboard', { state: { userInfo: user } });
+      return;
     } else {
       setAuth(false);
     }

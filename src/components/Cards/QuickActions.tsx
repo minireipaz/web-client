@@ -4,17 +4,17 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthProvider/indexAuthProvider";
 import { ResponseGenerateWorkflow } from "../../models/QuickActions";
 import { getUriFrontend } from "../../utils/getUriFrontend";
-import { Workflow } from "../../models/Dashboard";
+import { Workflow } from "../../models/Workflow";
 
 const emptyWorkflow: Workflow = {
   name: "",
   description: "",
   directory_to_save: "home",
   id: "",
-  sub: "",
+  user_id: "",
   created_at: "",
   updated_at: "",
-  status: "",
+  status: 1,
   start_time: "",
   duration: 0,
   is_active: 1,
@@ -99,20 +99,20 @@ export function QuickActions() {
         name: workflow.name,
         description: workflow.description,
         directory_to_save: workflow.directory_to_save,
-        sub: userInfo?.profile.sub,
+        user_id: userInfo?.profile.sub,
         // ?
         id: "",
-        status: "",
-        start_time: "",
+        status: 1,
+        created_at: "",
         duration: 0,
         is_active: 1
       };
 
-      const [ok, uriFrontend] = getUriFrontend("/api/workflows");
+      const [ok, uriFrontend] = getUriFrontend(`/api/workflows`);
       if (!ok) {
         return [false, failConnection];
       }
-      const response = await fetch(`${uriFrontend}`, {
+      const response = await fetch(uriFrontend, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

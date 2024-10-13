@@ -1,13 +1,15 @@
+import { User } from "oidc-client-ts";
 import { Navigate } from "react-router-dom";
 
 interface Props {
   handleLogin: () => void;
+  userInfo: User | null;
   authenticated: boolean | null;
 };
 
-export default function Login({ authenticated, handleLogin }: Props) {
-  if (authenticated === true) {
-    return <Navigate to="/dashboard" replace />;
+export default function Login({ authenticated, userInfo, handleLogin }: Props) {
+  if (authenticated === true && userInfo) {
+    return <Navigate to="/dashboard" replace state={userInfo} />;
   }
 
   return (

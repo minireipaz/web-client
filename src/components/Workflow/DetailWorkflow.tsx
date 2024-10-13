@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   ReactFlow,
   addEdge,
@@ -13,41 +13,59 @@ import {
   useReactFlow,
   ReactFlowJsonObject
 } from '@xyflow/react';
-import { edgeTypes, NodeData, nodeTypes, offsetBottom, offsetRight, Workflow } from '../../models/Workflow';
+import { edgeTypes, MsgSaved, NodeData, nodeTypes, offsetBottom, offsetRight, ResponseUpdateWorkflow, savedStatus, Workflow } from '../../models/Workflow';
 import '@xyflow/react/dist/style.css';
 import { WorkflowDrawer } from './WorkflowDrawer';
 import HeaderWorkflow from './HeaderWorkflow';
+import { getUriFrontend } from '../../utils/getUriFrontend';
+import { useAuth } from '../AuthProvider/indexAuthProvider';
 
 interface ContainerProps {
   workflow: Workflow;
 }
 
 export function DetailWorkflow(props: ContainerProps) {
-
-  const initialNodes: Node[] = [
-    {
-      id: 'initial-node',
-      type: 'wrapperNode',
-      position: { x: 2, y: 0 },
-      data: {
-        id: "initial-node",
-        label: 'Start Point',
-        options: 'Initial Options',
-        description: 'This is the starting point of your workflow',
-        onClickFromNode: () => handleClickFromNode(flowToScreenPosition({ x: 100, y: 0 }).x, flowToScreenPosition({ x: 100, y: 0 }).y, 'initial-node'),  //setIsDrawerOpen(true),
-      },
-    },
-  ];
-
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [workflow, setWorkflow] = useState(props.workflow);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const closeDrawer = () => setIsDrawerOpen(false);
   const [clickPosition, setClickPosition] = useState({ x: 0, y: 0 });
   const { screenToFlowPosition, flowToScreenPosition } = useReactFlow();
   const [lastNodeID, setLastNodeID] = useState("");
   const [rfInstance, setRfInstance] = useState(null);
-  const [workflow, setWorkflow] = useState(props.workflow);
+  const [msgSaved, setMsgSaved] = useState<MsgSaved>({ text: "" });
+  const { userInfo } = useAuth();
+
+  const closeDrawer = () => setIsDrawerOpen(false);
+  const handleClickFromNode = useCallback((posX: number, posY: number, nodeID: string) => {
+    setIsDrawerOpen(true);
+    setLastNodeID(nodeID);
+    setClickPosition({ x: posX, y: posY });
+  }, []);
+  // }, [isDrawerOpen, setIsDrawerOpen])
+
+  useEffect(() => {
+    if (props.workflow && props.workflow.nodes) {
+      const transformedNodes = props.workflow.nodes.map(node => ({
+        ...node,
+        data: {
+          ...node.data,
+          onClickFromNode: (posX: number, posY: number, nodeID: string) =>
+            // handleClickFromNode(flowToScreenPosition({ x: 100, y: 0 }).x, flowToScreenPosition({ x: 100, y: 0 }).y
+            // let { clientX, clientY } = 'changedTouches' in event ? event.changedTouches[0] : event;
+            // clientX += offsetRight;
+            // clientY += offsetBottom;
+            handleClickFromNode(
+              flowToScreenPosition({ x: node.position.x + 200, y: node.position.y }).x,
+              flowToScreenPosition({ x: node.position.x + 200, y: node.position.y }).y,
+              nodeID
+            ),
+        },
+      }));
+      setNodes(transformedNodes);
+      setEdges(props.workflow.edges || []);
+    }
+  }, [props.workflow, flowToScreenPosition, handleClickFromNode]);
 
   const onConnect = useCallback(
     function (params: Connection) {
@@ -70,12 +88,6 @@ export function DetailWorkflow(props: ContainerProps) {
       }
     }, [screenToFlowPosition])
 
-  const handleClickFromNode = useCallback((posX: number, posY: number, nodeID: string) => {
-    setIsDrawerOpen(true);
-    setLastNodeID(nodeID);
-    setClickPosition({ x: posX, y: posY });
-  }, [isDrawerOpen, setIsDrawerOpen])
-
   const handleClickDrawer = useCallback((event: any, nodeData: NodeData) => {
     event.preventDefault();
     const position = screenToFlowPosition({
@@ -92,7 +104,14 @@ export function DetailWorkflow(props: ContainerProps) {
         label: nodeData.label,
         options: nodeData.options || 'Default Options',
         description: nodeData.description || 'Default Description',
-        onClickFromNode: (posX: number, posY: number, nodeID: string) => handleClickFromNode(posX, posY, nodeID),
+        onClickFromNode: (posX: number, posY: number, nodeID: string) =>{
+          handleClickFromNode(posX, posY, nodeID);
+          // handleClickFromNode(
+          //   flowToScreenPosition({ x: posX, y: posY }).x,
+          //   flowToScreenPosition({ x: posX, y: posY }).y,
+          //   nodeID
+          // )
+        },
       },
     };
 
@@ -101,8 +120,8 @@ export function DetailWorkflow(props: ContainerProps) {
       eds.concat({ id: nodeID, source: lastNodeID, target: nodeID, type: 'buttonedge', animated: true, style: { stroke: '#fff' } }),
     );
     setIsDrawerOpen(false);
-
-  }, [isDrawerOpen, setIsDrawerOpen]);
+  }, [clickPosition, nodes, lastNodeID, screenToFlowPosition, flowToScreenPosition, handleClickFromNode]);
+  // }, [isDrawerOpen, setIsDrawerOpen]);
 
   const handleWorkflowUpdate = (updatedFields: Workflow) => {
     setWorkflow((prevWorkflow) => ({
@@ -112,15 +131,69 @@ export function DetailWorkflow(props: ContainerProps) {
 
   };
 
-  const handleSaveWorkflow = useCallback(() => {
+  const handleSaveWorkflow = useCallback(async () => {
     if (rfInstance) {
       // @ts-ignore ts(2339)
       const flow = rfInstance.toObject() as ReactFlowJsonObject;
       const currentWorkflow = { ...workflow, ...flow };
+      const updated = await sendChangedWorkflow(currentWorkflow);
+      if (!updated) {
+        setMsgSaved({ text: "Not Saved!", classText: savedStatus.alert });
+      } else {
+        setMsgSaved({ text: "Saved", classText: savedStatus.done });
+      }
+      setTimeout(() => {
+        setMsgSaved({ text: "", classText: savedStatus.none });
+      }, 5000);
       setWorkflow({ ...currentWorkflow });
       console.log('Saving workflow:', currentWorkflow);
     }
   }, [rfInstance, workflow]);
+
+  async function sendChangedWorkflow(currentWorkflow: Workflow) {
+    try {
+      const [ok, uriFrontend] = getUriFrontend(`/api/workflows/${currentWorkflow.id}`);
+      if (!ok) {
+        return false;
+      }
+
+      currentWorkflow.user_id = userInfo?.profile.sub;
+      currentWorkflow.access_token = userInfo?.access_token;
+      currentWorkflow.status = Number.parseInt(currentWorkflow.status.toString()) || 1;
+
+      const response = await fetch(uriFrontend, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${userInfo?.access_token}`,
+        },
+        body: JSON.stringify({
+          user_id: userInfo?.profile.sub,
+          access_token: userInfo?.access_token,
+          data: currentWorkflow
+        }),
+      });
+
+      if (!response.ok) {
+        // TODO: better redirect
+        return false;
+      }
+
+      const data: ResponseUpdateWorkflow = await response.json();
+      console.log("updated Workflow response:", JSON.stringify(data));
+      if (data.error !== "") {
+        return false;
+      }
+      if (data.status !== 200) {
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error("Error registering user in backend:", error);
+      return false;
+    }
+    return false;
+  }
 
   return (
     <>
@@ -129,6 +202,7 @@ export function DetailWorkflow(props: ContainerProps) {
           workflow={workflow}
           onUpdate={handleWorkflowUpdate}
           onSave={handleSaveWorkflow}
+          msgSaved= {msgSaved}
         />
         <div className="h-full w-full relative">
           <ReactFlow
@@ -163,7 +237,6 @@ export function DetailWorkflow(props: ContainerProps) {
               onClick={handleClickDrawer}
             />
           </div>
-
         </div>
       </div>
     </>

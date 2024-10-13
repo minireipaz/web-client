@@ -29,7 +29,9 @@ export function RecentWorkflows(props: ContainerProps) {
   }
 
   function formatStartTime(startTime: string): string {
-    if (startTime === "1970-01-01 00:00:00") {
+    if (!startTime) return "Not Started";
+
+    if (startTime.startsWith("1970") || startTime.startsWith("0001")) {
       return "Not Started";
     }
     return new Date(startTime).toLocaleString();
@@ -75,13 +77,12 @@ export function RecentWorkflows(props: ContainerProps) {
             {/* List of workflows */}
             <ul className="text-sm list-none m-0 p-0">
               {recentWorkflows && recentWorkflows.length > 0 ? (
-                recentWorkflows.map((workflow, index) => (
+                recentWorkflows.map( (workflow, index) => (
                   <li key={index} className="border-b last:border-b-0">
                     <div className="grid grid-cols-6 gap-4 py-2 items-center">
                       <div className="px-4">
                         <Link
                           to={`/workflow/${workflow.id}`}
-                          state={workflow}
                           className="w-fit font-medium flex flex-shrink-0 cursor-pointer items-center underline underline-offset-4 "
                         >
                           <span>
@@ -100,11 +101,11 @@ export function RecentWorkflows(props: ContainerProps) {
                         </Tooltip>
                       </div>
                       <div className="px-4 flex items-center">
-                        <div className={`${statusMap[Number.parseInt(workflow.status)].class} inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground`}>
-                          {statusMap[Number.parseInt(workflow.status)].text}
+                        <div className={`${statusMap[Number.parseInt(workflow.status.toString())].class} inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground`}>
+                          {statusMap[Number.parseInt(workflow.status.toString())].text}
                         </div>
                       </div>
-                      <div className="px-4 flex items-center">{formatStartTime(workflow.start_time)}</div>
+                      <div className="px-4 flex items-center">{formatStartTime(workflow.start_time as string)}</div>
                       <div className="px-4 flex items-center">{formatDuration(workflow.duration as number)}</div>
                       <div className="px-4 flex items-center">
                         <Dropdown label="More" dismissOnClick={false}>

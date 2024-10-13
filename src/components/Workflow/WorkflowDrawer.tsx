@@ -1,5 +1,5 @@
 import { Drawer } from "flowbite-react";
-import { NodeData } from "./DetailWorkflow";
+import { NodeData } from "../../models/Workflow";
 
 interface ContainerProps {
   isOpen: boolean;
@@ -8,16 +8,16 @@ interface ContainerProps {
 }
 
 export function WorkflowDrawer(props: ContainerProps) {
-  const DefaultNode = ({ type, label }: { type: string; label: string }) => (
+  const DefaultNode = (node: NodeData) => (
     <button
       className="w-52 border border-gray-300 rounded p-2 mb-2 bg-white text-black select-none"
       draggable={false}
       onClick={(event: any) => {
-        const nodeData: NodeData = { type, label };
+        const nodeData: NodeData = { ...node };
         props.onClick(event, nodeData);
       }}
     >
-      {label}
+      {node.label}
     </button>
   );
 
@@ -28,9 +28,9 @@ export function WorkflowDrawer(props: ContainerProps) {
         <Drawer.Items>
           <div className='ml-4 flex flex-col items-start justify-start'>
             <h2 className="text-lg font-bold mb-4 select-none text-black">Popular</h2>
-            <DefaultNode type="input" label="Nodo Input" />
-            <DefaultNode type="default" label="Nodo Default" />
-            <DefaultNode type="output" label="Nodo Output" />
+            <DefaultNode id="id1" description="node input" options="optin1" type="input" label="Nodo Input" />
+            <DefaultNode id="id2" description="node default" options="optin2" type="default" label="Nodo Default" />
+            <DefaultNode id="id3" description="node output" options="optin3" type="output" label="Nodo Output" />
           </div>
         </Drawer.Items>
       </Drawer>

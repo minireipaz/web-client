@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../components/AuthProvider/indexAuthProvider";
 import { NavDashboard } from "../components/Dashboard/NavDashboard";
 import { HeaderDashboard } from "../components/Dashboard/HeaderDashboard";
@@ -6,15 +7,19 @@ import { DashboardData, ResponseDashboardData, WorkflowCounts } from "../models/
 import { getUriFrontend } from "../utils/getUriFrontend";
 import { ContentDashboard } from "../components/Dashboard/ContentDashboard";
 import { Workflow } from "../models/Workflow";
+import { Node, Edge } from '@xyflow/react';
 
 export default function Dashboard() {
-  const { authenticated, userInfo } = useAuth();
+  const { authenticated, handleTokenExpiration, userInfo, handleSetUserInfo } = useAuth();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const fetchedRef = useRef(false);
 
   const fetchDashboardData = useCallback(async () => {
-    if (!authenticated || !userInfo) {
-      return;
-    }
+    if (fetchedRef.current) return;
+
+    fetchedRef.current = true;
 
     try {
       const [ok, uriFrontend] = getUriFrontend(`/api/dashboard/${userInfo?.profile.sub}`);
@@ -29,15 +34,22 @@ export default function Dashboard() {
           "Authorization": `Bearer ${userInfo?.access_token}`,
         },
       });
+
+      if (response.status === 401) {
+        // Token has expired, handle expiration and redirect
+        handleTokenExpiration();
+        navigate('/', { replace: true });
+        return;
+      }
+
       if (!response.ok) {
-        // TODO: better redirect
         setDashboardData(null);
         return;
       }
 
       const data: ResponseDashboardData = await response.json();
       if (data.error !== "" || data.status !== 200) {
-        console.log("ERROR | cannot get dashboard data"); // loop
+        console.log("ERROR | cannot get dashboard data");
         return;
       }
       let convertedDashboard: DashboardData = convertDashboardData(data);
@@ -46,15 +58,27 @@ export default function Dashboard() {
       setDashboardData(null);
       console.error("Error fetching dashboard data:", error);
     }
-  }, [authenticated, userInfo]);
+  }, [handleTokenExpiration, navigate]);
 
   useEffect(() => {
-    if (authenticated && userInfo) {
+    if (!authenticated) {
+      navigate('/', { replace: true });
+      return;
+    }
+
+    if (!userInfo) {
+      if (location.state.userInfo) {
+        handleSetUserInfo(location.state.userInfo);
+      }
+    }
+
+    if (userInfo) {
       if (!dashboardData) {
         fetchDashboardData();
       }
     }
-  }, [authenticated, userInfo]);
+
+  }, [userInfo, authenticated, fetchDashboardData, navigate]);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -68,7 +92,7 @@ export default function Dashboard() {
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [fetchDashboardData]);
+  }, [fetchDashboardData, dashboardData]);
 
   function convertDashboardData(responseData: ResponseDashboardData): DashboardData {
     let dashboard: DashboardData = {
@@ -92,24 +116,21 @@ export default function Dashboard() {
           id: values[0],
           name: values[1],
           description: values[2],
-          status: values[3],
+          status: Number.parseInt(values[3]),
           is_active: Number.parseInt(values[4]) as 1 | 2 | 3,
-          start_time: values[5],
-          duration: Number.parseInt(values[6]) || 0,
-          directory_to_save: "home",
-          nodes: [],
-          edges: [],
+          created_at: values[5] as string,
+          updated_at: values[6] as string,
+          nodes: JSON.parse(values[7]) as Node[],
+          edges: JSON.parse(values[8]) as Edge[],
+          viewport: JSON.parse(values[9]),
+          directory_to_save: values[10],
+          start_time: values[11],
+          duration: Number.parseInt(values[12])
         };
         dashboard.workflows_recents.push(workflows);
       }
-
-
     }
     return dashboard;
-  }
-
-  if (!authenticated || !userInfo) {
-    return <div>Redirecting dasboard...</div>;
   }
 
   return (

@@ -18,7 +18,7 @@ export async function ensureUserExists(userInfo: User | null): Promise<boolean> 
         "Authorization": `Bearer ${userInfo?.access_token}`,
       },
       body: JSON.stringify({
-        sub: userInfo?.profile.sub,
+        user_id: userInfo?.profile.sub,
         access_token: userInfo.access_token,
       }),
     });

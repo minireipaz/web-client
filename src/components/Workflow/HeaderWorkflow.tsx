@@ -1,14 +1,15 @@
 import React from 'react';
 import { Button, ToggleSwitch } from "flowbite-react";
-import { Workflow } from "../../models/Workflow";
+import { MsgSaved, Workflow } from "../../models/Workflow";
 
 interface ContainerProps {
   workflow: Workflow;
   onUpdate: (updatedFields: Workflow) => void;
   onSave: () => void;
+  msgSaved: MsgSaved;
 }
 
-export default function HeaderWorkflow({ workflow, onUpdate, onSave }: ContainerProps) {
+export default function HeaderWorkflow({ workflow, onUpdate, onSave, msgSaved }: ContainerProps) {
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.value === "") return;
     const tempWorkflow = {...workflow, name: event.target.value } satisfies Workflow;
@@ -34,6 +35,14 @@ export default function HeaderWorkflow({ workflow, onUpdate, onSave }: Container
           />
         </div>
         <div className="flex items-center space-x-4">
+          <span>
+            Only save when you press the SAVE button
+          </span>
+          <span className={msgSaved.classText}>
+            {msgSaved.text}
+          </span>
+        </div>
+        <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             <label htmlFor="is_active" className="text-sm text-gray-400 select-none">Active</label>
             <ToggleSwitch
@@ -45,7 +54,7 @@ export default function HeaderWorkflow({ workflow, onUpdate, onSave }: Container
           <Button disabled size="sm" className="text-gray-400 border-gray-700">
             Share
           </Button>
-          <Button onClick={onSave} size="sm">Save</Button>
+          <Button onClick={onSave} size="sm" autoFocus={false}>Save</Button>
         </div>
       </div>
     </div>
