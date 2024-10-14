@@ -1,19 +1,20 @@
 import { Link } from 'react-router-dom';
 import { DashboardData, statusMap, activeMap } from "../../models/Dashboard";
-import { CustomFlowbiteTheme, Dropdown, Tooltip } from 'flowbite-react';
+import {  Dropdown, Tooltip } from 'flowbite-react';
+import { customTooltipTheme } from '../../models/Workflow';
 
 
 interface ContainerProps {
   dashboardData: DashboardData | null
 }
 
-const customTooltipTheme: CustomFlowbiteTheme["tooltip"] = {
-  target: "w-[-webkit-fill-available]"
-};
+
 
 export function RecentWorkflows(props: ContainerProps) {
 
   function formatDuration(durati: number): string {
+    if (!durati) return "N/A";
+
     const duration = Number.parseInt(durati.toString() as string);
     if (duration === null || duration === undefined || !Number.isInteger(duration)) {
       return "N/A";
@@ -57,7 +58,7 @@ export function RecentWorkflows(props: ContainerProps) {
 
   return (
     <>
-      <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+      <div className="rounded-lg border ">
         <div className="flex flex-col space-y-1.5 p-6">
           <h3 className="whitespace-nowrap text-2xl font-semibold leading-none tracking-tight">Recent Workflows</h3>
           <p className="text-sm">View the latest workflows</p>

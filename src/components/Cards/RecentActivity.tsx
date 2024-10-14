@@ -1,7 +1,7 @@
 export function RecentActivity() {
   return (
     <>
-      <div className="rounded-lg border bg-card text-card-foreground shadow-sm" >
+      <div className="rounded-lg border " >
         <div className="flex flex-col space-y-1.5 p-6" >
           <h3 className="whitespace-nowrap text-2xl font-semibold leading-none tracking-tight" >Recent Activity</h3>
         </div>

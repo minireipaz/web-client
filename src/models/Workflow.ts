@@ -1,6 +1,7 @@
 import { Node, Edge, NodeTypes } from '@xyflow/react';
 import { WrapperNode } from '../components/Workflow/WrapperNode';
 import ButtonEdge from '../components/Workflow/ButtonEdge';
+import { CustomFlowbiteTheme } from 'flowbite-react';
 
 export interface NodeData {
   id: string;
@@ -65,6 +66,12 @@ export interface ResponseGetWorkflow {
   workflow: Workflow;
 }
 
+export interface ResponseGetAllWorkflows {
+  error: string;
+  status: number;
+  workflow: Workflow[];
+}
+
 
 export interface MsgSaved {
   text: string;
@@ -77,4 +84,8 @@ export const savedStatus: Record<string, string> = {
   "done": 'text-sm text-green-800 select-none',
   "alert": 'text-sm bg-red-100 text-red-800 select-none',
   "none": "",
+};
+
+export const customTooltipTheme: CustomFlowbiteTheme["tooltip"] = {
+  target: "w-[-webkit-fill-available]"
 };
