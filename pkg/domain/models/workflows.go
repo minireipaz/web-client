@@ -48,6 +48,13 @@ type ResponseWorkflow struct {
 	Status   int      `json:"status"`
 }
 
+type ResponseAllWorkflow struct {
+	Error    string   `json:"error"`
+	Workflow []Workflow `json:"workflow"`
+	Status   int      `json:"status"`
+}
+
+
 type ResponseUpdatedWorkflow struct {
 	Error  string `json:"error"`
 	Status int    `json:"status"`

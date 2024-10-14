@@ -68,6 +68,39 @@ func (r *WorkflowRepository) GetWorkflow(userID, workflowID, userToken, serviceU
 	return newResponse
 }
 
+func (r *WorkflowRepository) GetAllWorkflow(userID, userToken, serviceUserAccessToken *string) models.ResponseAllWorkflow {
+	url, err := getBackendURL(fmt.Sprintf("/api/workflows/%s", *userID))
+	if err != nil {
+		log.Printf("ERROR | %v", err)
+		return models.ResponseAllWorkflow{
+			Status:   http.StatusInternalServerError,
+			Error:    fmt.Sprintf("ERROR | %v", err),
+			Workflow: nil,
+		}
+	}
+
+	body, err := r.client.DoRequest("GET", url, *serviceUserAccessToken, nil)
+	if err != nil {
+		log.Printf("ERROR | %v", err)
+		return models.ResponseAllWorkflow{
+			Status:   http.StatusInternalServerError,
+			Error:    fmt.Sprintf("ERROR | %v", err),
+			Workflow: nil,
+		}
+	}
+
+	var newResponse models.ResponseAllWorkflow
+	if err := json.Unmarshal(body, &newResponse); err != nil {
+		return models.ResponseAllWorkflow{
+			Status:   http.StatusInternalServerError,
+			Error:    "Not valid URL",
+			Workflow:nil,
+		}
+	}
+
+	return newResponse
+}
+
 func (r *WorkflowRepository) UpdateWorkflow(workflow models.Workflow, serviceUserAccessToken string) models.ResponseUpdatedWorkflow {
 	url, err := getBackendURL(fmt.Sprintf("/api/workflows/%s", workflow.UUID))
 	if err != nil {

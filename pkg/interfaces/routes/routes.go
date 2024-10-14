@@ -15,7 +15,7 @@ func Register(app *gin.Engine, workflowController *controllers.WorkflowControlle
 	{
 		route.GET("/ping", common.Ping)
 		route.POST("/workflows", middlewares.ValidateWorkflow(), workflowController.CreateWorkflow)
-		// route.GET("/workflows", controllers.GetAllWorkflows)
+		route.GET("/workflows/:iduser", middlewares.ValidateUserID(), workflowController.GetAllWorkflows)
 		route.GET("/workflows/:iduser/:idworkflow", middlewares.ValidateGetWorkflow(), workflowController.GetWorkflowByID)
 		route.PUT("/workflows/:id", middlewares.ValidateUpdateWorkflow(), workflowController.UpdateWorkflow)
 		// route.DELETE("/workflows/:id", controllers.DeleteWorkflow)

@@ -21,6 +21,10 @@ func (s *WorkflowService) GetWorkflow(userID, workflowID, userToken, serviceUser
 	return s.workflowRepo.GetWorkflow(userID, workflowID, userToken, serviceUserAccessToken)
 }
 
+func (s *WorkflowService) GetAllWorkflow(userID, userToken, serviceUserAccessToken *string) models.ResponseAllWorkflow {
+	return s.workflowRepo.GetAllWorkflow(userID, userToken, serviceUserAccessToken)
+}
+
 func (s *WorkflowService) UpdateWorkflow(workflow models.Workflow, serviceUserToken *string) models.ResponseUpdatedWorkflow {
 	return s.workflowRepo.UpdateWorkflow(workflow, *serviceUserToken)
 }

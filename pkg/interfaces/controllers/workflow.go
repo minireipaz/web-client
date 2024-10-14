@@ -37,6 +37,24 @@ func (wc *WorkflowController) CreateWorkflow(ctx *gin.Context) {
 	ctx.JSON(createdWorkflow.Status, createdWorkflow)
 }
 
+func (wc *WorkflowController) GetAllWorkflows(ctx *gin.Context) {
+  userID := ctx.Param("iduser")
+	userToken := ctx.MustGet("usertoken").(string) // it's validated
+	serviceUserToken, err := wc.authService.GetServiceUserAccessToken()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error":  fmt.Sprintf("Failed to authenticate: %v", err),
+			"status": http.StatusInternalServerError,
+		})
+		return
+	}
+
+	newWorkflow := wc.service.GetAllWorkflow(&userID, &userToken, serviceUserToken)
+
+	ctx.JSON(newWorkflow.Status, newWorkflow)
+}
+
+
 func (wc *WorkflowController) GetWorkflowByID(ctx *gin.Context) {
 	userID := ctx.Param("iduser")
 	workflowID := ctx.Param("idworkflow")
