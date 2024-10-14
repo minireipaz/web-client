@@ -38,7 +38,7 @@ func (wc *WorkflowController) CreateWorkflow(ctx *gin.Context) {
 }
 
 func (wc *WorkflowController) GetAllWorkflows(ctx *gin.Context) {
-  userID := ctx.Param("iduser")
+	userID := ctx.Param("iduser")
 	userToken := ctx.MustGet("usertoken").(string) // it's validated
 	serviceUserToken, err := wc.authService.GetServiceUserAccessToken()
 	if err != nil {
@@ -53,7 +53,6 @@ func (wc *WorkflowController) GetAllWorkflows(ctx *gin.Context) {
 
 	ctx.JSON(newWorkflow.Status, newWorkflow)
 }
-
 
 func (wc *WorkflowController) GetWorkflowByID(ctx *gin.Context) {
 	userID := ctx.Param("iduser")

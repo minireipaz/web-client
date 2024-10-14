@@ -94,7 +94,7 @@ func (r *WorkflowRepository) GetAllWorkflow(userID, userToken, serviceUserAccess
 		return models.ResponseAllWorkflow{
 			Status:   http.StatusInternalServerError,
 			Error:    "Not valid URL",
-			Workflow:nil,
+			Workflow: nil,
 		}
 	}
 
