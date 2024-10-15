@@ -131,7 +131,6 @@ export function Workflows() {
           <HeaderDashboard title="Workflows" />
           <div className="grid gap-6" >
             <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="whitespace-nowrap text-2xl font-semibold leading-none tracking-tight">Workflows</h3>
               <p className="text-sm">Lorem ipsum, dolor sit amet consectetur adipisicing elit.</p>
             </div>
             <div className="pt-0 pr-4 pl-4 pb-4">
