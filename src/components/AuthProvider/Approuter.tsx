@@ -7,6 +7,7 @@ import Dashboard from "../../Pages/indexDashboard.tsx";
 import { Workflows } from "../../Pages/indexWorkflows.tsx";
 import { WorkflowDetails } from "../../Pages/indexWorkflowDetail.tsx";
 import { UserManager } from 'oidc-client-ts';
+import { Credentials } from '../../Pages/indexCredentials.tsx';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { authenticated, loading } = useAuth();
@@ -63,6 +64,11 @@ export function AppRouter() {
         <Route path="/workflow/:uuid" element={
           <ProtectedRoute>
             <WorkflowDetails />
+          </ProtectedRoute>
+        } />
+        <Route path="/credentials" element={
+          <ProtectedRoute>
+            <Credentials />
           </ProtectedRoute>
         } />
       </Routes>
