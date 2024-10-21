@@ -10,7 +10,7 @@ interface Props {
   handleLogout: any;
 };
 
-export default function Callback({ authenticated, setAuth, userManager }: Props) {
+export default function Callback({ authenticated, setAuth, userManager, handleLogout }: Props) {
   const [userInfo, setUserInfo] = useState<User | null>(null);
   const navigate = useNavigate();
 
@@ -45,10 +45,10 @@ export default function Callback({ authenticated, setAuth, userManager }: Props)
             checkUserExist(user);
           }
         } else {
-          setAuth(false);
+          handleLogout();
         }
       } catch (error) {
-        setAuth(false);
+        handleLogout();
       }
     }
     if (authenticated === true && userInfo) {
@@ -73,7 +73,7 @@ export default function Callback({ authenticated, setAuth, userManager }: Props)
       navigate('/dashboard', { state: { userInfo: user } });
       return;
     } else {
-      setAuth(false);
+      handleLogout();
     }
   }
 
