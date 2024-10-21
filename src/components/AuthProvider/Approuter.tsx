@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import React, { useEffect } from 'react';
+import { BrowserRouter, Route, Routes, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthProvider/indexAuthProvider.tsx";
 import Login from "../Login/indexLogin.tsx";
 import Callback from "../Callback/indexCallback.tsx";
@@ -8,9 +8,28 @@ import { Workflows } from "../../Pages/indexWorkflows.tsx";
 import { WorkflowDetails } from "../../Pages/indexWorkflowDetail.tsx";
 import { UserManager } from 'oidc-client-ts';
 import { Credentials } from '../../Pages/indexCredentials.tsx';
+import { ensureUserExists } from "../Callback/authUserBackend.ts";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { authenticated, loading } = useAuth();
+  const { authenticated, loading, userInfo, handleLogout } = useAuth();
+
+  useEffect(() => {
+    if (!authenticated || !userInfo) return;
+
+    const checkUser = async () => {
+      try {
+        const isOk = await ensureUserExists(userInfo);
+        if (!isOk) {
+          handleLogout();
+        }
+      } catch (error) {
+        console.error('Error checking user existence:', error);
+        handleLogout();
+      }
+    };
+
+    checkUser();
+  }, [authenticated, userInfo]);
 
   if (loading) {
     return <div>Loading...</div>;
