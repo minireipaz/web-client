@@ -35,7 +35,7 @@ func ValidateWorkflow() gin.HandlerFunc {
 			return
 		}
 
-		ctx.Set("workflow", workflow)
+		ctx.Set(models.ValidateWorkflowContextKey, workflow)
 		ctx.Next()
 	}
 }
@@ -61,7 +61,7 @@ func ValidateUser() gin.HandlerFunc {
 			return
 		}
 
-		ctx.Set("user", currentUser)
+		ctx.Set(models.ValidateUserContextKey, currentUser)
 		ctx.Next()
 	}
 }
@@ -146,7 +146,46 @@ func ValidateUpdateWorkflow() gin.HandlerFunc {
 			return
 		}
 
-		ctx.Set("requestupdate", currentReq)
+		ctx.Set(models.RequestUpdateWorkflowContextKey, currentReq)
+		ctx.Next()
+	}
+}
+
+// not intensive validation
+func ValidateCredential() gin.HandlerFunc {
+	return func(ctx *gin.Context) { // not intensive validation
+		var currentReq models.RequestCreateCredential
+		if err := ctx.ShouldBindJSON(&currentReq); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+			ctx.Abort()
+			return
+		}
+
+		if strings.TrimSpace(currentReq.Name) == "" || strings.TrimSpace(currentReq.Name) == " " {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Workflow name is required"})
+			ctx.Abort()
+			return
+		}
+		// dummy validations
+		if len(currentReq.Name) < 3 || len(currentReq.Name) > 150 {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Workflow name must be between 3 and 150 characters"})
+			ctx.Abort()
+			return
+		}
+
+		if strings.TrimSpace(currentReq.Sub) == "" {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Directory to save is required"})
+			ctx.Abort()
+			return
+		}
+
+		if !models.ValidCredentialTypes[currentReq.Type] {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid credential type"})
+			ctx.Abort()
+			return
+		}
+
+		ctx.Set(models.CredentialCreateContextKey, currentReq)
 		ctx.Next()
 	}
 }

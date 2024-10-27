@@ -10,4 +10,21 @@ const (
 	SleepOffset           = 50 * time.Millisecond  // offset
 	SaveOffset            = 10
 	TwoDays               = 172_800 * time.Second
+	TimeoutRequest        = 5 * time.Minute
+	TimeoutIDLEConnection = 0 * time.Second
 )
+
+var ValidCredentialTypes = map[string]bool{
+	"googlesheets": true,
+}
+
+const (
+  CredentialCreateContextKey = "createcredential"
+  RequestUpdateWorkflowContextKey = "requestupdate"
+  ValidateUserContextKey = "user"
+  ValidateWorkflowContextKey = "workflow"
+)
+
+var PermitedPathList = map[string]bool{
+  "/oauth2-credential/callback": true,
+}

@@ -12,6 +12,10 @@ import (
 
 func AuthMiddleware(authService *services.AuthService) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		if models.PermitedPathList[ctx.FullPath()] {
+			ctx.Next()
+		}
+
 		if ctx.ContentType() != "application/json" {
 			ctx.JSON(http.StatusUnsupportedMediaType, NewUnsupportedMediaTypeError("Only application/json is supported"))
 			ctx.Abort()
