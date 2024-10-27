@@ -2,14 +2,14 @@ package services
 
 import (
 	"minireipaz/pkg/domain/models"
-	"minireipaz/pkg/infra/httpclient"
+	"minireipaz/pkg/domain/repositories"
 )
 
 type WorkflowService struct {
-	workflowRepo *httpclient.WorkflowRepository
+	workflowRepo repositories.WorkflowRepository
 }
 
-func NewWorkflowService(repo *httpclient.WorkflowRepository) *WorkflowService {
+func NewWorkflowService(repo repositories.WorkflowRepository) *WorkflowService {
 	return &WorkflowService{workflowRepo: repo}
 }
 

@@ -2,14 +2,14 @@ package services
 
 import (
 	"minireipaz/pkg/domain/models"
-	"minireipaz/pkg/infra/httpclient"
+	"minireipaz/pkg/domain/repositories"
 )
 
 type UserService struct {
-	userRepo *httpclient.UserRepository
+	userRepo repositories.UserRepository
 }
 
-func NewUserService(repo *httpclient.UserRepository) *UserService {
+func NewUserService(repo repositories.UserRepository) *UserService {
 	return &UserService{userRepo: repo}
 }
 

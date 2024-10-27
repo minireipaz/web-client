@@ -3,15 +3,15 @@ package services
 import (
 	"fmt"
 	"minireipaz/pkg/domain/models"
-	"minireipaz/pkg/infra/httpclient"
+	"minireipaz/pkg/domain/repositories"
 )
 
 type DashboardService struct {
-	dashboardRepo *httpclient.DashboardRepository
+	dashboardRepo repositories.DashboardRepository
 	userService   *UserService
 }
 
-func NewDashboardService(repo *httpclient.DashboardRepository, userServ *UserService) *DashboardService {
+func NewDashboardService(repo repositories.DashboardRepository, userServ *UserService) *DashboardService {
 	return &DashboardService{dashboardRepo: repo, userService: userServ}
 }
 
