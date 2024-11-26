@@ -4,22 +4,23 @@ import (
 	"log"
 	"minireipaz/pkg/vaults"
 	"os"
-	"path/filepath"
+	// "path/filepath"
 
 	"github.com/joho/godotenv"
 )
 
 func LoadEnvs(baseDir string) {
+	log.Printf("basedir %s", baseDir)
 	if err := godotenv.Load(); err != nil {
 		log.Printf("WARNING | Cannot read .env %v", err)
-		envPath := filepath.Join(baseDir, ".env")
-		if err := loadEnvFile(envPath); err != nil {
-			log.Printf("WARNING | Cannot read envPath %s %v", envPath, err)
-			localEnvPath := filepath.Join(baseDir, ".env.local")
-			if err := loadEnvFile(localEnvPath); err != nil {
-				log.Printf("ERROR | Initial LoadEnvs FAILED")
-			}
-		}
+		// envPath := filepath.Join(baseDir, ".env")
+		// if err := loadEnvFile(envPath); err != nil {
+		// 	log.Printf("WARNING | Cannot read envPath %s %v", envPath, err)
+		// 	localEnvPath := filepath.Join(baseDir, ".env.local")
+		// 	if err := loadEnvFile(localEnvPath); err != nil {
+		// 		log.Printf("ERROR | Initial LoadEnvs FAILED")
+		// 	}
+		// }
 	}
 
 	LoadEnvsFromVault()
