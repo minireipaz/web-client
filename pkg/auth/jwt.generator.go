@@ -15,15 +15,17 @@ type JWTGenerator struct {
 }
 
 type ServiceUserConfig struct {
-	UserID     string
-	PrivateKey []byte
 	KeyID      string
+	PrivateKey []byte
+	UserID     string
+	ClientID   string
 }
 
 type BackendAppConfig struct {
 	KeyID      string
 	PrivateKey []byte
 	AppID      string
+	ClientID   string
 }
 
 type JWTGeneratorConfig struct {
@@ -44,27 +46,8 @@ func NewJWTGenerator(config JWTGeneratorConfig) *JWTGenerator {
 	}
 }
 
-// func (j *JWTGenerator) GenerateInstrospectJWT(timeExpire time.Duration) (string, error) {
-// 	now := time.Now()
-// 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-// 		"iss": j.clientID,
-// 		"sub": j.clientID,
-// 		"aud": j.apiURL,
-// 		"exp": now.Add(timeExpire).Unix(),
-// 		"iat": now.Unix(),
-// 	})
-// 	token.Header["kid"] = j.BackendApp.KeyID
-
-// 	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(j.BackendApp.PrivateKey)
-// 	if err != nil {
-// 		return "", err
-// 	}
-
-// 	return token.SignedString(privateKey)
-// }
-
 func (j *JWTGenerator) GenerateServiceUserJWT(timeExpire time.Duration) (string, error) {
-	now := time.Now()
+	now := time.Now().UTC()
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 		"iss": j.ServiceUser.UserID,
 		"sub": j.ServiceUser.UserID,
