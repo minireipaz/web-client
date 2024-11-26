@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { HeaderDashboard } from "../components/Header/Headers";
 import { NavDashboard } from "../components/Dashboard/NavDashboard";
 import { useAuth } from "../components/AuthProvider/indexAuthProvider";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getUriFrontend } from "../utils/getUriFrontend";
 import { customTooltipTheme, ResponseGetAllWorkflows, Workflow } from "../models/Workflow";
 import { Dropdown, Tooltip } from "flowbite-react";

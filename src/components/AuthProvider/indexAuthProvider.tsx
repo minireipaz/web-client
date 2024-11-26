@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const [userInfo, setUserInfo] = useState<User | null>(null);
-  const [userValidated, setUserValidated] = useState(false);
+  const [_, setUserValidated] = useState(false); // not implemented int this block
   const [userManager, setUserManager] = useState<UserManager | null>(zitadel.userManager as unknown as UserManager);
   const fetchedRef = useRef(false);
 
