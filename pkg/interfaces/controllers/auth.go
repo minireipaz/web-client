@@ -32,7 +32,7 @@ func (ac *AuthContext) GetAuthController() *AuthController {
 			configZitadel.GetZitadelServiceUserKeyPrivate(),
 			configZitadel.GetZitadelServiceUserKeyID(),
 			configZitadel.GetZitadelProjectID(),
-			configZitadel.GetZitadelKeyClientID(),
+			configZitadel.GetZitadelKeyServiceUserClientID(),
 		)
 
 		jwtGenerator := auth.NewJWTGenerator(auth.JWTGeneratorConfig{
@@ -40,6 +40,13 @@ func (ac *AuthContext) GetAuthController() *AuthController {
 				UserID:     configZitadel.GetZitadelServiceUserID(),
 				PrivateKey: []byte(configZitadel.GetZitadelServiceUserKeyPrivate()),
 				KeyID:      configZitadel.GetZitadelServiceUserKeyID(),
+				ClientID:   configZitadel.GetZitadelKeyServiceUserClientID(),
+			},
+			BackendApp: auth.BackendAppConfig{
+				KeyID:      configZitadel.GetZitadelBackendKeyID(),
+				PrivateKey: []byte(configZitadel.GetZitadelBackendKeyPrivate()),
+				AppID:      configZitadel.GetZitadelBackendID(),
+				ClientID:   configZitadel.GetZitadelBackendClientID(),
 			},
 			APIURL:    configZitadel.GetZitadelURI(),
 			ProjectID: configZitadel.GetZitadelProjectID(),

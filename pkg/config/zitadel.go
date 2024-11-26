@@ -8,8 +8,10 @@ type Config interface {
 	GetZitadelServiceUserKeyPrivate() string
 	GetZitadelServiceUserKeyID() string
 	GetZitadelBackendID() string
+	GetZitadelBackendClientID() string
 	GetZitadelBackendKeyPrivate() string
 	GetZitadelBackendKeyID() string
+	GetZitadelKeyServiceUserClientID() string
 	GetZitadelKeyClientID() string
 	GetZitadelProjectID() string
 	GetEnv(key, fallback string) string
@@ -39,8 +41,8 @@ func (e *EnvZitadelConfig) GetZitadelProjectID() string {
 	return GetEnv("ZITADEL_PROJECTID", "")
 }
 
-func (e *EnvZitadelConfig) GetZitadelKeyClientID() string {
-	return GetEnv("ZITADEL_KEY_CLIENTID", "")
+func (e *EnvZitadelConfig) GetZitadelKeyServiceUserClientID() string {
+	return GetEnv("ZITADEL_KEY_CLIENTID_SERVICE_ACCOUNT", "")
 }
 
 func (e *EnvZitadelConfig) GetZitadelServiceUserID() string {
@@ -65,6 +67,14 @@ func (e *EnvZitadelConfig) GetZitadelBackendKeyPrivate() string {
 
 func (e *EnvZitadelConfig) GetZitadelBackendKeyID() string {
 	return GetEnv("ZITADEL_KEY_KEYID_BACKEND", "")
+}
+
+func (e *EnvZitadelConfig) GetZitadelKeyClientID() string {
+	return GetEnv("ZITADEL_KEY_CLIENTID", "")
+}
+
+func (e *EnvZitadelConfig) GetZitadelBackendClientID() string {
+	return GetEnv("ZITADEL_KEY_CLIENTID", "")
 }
 
 func NewZitaldelEnvConfig() Config {
