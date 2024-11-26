@@ -58,5 +58,6 @@ func AuthMiddleware(authService *services.AuthService) gin.HandlerFunc {
 
 func verifyUserToken(authService *services.AuthService, userToken string) (bool, bool) {
 	isValid, expired := authService.VerifyUserToken(userToken)
+  log.Printf("isValid %v", isValid)
 	return isValid, expired
 }
