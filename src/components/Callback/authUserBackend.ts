@@ -1,15 +1,19 @@
 import { User } from "oidc-client-ts";
 import { getUriFrontend } from "../../utils/getUriFrontend";
 import { ResponseSyncUser } from "../../models/Users";
+let calling = 0;
+const userTokenExpired = "token expired"
 
-export async function ensureUserExists(userInfo: User | null): Promise<boolean> {
+export async function ensureUserExists(userInfo: User | null): Promise<[boolean, boolean]> {
   if (!userInfo || !userInfo?.profile.sub || userInfo?.profile.sub == "" || userInfo.access_token == "") {
-    return false;
+    return [false, true];
   }
   try {
+    console.log("calling=" + calling);
+    calling++;
     const [ok, uriFrontend] = getUriFrontend("/api/users");
     if (!ok) {
-      return false;
+      return [false, true];
     }
     const response = await fetch(uriFrontend, {
       method: "POST",
@@ -25,18 +29,21 @@ export async function ensureUserExists(userInfo: User | null): Promise<boolean> 
 
     if (!response.ok) {
       // TODO: better redirect
-      return false;
+      return [false, true];
     }
 
     const data: ResponseSyncUser = await response.json();
     console.log("User response:", JSON.stringify( data));
-    if (data.error !== "") {
-      return false;
+    if (response.status === 401 && data.error === userTokenExpired) {
+      return [data.exist, data.expired]
     }
-    return true;
+    if (data.error !== "") {
+      return [false, true];
+    }
+    return [data.exist, data.expired]
   } catch (error) {
     console.error("Error registering user in backend:", error);
-    return false;
+    return [false, true];
   }
-  return false;
+  return [false, true];
 }
