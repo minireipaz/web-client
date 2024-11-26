@@ -2,6 +2,7 @@ import { Node, Edge, NodeTypes } from '@xyflow/react';
 import { WrapperNode } from '../components/Workflow/WrapperNode';
 import ButtonEdge from '../components/Workflow/ButtonEdge';
 import { CustomFlowbiteTheme } from 'flowbite-react';
+import { ModalCredentialData } from './Credential';
 
 export interface NodeData {
   id: string;
@@ -64,12 +65,14 @@ export interface ResponseGetWorkflow {
   error: string;
   status: number;
   workflow: Workflow;
+  credentials: ModalCredentialData[];
 }
 
 export interface ResponseGetAllWorkflows {
   error: string;
   status: number;
   workflow: Workflow[];
+  credentials: ModalCredentialData[];
 }
 
 
