@@ -1,13 +1,13 @@
 package models
 
 const (
-	UserNameExist        = "username already exists"
-	UserCannotGenerate   = "error checking Sub existence"
-	UserNameCannotCreate = "error checking username existence"
-	UsertNameNotGenerate = "cannot create new user"
-	UserSubExist         = "Sub already exists"
-	UserSubIsRequired    = "Sub is required"
-
+	UserNameExist          = "username already exists"
+	UserCannotGenerate     = "error checking Sub existence"
+	UserNameCannotCreate   = "error checking username existence"
+	UsertNameNotGenerate   = "cannot create new user"
+	UserSubExist           = "Sub already exists"
+	UserSubIsRequired      = "Sub is required"
+	UserTokenExpired       = "token expired"
 	UserSubInvalid         = "Sub must be a numeric string with max length of 50"
 	UserAccessTokenInvalid = "Access token must be a valid JWT with max length of 1000"
 	UserSubRequired        = "Sub user is required"
@@ -51,6 +51,7 @@ type ResponseExistUser struct {
 	Error   string `json:"error"`
 	Created bool   `json:"created"`
 	Status  int    `json:"status"`
+	Expired bool   `json:"expired"`
 }
 
 type UnauthorizedError struct {
@@ -70,6 +71,7 @@ type TooManyRequestsError struct {
 }
 
 type ResponseVerifyTokenUser struct {
-	Valid bool   `json:"valid"`
-	Error string `json:"error"`
+	Valid   bool   `json:"valid"`
+	Expired bool   `json:"expired"`
+	Error   string `json:"error"`
 }

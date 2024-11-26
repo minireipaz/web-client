@@ -31,7 +31,7 @@ type TokenResult struct {
 func NewZitadelClient(apiURL, userID, privateKey, keyID, projectID, clientID string) *ZitadelClient {
 	return &ZitadelClient{
 		apiURL:     apiURL,
-		client:     ClientImpl{}, // &http.Client{Timeout: 10 * time.Second},
+		client:     *NewClientImpl(models.TimeoutRequest),
 		userID:     userID,
 		privateKey: []byte(privateKey),
 		keyID:      keyID,
@@ -68,7 +68,7 @@ func (z *ZitadelClient) GetAccessToken(jwt string) (string, time.Duration, error
 }
 
 func (z *ZitadelClient) GetServiceUserAccessToken(jwt string) (string, time.Duration, error) {
-	data := fmt.Sprintf(`grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&scope='openid profile urn:zitadel:iam:org:project:id:%s:aud'&assertion=%s`, z.projectID, jwt)
+	data := fmt.Sprintf(`grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&scope=openid profile email urn:zitadel:iam:org:project:id:%s:aud read:messages&assertion=%s`, z.projectID, jwt)
 	req, err := http.NewRequest("POST", z.apiURL+"/oauth/v2/token", bytes.NewBufferString(data))
 	if err != nil {
 		return "", models.TwoDays, err
@@ -95,29 +95,29 @@ func (z *ZitadelClient) GetServiceUserAccessToken(jwt string) (string, time.Dura
 	return result.AccessToken, result.ExpiresIn, nil
 }
 
-func (z *ZitadelClient) VerifyUserToken(userToken, serviceUserToken string) (bool, error) {
+func (z *ZitadelClient) VerifyUserToken(userToken, serviceUserToken string) (bool, bool, error) {
 	url, err := getBackendURL(fmt.Sprintf("/api/auth/verify/%s", userToken))
 	if err != nil {
 		log.Printf("ERROR | error formatting url: %v", err)
-		return false, fmt.Errorf("error formatting url")
+		return false, true, fmt.Errorf("error formatting url")
 	}
 
 	body, err := z.client.DoRequest("GET", url, serviceUserToken, nil)
 	if err != nil {
 		log.Printf("ERROR | connection error %v", err)
-		return false, fmt.Errorf("connection error")
+		return false, true, fmt.Errorf("connection error")
 	}
 
 	var tokenValidation models.ResponseVerifyTokenUser
 	if err := json.Unmarshal(body, &tokenValidation); err != nil {
 		log.Printf("ERROR | error unmarshalling response %v", err)
-		return false, fmt.Errorf("error unmarshalling response")
+		return false, true, fmt.Errorf("error unmarshalling response")
 	}
 
 	if tokenValidation.Error != "" {
 		log.Printf("token validation error: %s", tokenValidation.Error)
-		return false, fmt.Errorf("token validation error")
+		return false, true, fmt.Errorf("token validation error")
 	}
 
-	return tokenValidation.Valid, nil
+	return tokenValidation.Valid, tokenValidation.Expired, nil
 }

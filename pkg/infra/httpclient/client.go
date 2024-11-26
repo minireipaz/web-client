@@ -6,9 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"minireipaz/pkg/config"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 type HTTPClient interface {
@@ -16,11 +18,22 @@ type HTTPClient interface {
 	DoRequest(method, url, authToken string, body interface{}) ([]byte, error)
 }
 
-type ClientImpl struct{}
+type ClientImpl struct {
+	client *http.Client
+}
+
+func NewClientImpl(timeout time.Duration) *ClientImpl {
+	log.Printf("WARN | Client Http not used Timeout context %v", timeout)
+	return &ClientImpl{
+		client: &http.Client{
+			Timeout:   http.DefaultClient.Timeout,
+			Transport: http.DefaultTransport,
+		},
+	}
+}
 
 func (c *ClientImpl) Do(req *http.Request) (*http.Response, error) {
-	client := &http.Client{}
-	return client.Do(req)
+	return c.client.Do(req)
 }
 
 func (c *ClientImpl) DoRequest(method, url, authToken string, body interface{}) ([]byte, error) {
@@ -28,7 +41,7 @@ func (c *ClientImpl) DoRequest(method, url, authToken string, body interface{}) 
 	if err != nil {
 		return nil, fmt.Errorf("error marshalling data: %v", err)
 	}
-
+	// not used with context
 	req, err := http.NewRequest(method, url, NewBuffer(jsonData))
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %v", err)

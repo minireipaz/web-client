@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"minireipaz/pkg/common"
+	"minireipaz/pkg/config"
 	"minireipaz/pkg/domain/models"
 	"minireipaz/pkg/infra/redisclient"
 	"sync"
@@ -37,7 +38,7 @@ func (r *TokenRepository) GetToken() (*Token, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	if r.token != nil && !r.token.IsExpired() {
+	if r.token != nil && !r.isExpired(r.token) {
 		return r.token, nil
 	}
 
@@ -45,6 +46,10 @@ func (r *TokenRepository) GetToken() (*Token, error) {
 	cachedToken, err := r.GetCachedToken()
 	if err != nil {
 		return nil, err
+	}
+
+	if cachedToken != nil && r.isExpired(cachedToken) {
+		return nil, fmt.Errorf("no token found")
 	}
 
 	r.token = cachedToken
@@ -83,8 +88,13 @@ func (r *TokenRepository) GetCachedToken() (*Token, error) {
 	return &token, err
 }
 
-func (t *Token) IsExpired() bool {
-	return time.Now().After(t.ObtainedAt.Add(t.ExpiresIn * time.Second))
+func (r *TokenRepository) isExpired(token *Token) bool {
+	if config.GetEnv("ROTATE_SERVICE_USER_TOKEN", "n") == "y" {
+		if time.Now().UTC().After(token.ObtainedAt.Add(token.ExpiresIn * time.Second)) {
+			return true
+		}
+	}
+	return false
 }
 
 func (r *TokenRepository) SaveToken(token *Token) error {
