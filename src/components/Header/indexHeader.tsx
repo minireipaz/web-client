@@ -1,6 +1,7 @@
+import React from "react";
 import { AppRouter } from "../AuthProvider/Approuter.tsx";
 
-export function Header() {
+export const Header = React.memo(function Header() {
   return (
     <>
       <header className="">
@@ -8,4 +9,4 @@ export function Header() {
       <AppRouter />
     </>
   );
-}
+});

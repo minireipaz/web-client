@@ -1,3 +1,4 @@
+import React from "react";
 import { DashboardData } from "../../models/Dashboard";
 import { FailedWorkflows } from "../Cards/FailedWorkflows";
 import { PendingWorkflows } from "../Cards/PendingWorkflows";
@@ -10,7 +11,7 @@ import { TotalWorkflows } from "../Cards/TotalWorkflows";
 interface ContainerProps {
   dashboardData: DashboardData | null
 }
-export function ContentDashboard(props: ContainerProps) {
+export const ContentDashboard = React.memo(function ContentDashboard(props: ContainerProps) {
 
   return(
     <>
@@ -32,4 +33,4 @@ export function ContentDashboard(props: ContainerProps) {
     </>
   );
 
-}
+});

@@ -1,5 +1,5 @@
 import { Button, Modal, TextInput, Label, Select } from "flowbite-react";
-import { useState } from "react";
+import { useState, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthProvider/indexAuthProvider";
 import { ResponseGenerateWorkflow } from "../../models/QuickActions";
@@ -20,7 +20,7 @@ const emptyWorkflow: Workflow = {
   is_active: 1,
 }
 
-export function QuickActions() {
+export const QuickActions = memo(function QuickActions() {
   const [openModal, setOpenModal] = useState(false);
   const [workflow, setWorkflow] = useState<Workflow>(emptyWorkflow);
   const [errorTitle, setErrorTitle] = useState<string>("");
@@ -212,4 +212,4 @@ export function QuickActions() {
       </Modal>
     </>
   );
-}
+});

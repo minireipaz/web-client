@@ -1,7 +1,8 @@
 import { Dropdown } from "flowbite-react";
+import React from "react";
 import { useAuth } from "../AuthProvider/indexAuthProvider";
 
-export function MyAccount() {
+export const MyAccount = React.memo(function MyAccount() {
   const { handleLogout, userInfo } = useAuth();
 
   let name = userInfo?.profile.name || "demo";
@@ -32,7 +33,7 @@ export function MyAccount() {
       </div>
     </>
   );
-}
+});
 
 function IconLogout(props: any) {
   return (
