@@ -11,40 +11,39 @@ import (
 	"time"
 )
 
-const (
-	twoDays = 172_800 * time.Second
-)
-
 type AuthService struct {
 	jwtGenerator  *auth.JWTGenerator
+	httpclient    *httpclient.AuthRepository
 	tokenRepo     *tokenrepo.TokenRepository
 	zitadelClient *httpclient.ZitadelClient
 }
 
-func NewAuthService(newTokenRepo *tokenrepo.TokenRepository, newZitadelClient *httpclient.ZitadelClient, jwtGenerator *auth.JWTGenerator) *AuthService {
+func NewAuthService(newTokenRepo *tokenrepo.TokenRepository, newZitadelClient *httpclient.ZitadelClient, jwtGenerator *auth.JWTGenerator, cli *httpclient.AuthRepository) *AuthService {
 	return &AuthService{
 		jwtGenerator:  jwtGenerator,
 		zitadelClient: newZitadelClient,
 		tokenRepo:     newTokenRepo,
+		httpclient:    cli,
 	}
 }
 
 func (s *AuthService) GetServiceUserAccessToken() (*string, error) {
-	serviceUserAccessToken, err := s.getAccessToken()
+	serviceUserAccessToken, err := s.getServiceUserAccessToken()
 	if err != nil || serviceUserAccessToken == "" {
 		return nil, fmt.Errorf("authentication failed")
 	}
 	return &serviceUserAccessToken, nil
 }
 
-func (s *AuthService) getAccessToken() (string, error) {
+// TODO: better logic ---------------
+func (s *AuthService) getServiceUserAccessToken() (string, error) {
 	existingToken, err := s.tokenRepo.GetToken()
 	if err != nil {
-		log.Printf("ERROR getaccesstoken %v", err)
+		log.Printf("ERROR | getaccesstoken %v", err)
 		// TODO: better control in case cannot get token auth
 		if err.Error() == "no token found" {
 			log.Printf("WARN | no token found, generating new one")
-			existingToken, err = s.GenerateNewToken()
+			existingToken, err = s.GenerateNewToken() // better sync with external app designed to auth
 			if err != nil {
 				log.Printf("WARN | failed to generate a new one token, try to read a new one")
 				existingToken, err = s.tokenRepo.GetToken()
@@ -57,24 +56,20 @@ func (s *AuthService) getAccessToken() (string, error) {
 		return "", fmt.Errorf("ERROR | Cannot get token to auth")
 	}
 
-	if existingToken != nil {
-		if time.Now().After(existingToken.ObtainedAt.Add(existingToken.ExpiresIn * time.Second)) {
-			// TODO: better control in case cannot get token auth
-			log.Panicf("ERROR | Cannot get token new token expired")
-		}
-		return existingToken.AccessToken, nil
+	if existingToken == nil {
+		return "", fmt.Errorf("not exist")
 	}
 	// TODO: better control in case cannot get token auth
-	return "", nil
+	return existingToken.AccessToken, nil
 }
 
-func (s *AuthService) VerifyUserToken(userToken string) bool {
-	serviceUserToken, err := s.getAccessToken()
+func (s *AuthService) VerifyUserToken(userToken string) (bool, bool) {
+	serviceUserAccesToken, err := s.getServiceUserAccessToken()
 	if err != nil {
-		return false
+		return false, true
 	}
 	for i := 1; i < models.MaxAttempts; i++ {
-		isValid, err := s.zitadelClient.VerifyUserToken(userToken, serviceUserToken)
+		isValid, expired, err := s.zitadelClient.VerifyUserToken(userToken, serviceUserAccesToken)
 		if err != nil {
 			if err.Error() == "connection error" {
 				waitTime := common.RandomDuration(models.MaxRangeSleepDuration, models.MinRangeSleepDuration, i)
@@ -83,17 +78,20 @@ func (s *AuthService) VerifyUserToken(userToken string) bool {
 				continue
 			}
 			log.Printf("ERROR | cannot verify user token: %v", err)
-			return false
+			return false, true
 		}
 
-		return isValid
+		if i == 1 && !isValid { // change to retry
+			continue
+		}
+		return isValid, expired
 	}
 	log.Printf("ERROR | Failed to verify user token after %d attempts", models.MaxAttempts)
-	return false
+	return false, true
 }
 
 func (s *AuthService) GenerateNewToken() (*tokenrepo.Token, error) {
-	jwt, err := s.jwtGenerator.GenerateServiceUserJWT(twoDays)
+	jwt, err := s.jwtGenerator.GenerateServiceUserJWT(time.Hour)
 	if err != nil {
 		log.Panicf("ERROR | Cannot generate JWT %v", err)
 	}

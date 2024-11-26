@@ -3,6 +3,7 @@ package controllers
 import (
 	"minireipaz/pkg/auth"
 	"minireipaz/pkg/config"
+	"minireipaz/pkg/domain/models"
 	"minireipaz/pkg/domain/services"
 	"minireipaz/pkg/infra/httpclient"
 	"minireipaz/pkg/infra/redisclient"
@@ -55,7 +56,9 @@ func (ac *AuthContext) GetAuthController() *AuthController {
 
 		redisClient := redisclient.NewRedisClient()
 		tokenRepo := tokenrepo.NewTokenRepository(redisClient)
-		authService := services.NewAuthService(tokenRepo, zitadelClient, jwtGenerator)
+		authHTTPClient := httpclient.NewClientImpl(models.TimeoutRequest)
+		authHTTPRepo := httpclient.NewAuthRepository(authHTTPClient)
+		authService := services.NewAuthService(tokenRepo, zitadelClient, jwtGenerator, authHTTPRepo)
 		ac.authController = &AuthController{authService: authService}
 	})
 	return ac.authController

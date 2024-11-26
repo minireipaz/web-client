@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Register(app *gin.Engine, workflowController *controllers.WorkflowController, userController *controllers.UserController, dashboardController *controllers.DashboardController) {
+func Register(app *gin.Engine, workflowController *controllers.WorkflowController, userController *controllers.UserController, dashboardController *controllers.DashboardController, credentialController *controllers.CredentialsController) {
 	app.NoRoute(ErrRouter)
 	route := app.Group("/api")
 	{
@@ -21,6 +21,14 @@ func Register(app *gin.Engine, workflowController *controllers.WorkflowControlle
 		// route.DELETE("/workflows/:id", controllers.DeleteWorkflow)
 		route.POST("/users", middlewares.ValidateUser(), userController.SyncUser)
 		route.GET("/dashboard/:iduser", middlewares.ValidateUserID(), dashboardController.GetUserDashboardByID)
+
+		route.POST("/credentials", middlewares.ValidateCredential(), credentialController.CreateCredentials)
+		route.GET("/credentials/:iduser", middlewares.ValidateUserID(), credentialController.GetAllCredentials)
+		// route.GET("/credentials/:iduser/:idcredential", middlewares.ValidateGetCredential(), credentialController.GetCredentialsByID)
+	}
+	creds := app.Group("/oauth2-credentials")
+	{
+		creds.POST("/save", middlewares.ValidateCredentialExchange(), credentialController.CallbackCredentials)
 	}
 }
 
