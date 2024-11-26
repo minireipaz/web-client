@@ -17,8 +17,8 @@ export default function Login({ authenticated, userInfo, handleLogin }: Props) {
       <button className="bg-slate-400" onClick={handleLogin}>
         Login
       </button>
-      <h2>user: ayilezt485@nic.edu.pl</h2>
-      <h2>pass: 123</h2>
+      <h2>ayilezt485@nic.edu.pl</h2>
+      <h2>123</h2>
     </div>
   );
 }
