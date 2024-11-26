@@ -29,6 +29,7 @@ export const statusMap: Record<number, Record<string, string>> = {
   3: { text: 'Completed', class: 'bg-green-100 text-green-800' },
   4: { text: 'Processing', class: 'bg-blue-100 text-blue-800' },
   5: { text: 'Failed', class: 'bg-red-100 text-red-800' },
+  6: { text: 'Active', class: 'bg-green-100 text-green-800' },
 };
 
 export const activeMap: Record<number, Record<string, string>> = {

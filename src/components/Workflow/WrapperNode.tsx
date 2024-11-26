@@ -4,21 +4,21 @@ interface WrapperNodeProps {
   data: {
     id: string;
     label: string;
+    type: string;
     description: string;
     options: string;
     onClickFromNode: (posX: number, posY: number, nodeID: string) => void;
   };
 }
 
-
 const offsetRight = 200;
 const offsetBottom = -50;
 
 export function WrapperNode(props: WrapperNodeProps) {
 
-  function handleClick(event: any) {
+  function handleClick(event: React.MouseEvent) {
     event.preventDefault();
-    const { clientX, clientY } = 'changedTouches' in event ? event.changedTouches[0] : event;
+    const { clientX, clientY } = event;
     props.data.onClickFromNode(clientX + offsetRight, clientY + offsetBottom, props.data.id);
   }
 

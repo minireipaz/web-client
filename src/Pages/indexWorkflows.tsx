@@ -10,8 +10,7 @@ import { activeMap, statusMap } from "../models/Dashboard";
 
 
 export function Workflows() {
-  const { authenticated, handleTokenExpiration, userInfo, handleSetUserInfo } = useAuth();
-  const location = useLocation();
+  const { authenticated, handleTokenExpiration, userInfo } = useAuth();
   const navigate = useNavigate();
   const [workflowsData, setWorkflowsData] = useState<Workflow[] | null>(null);
   const fetchedRef = useRef(false);
@@ -19,7 +18,6 @@ export function Workflows() {
 
   const fetchAllWorkflows = useCallback(async () => {
     if (fetchedRef.current) return;
-
     fetchedRef.current = true;
 
     try {
@@ -65,12 +63,6 @@ export function Workflows() {
     if (!authenticated) {
       navigate('/', { replace: true });
       return;
-    }
-
-    if (!userInfo) {
-      if (location.state.userInfo) {
-        handleSetUserInfo(location.state.userInfo);
-      }
     }
 
     if (userInfo) {
@@ -134,7 +126,7 @@ export function Workflows() {
               <p className="text-sm">Lorem ipsum, dolor sit amet consectetur adipisicing elit.</p>
             </div>
             <div className="pt-0 pr-4 pl-4 pb-4">
-              <div className="relative w-full overflow-auto">
+              <div className="relative w-full">
                 {/* Header */}
                 <div className="grid grid-cols-6 gap-4 font-medium text-sm border-b py-2">
                   <div className="px-4">Name</div>
@@ -147,7 +139,17 @@ export function Workflows() {
 
                 {/* List of workflows */}
                 <ul className="text-sm list-none m-0 p-0">
-                  {workflowsData && workflowsData.length > 0 ? (
+                  {
+                    workflowsData === null ? (
+                      <li className="py-4 px-4">
+                        <div className="font-medium text-lg">Loading...</div>
+                      </li>
+                    ) : workflowsData.length === 0 ? (
+                      <li className="py-4 px-4">
+                        <div className="font-medium text-lg">No data</div>
+                      </li>
+                    ) :
+                    (
                     workflowsData.map((workflow, index) => (
                       <li key={index} className="border-b last:border-b-0">
                         <div className="grid grid-cols-6 gap-4 py-2 items-center">
@@ -189,10 +191,6 @@ export function Workflows() {
                         </div>
                       </li>
                     ))
-                  ) : (
-                    <li className="py-4 px-4">
-                      <div className="font-medium">No data</div>
-                    </li>
                   )}
                 </ul>
               </div>

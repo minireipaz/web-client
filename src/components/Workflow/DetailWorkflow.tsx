@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { memo } from 'react';
 import {
   ReactFlow,
   addEdge,
@@ -19,42 +20,52 @@ import { WorkflowDrawer } from './WorkflowDrawer';
 import HeaderWorkflow from './HeaderWorkflow';
 import { getUriFrontend } from '../../utils/getUriFrontend';
 import { useAuth } from '../AuthProvider/indexAuthProvider';
+import { WorkflowModal } from '../WorkflowModal/Modal';
+import { ModalCredentialData } from '../../models/Credential';
+// import { ModalCredentialData } from '../Credentials/ModalCredential';
 
 interface ContainerProps {
   workflow: Workflow;
+  credentials: ModalCredentialData[];
 }
 
-export function DetailWorkflow(props: ContainerProps) {
+export const DetailWorkflow = memo(function DetailWorkflow(props: ContainerProps) {
   const [workflow, setWorkflow] = useState(props.workflow);
+  const [listCredentials, setListCredentials] = useState(props.credentials);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isOpenModal, setIsOpenModal] = useState(false);
   const [clickPosition, setClickPosition] = useState({ x: 0, y: 0 });
   const { screenToFlowPosition, flowToScreenPosition } = useReactFlow();
   const [lastNodeID, setLastNodeID] = useState("");
   const [rfInstance, setRfInstance] = useState(null);
   const [msgSaved, setMsgSaved] = useState<MsgSaved>({ text: "" });
+  const [customDataNode, setCustomDataNode] = useState<Node>();
   const { userInfo } = useAuth();
 
-  const closeDrawer = () => setIsDrawerOpen(false);
+  const closeDrawer = useCallback(() => {
+    setIsDrawerOpen(false);
+  }, []);
+
   const handleClickFromNode = useCallback((posX: number, posY: number, nodeID: string) => {
     setIsDrawerOpen(true);
     setLastNodeID(nodeID);
     setClickPosition({ x: posX, y: posY });
   }, []);
-  // }, [isDrawerOpen, setIsDrawerOpen])
 
   useEffect(() => {
     if (props.workflow && props.workflow.nodes) {
       const transformedNodes = transformNodes(props.workflow.nodes);
       setNodes(transformedNodes);
       setEdges(props.workflow.edges || []);
+      setListCredentials(props.credentials);
     }
   }, [props.workflow, flowToScreenPosition, handleClickFromNode]);
 
-  function transformNodes(nodes: Node[]) {
+  function transformNodes(currentNodes: Node[]) {
     const transformedNodes = [];
-    for (const node of nodes) {
+    for (const node of currentNodes) {
       const posX = node.position.x + 200;
       const posY = node.position.y;
 
@@ -94,7 +105,8 @@ export function DetailWorkflow(props: ContainerProps) {
         setClickPosition({ x: clientX, y: clientY });
         setIsDrawerOpen(true);
       }
-    }, [screenToFlowPosition])
+    }, [screenToFlowPosition]
+  )
 
   const handleClickDrawer = useCallback((event: any, nodeData: NodeData) => {
     event.preventDefault();
@@ -105,21 +117,20 @@ export function DetailWorkflow(props: ContainerProps) {
     const nodeID = `${nodeData.type}-${nodes.length + 1}`;
     const newNode: Node = {
       id: nodeID,
-      type: 'wrapperNode',
+      type: 'wrapperNode', // type for reactflow
       position,
       data: {
         id: nodeID,
         label: nodeData.label,
+        type: nodeData.type,
         options: nodeData.options || 'Default Options',
         description: nodeData.description || 'Default Description',
-        onClickFromNode: (posX: number, posY: number, nodeID: string) =>{
+        onClickFromNode: (posX: number, posY: number, nodeID: string) => {
           handleClickFromNode(posX, posY, nodeID);
-          // handleClickFromNode(
-          //   flowToScreenPosition({ x: posX, y: posY }).x,
-          //   flowToScreenPosition({ x: posX, y: posY }).y,
-          //   nodeID
-          // )
         },
+        workflowid: workflow.id,
+        nodeid: nodeID,
+        credential: {},
       },
     };
 
@@ -129,34 +140,51 @@ export function DetailWorkflow(props: ContainerProps) {
     );
     setIsDrawerOpen(false);
   }, [clickPosition, nodes, lastNodeID, screenToFlowPosition, flowToScreenPosition, handleClickFromNode]);
-  // }, [isDrawerOpen, setIsDrawerOpen]);
 
-  const handleWorkflowUpdate = (updatedFields: Workflow) => {
+  const handleWorkflowUpdate = useCallback((updatedFields: Workflow) => {
     setWorkflow((prevWorkflow) => ({
       ...prevWorkflow,
       ...updatedFields
     }));
-
-  };
+  }, []);
 
   const handleSaveWorkflow = useCallback(async () => {
-    if (rfInstance) {
-      // @ts-ignore ts(2339)
-      const flow = rfInstance.toObject() as ReactFlowJsonObject;
-      const currentWorkflow = { ...workflow, ...flow };
-      const updated = await sendChangedWorkflow(currentWorkflow);
-      if (!updated) {
-        setMsgSaved({ text: "Not Saved!", classText: savedStatus.alert });
-      } else {
-        setMsgSaved({ text: "Saved", classText: savedStatus.done });
-      }
-      setTimeout(() => {
-        setMsgSaved({ text: "", classText: savedStatus.none });
-      }, 5000);
-      setWorkflow({ ...currentWorkflow });
-      console.log('Saving workflow:', currentWorkflow);
+    if (!rfInstance) return;
+
+    // @ts-ignore ts(2339)
+    const flowJSON = rfInstance.toObject() as ReactFlowJsonObject;
+    const currentWorkflow = { ...workflow, ...flowJSON };
+    const updated = await sendChangedWorkflow(currentWorkflow);
+    if (!updated) {
+      setMsgSaved({ text: "Not Saved!", classText: savedStatus.alert });
+    } else {
+      setMsgSaved({ text: "Saved", classText: savedStatus.done });
     }
+    setTimeout(() => {
+      setMsgSaved({ text: "", classText: savedStatus.none });
+    }, 5000);
+    setWorkflow({ ...currentWorkflow });
+    console.log('Saving workflow:', currentWorkflow);
+
   }, [rfInstance, workflow]);
+
+  async function handleUpdateNodes(newDataForNode: ModalCredentialData) {
+    for (let i = 0; i < nodes.length; i++) {
+      if (nodes[i].id === newDataForNode.nodeid) {
+        nodes[i].data.credential = {
+          id: newDataForNode.id,
+          sub: workflow.user_id,
+          name: newDataForNode.name,
+          workflowid: nodes[i].data.workflowid,
+          nodeid: nodes[i].data.nodeid,
+          type: newDataForNode.type,
+          data: { ...newDataForNode.data }
+        };
+      }
+    }
+    setNodes(nodes);
+    await handleSaveWorkflow();
+  }
 
   async function sendChangedWorkflow(currentWorkflow: Workflow) {
     try {
@@ -168,7 +196,11 @@ export function DetailWorkflow(props: ContainerProps) {
       currentWorkflow.user_id = userInfo?.profile.sub;
       currentWorkflow.access_token = userInfo?.access_token;
       currentWorkflow.status = Number.parseInt(currentWorkflow.status.toString()) || 1;
-
+      console.log(JSON.stringify({
+        user_id: userInfo?.profile.sub,
+        access_token: userInfo?.access_token,
+        data: currentWorkflow
+      }));
       const response = await fetch(uriFrontend, {
         method: "PUT",
         headers: {
@@ -203,6 +235,21 @@ export function DetailWorkflow(props: ContainerProps) {
     return false;
   }
 
+  const onDoubleClickNode = useCallback(async (_: React.MouseEvent, node: Node) => {
+    console.log("node" + JSON.stringify(node));
+    setCustomDataNode(node);
+    setIsOpenModal(true);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setIsOpenModal(false);
+  }, []);
+
+  const memoizedControls = useMemo(() => <Controls />, []);
+  const memoizedBackground = useMemo(() => (
+    <Background color="#ffffff4f" variant={BackgroundVariant.Dots} gap={6} size={1} />
+  ), []);
+
   return (
     <>
       <div className="flex flex-col">
@@ -210,13 +257,14 @@ export function DetailWorkflow(props: ContainerProps) {
           workflow={workflow}
           onUpdate={handleWorkflowUpdate}
           onSave={handleSaveWorkflow}
-          msgSaved= {msgSaved}
+          msgSaved={msgSaved}
         />
         <div className="h-full w-full relative">
           <ReactFlow
             onInit={setRfInstance as any}
             nodes={nodes}
             edges={edges}
+            onNodeDoubleClick={onDoubleClickNode}
             onConnectEnd={onConnectEnd}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
@@ -229,8 +277,8 @@ export function DetailWorkflow(props: ContainerProps) {
             colorMode='dark'
             nodeOrigin={[2, 0]}
           >
-            <Controls />
-            <Background color="#ffffff4f" variant={BackgroundVariant.Dots} gap={6} size={1} />
+            {memoizedControls}
+            {memoizedBackground}
           </ReactFlow>
           <div className='absolute w-16 h-32 top-0 right-0 flex flex-col z-50'>
             <div className='absolute top-4 right-4'>
@@ -244,10 +292,11 @@ export function DetailWorkflow(props: ContainerProps) {
               onClose={closeDrawer}
               onClick={handleClickDrawer}
             />
+            <WorkflowModal onSave={handleUpdateNodes} isOpen={isOpenModal} onClose={handleCloseModal} dataNode={customDataNode as Node} credentials={listCredentials} />
           </div>
         </div>
       </div>
     </>
   );
-};
+});
 

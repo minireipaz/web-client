@@ -10,6 +10,8 @@ interface ContainerProps {
 export function WorkflowDrawer(props: ContainerProps) {
   const DefaultNode = (node: NodeData) => (
     <button
+      key={node.id}
+      id={node.id}
       className="w-52 border border-gray-300 rounded p-2 mb-2 bg-white text-black select-none"
       draggable={false}
       onClick={(event: any) => {
@@ -28,7 +30,7 @@ export function WorkflowDrawer(props: ContainerProps) {
         <Drawer.Items>
           <div className='ml-4 flex flex-col items-start justify-start'>
             <h2 className="text-lg font-bold mb-4 select-none text-black">Popular</h2>
-            <DefaultNode id="id1" description="node input" options="optin1" type="input" label="Nodo Input" />
+            <DefaultNode id="googlesheets" description="Google Sheets bla bla bla" options="optin1" type="googlesheets" label="Google Sheets" />
             <DefaultNode id="id2" description="node default" options="optin2" type="default" label="Nodo Default" />
             <DefaultNode id="id3" description="node output" options="optin3" type="output" label="Nodo Output" />
           </div>
