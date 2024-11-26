@@ -100,8 +100,7 @@ export function QuickActions() {
         description: workflow.description,
         directory_to_save: workflow.directory_to_save,
         user_id: userInfo?.profile.sub,
-        // ?
-        id: "",
+        id: "", // not set in user
         status: 1,
         created_at: "",
         duration: 0,

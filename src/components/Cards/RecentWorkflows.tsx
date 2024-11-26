@@ -64,7 +64,7 @@ export function RecentWorkflows(props: ContainerProps) {
           <p className="text-sm">View the latest workflows</p>
         </div>
         <div className="pt-0 pr-4 pl-4 pb-4">
-          <div className="relative w-full overflow-auto">
+          <div className="relative w-full">
             {/* Header */}
             <div className="grid grid-cols-6 gap-4 font-medium text-sm border-b py-2">
               <div className="px-4">Name</div>
