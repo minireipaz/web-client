@@ -19,12 +19,13 @@ var ValidCredentialTypes = map[string]bool{
 }
 
 const (
-  CredentialCreateContextKey = "createcredential"
-  RequestUpdateWorkflowContextKey = "requestupdate"
-  ValidateUserContextKey = "user"
-  ValidateWorkflowContextKey = "workflow"
+	CredentialCreateContextKey      = "createcredential"
+	CredentialExchangeContextKey    = "exchangecredential"
+	RequestUpdateWorkflowContextKey = "requestupdate"
+	ValidateUserContextKey          = "user"
+	ValidateWorkflowContextKey      = "workflow"
 )
 
 var PermitedPathList = map[string]bool{
-  "/oauth2-credential/callback": true,
+	"/oauth2-credential/callback": true,
 }
