@@ -10,9 +10,8 @@ import { Workflow } from "../models/Workflow";
 import { Node, Edge } from '@xyflow/react';
 
 export default function Dashboard() {
-  const { authenticated, handleTokenExpiration, userInfo, handleSetUserInfo } = useAuth();
+  const { authenticated, handleTokenExpiration, userInfo } = useAuth();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
-  const location = useLocation();
   const navigate = useNavigate();
   const fetchedRef = useRef(false);
 
@@ -64,12 +63,6 @@ export default function Dashboard() {
     if (!authenticated) {
       navigate('/', { replace: true });
       return;
-    }
-
-    if (!userInfo) {
-      if (location.state.userInfo) {
-        handleSetUserInfo(location.state.userInfo);
-      }
     }
 
     if (userInfo) {
