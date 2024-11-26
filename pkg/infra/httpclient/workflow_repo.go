@@ -36,12 +36,12 @@ func (r *WorkflowRepository) CreateWorkflow(workflow models.Workflow, serviceUse
 }
 
 func (r *WorkflowRepository) GetWorkflow(userID, workflowID, userToken, serviceUserAccessToken *string) models.ResponseWorkflow {
-	url, err := getBackendURL(fmt.Sprintf("/api/workflows/%s/%s", *userID, *workflowID))
+	url, err := getBackendURL(fmt.Sprintf("/api/workflows/%s/workflow/%s/%s", *userID, *workflowID, *userToken))
 	if err != nil {
 		log.Printf("ERROR | %v", err)
 		return models.ResponseWorkflow{
 			Status:   http.StatusInternalServerError,
-			Error:    fmt.Sprintf("ERROR | %v", err),
+			Error:    err.Error(),
 			Workflow: models.Workflow{},
 		}
 	}
@@ -51,7 +51,7 @@ func (r *WorkflowRepository) GetWorkflow(userID, workflowID, userToken, serviceU
 		log.Printf("ERROR | %v", err)
 		return models.ResponseWorkflow{
 			Status:   http.StatusInternalServerError,
-			Error:    fmt.Sprintf("ERROR | %v", err),
+			Error:    err.Error(),
 			Workflow: models.Workflow{},
 		}
 	}
@@ -69,12 +69,12 @@ func (r *WorkflowRepository) GetWorkflow(userID, workflowID, userToken, serviceU
 }
 
 func (r *WorkflowRepository) GetAllWorkflow(userID, userToken, serviceUserAccessToken *string) models.ResponseAllWorkflow {
-	url, err := getBackendURL(fmt.Sprintf("/api/workflows/%s", *userID))
+	url, err := getBackendURL(fmt.Sprintf("/api/workflows/%s/%s", *userID, *userToken))
 	if err != nil {
 		log.Printf("ERROR | %v", err)
 		return models.ResponseAllWorkflow{
 			Status:   http.StatusInternalServerError,
-			Error:    fmt.Sprintf("ERROR | %v", err),
+			Error:    err.Error(),
 			Workflow: nil,
 		}
 	}
@@ -84,7 +84,7 @@ func (r *WorkflowRepository) GetAllWorkflow(userID, userToken, serviceUserAccess
 		log.Printf("ERROR | %v", err)
 		return models.ResponseAllWorkflow{
 			Status:   http.StatusInternalServerError,
-			Error:    fmt.Sprintf("ERROR | %v", err),
+			Error:    err.Error(),
 			Workflow: nil,
 		}
 	}

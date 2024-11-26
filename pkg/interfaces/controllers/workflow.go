@@ -39,7 +39,7 @@ func (wc *WorkflowController) CreateWorkflow(ctx *gin.Context) {
 
 func (wc *WorkflowController) GetAllWorkflows(ctx *gin.Context) {
 	userID := ctx.Param("iduser")
-	userToken := ctx.MustGet("usertoken").(string) // it's validated
+	userToken := ctx.MustGet("usertoken").(string) // it's validated in middleware
 	serviceUserToken, err := wc.authService.GetServiceUserAccessToken()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
