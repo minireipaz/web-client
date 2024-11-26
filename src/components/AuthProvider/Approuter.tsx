@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter, Route, Routes, Navigate, useNavigate } from "react-router-dom";
+import { ReactNode } from 'react';
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { useAuth } from "../AuthProvider/indexAuthProvider.tsx";
 import Login from "../Login/indexLogin.tsx";
 import Callback from "../Callback/indexCallback.tsx";
@@ -8,40 +8,21 @@ import { Workflows } from "../../Pages/indexWorkflows.tsx";
 import { WorkflowDetails } from "../../Pages/indexWorkflowDetail.tsx";
 import { UserManager } from 'oidc-client-ts';
 import { Credentials } from '../../Pages/indexCredentials.tsx';
-import { ensureUserExists } from "../Callback/authUserBackend.ts";
+import { OAuthCallBack } from '../Callback/oauthCallback.tsx';
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { authenticated, loading, userInfo, handleLogout } = useAuth();
-
-  useEffect(() => {
-    if (!authenticated || !userInfo) return;
-
-    const checkUser = async () => {
-      try {
-        const isOk = await ensureUserExists(userInfo);
-        if (!isOk) {
-          handleLogout();
-        }
-      } catch (error) {
-        console.error('Error checking user existence:', error);
-        handleLogout();
-      }
-    };
-
-    checkUser();
-  }, [authenticated, userInfo]);
+const ProtectedRoute = ({ children }: { children: ReactNode }) => {
+  const { authenticated, loading, userInfo } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>Loading protected route...</div>;
   }
 
-  if (!authenticated) {
+  if (!authenticated || !userInfo) {
     return <Navigate to="/" replace />;
   }
 
-  return (
-    <>{children}</>
-  );;
+  return <>{children}</>;
+
 };
 
 export function AppRouter() {
@@ -49,7 +30,7 @@ export function AppRouter() {
 
   if (loading) {
     return (
-      <div>Loading...</div>
+      <div>Loading approuter...</div>
     );
   }
 
@@ -88,6 +69,12 @@ export function AppRouter() {
         <Route path="/credentials" element={
           <ProtectedRoute>
             <Credentials />
+          </ProtectedRoute>
+        } />
+        {/* client side */}
+        <Route path="/oauth2-credential/callback" element={
+          <ProtectedRoute>
+            <OAuthCallBack />
           </ProtectedRoute>
         } />
       </Routes>
