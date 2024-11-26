@@ -4,7 +4,7 @@ This repository contains the user-facing frontend service for the minireipaz pro
 ## Testing users
 
 Username: ayilezt485@nic.edu.pl
-Password: 1234
+Password: 123
 
 
 ## Repo Structure
@@ -244,7 +244,7 @@ graph TD
     N --> O[End]
 ```
 
-### Flow Explanation
+###### Explanation
 
 1. **Start**: The process begins.
 2. **User clicks Create New Workflow**: The user initiates the creation of a new workflow by clicking a button.
@@ -265,39 +265,11 @@ graph TD
 13. **Fill Information on New Page**: Populate the new workflow page with the received workflow information.
 14. **End**: The process ends.
 
-## Notes on Choosing Confluent Cloud Kafka over Upstash Kafka
 
-- Triggers to Vercel Functions:
+## Flow within selected types of nodes and display information about each node
+![](./images/node_worflow.svg)
 
-  <b>Upstash Kafka:</b> Does not support direct triggers to Vercel Functions.
-  <b>Confluent Kafka:</b> Offers an HTTP connector that can send data directly to Vercel Functions, enabling real-time processing and more efficient workflows.
-
-- Polling Interval:
-
-  <b>Upstash Kafka:</b> Uses a service called QStash, which has a minimum polling interval of 1 minute. This delay is not suitable for use cases that require more immediate data processing.
-  
-  <b>Confluent Kafka:</b> The HTTP connector allows for near-instantaneous data transmission to Vercel Functions, ensuring timely processing without the limitations of a minimum polling interval.
-  
-## Reasons for Choosing Double-Writing Over CDC with Debezium or similar for Kafka Integration
-
-When integrating event-driven systems like Apache Kafka with databases, the "double-writing" approach—writing data both to the database and Kafka—can lead to potential consistency issues. However, in certain scenarios, such as relying on free SaaS (Software as a Service) solutions, double-writing might be the practical choice. Here are the reasons why double-writing is preferred in our situation:
-
-- Free SaaS Solutions: We depend on free SaaS offerings which provide necessary services at no cost. These services often do not support advanced features like change data capture (CDC) directly from their databases, limiting our ability to use solutions like Debezium.
-
-- Infrastructure Limitations: Running a CDC tool like Debezium requires dedicated infrastructure and resources to manage and maintain the setup. Given our current limitations in infrastructure and resource availability, double-writing becomes a more feasible option.
-
-- Quicker Implementation: Double-writing can be implemented more quickly compared to setting up a full CDC pipeline with Debezium. This allows us to achieve our integration goals faster, meeting immediate project deadlines and requirements.
-
-- Simplicity: Double-writing involves straightforward code changes to ensure data is written to both the database and Kafka, simplifying the implementation process without needing in-depth CDC expertise.
-Flexibility:
-
-- Adaptable to SaaS Limitations: Many free SaaS platforms have limitations on direct access to their databases or transaction logs. Double-writing allows us to bypass these limitations by writing data to Kafka directly from our application layer.
-
-- Custom Workflows: Double-writing enables us to create custom workflows tailored to our specific needs, which might not be fully supported by a standard CDC tool.
-
-- Short-Term Viability: Double-writing serves as a viable interim solution while we assess and plan for a more robust CDC implementation in the future. It allows us to meet current project requirements and maintain progress.
-
-- Evaluation Phase: This approach provides us with the opportunity to evaluate the actual requirements and benefits of a full CDC setup, ensuring that any future investment in Debezium or similar tools is well-justified.
+###### Notes:
 
 ## Code Scanning CodeQL Analysis
 
