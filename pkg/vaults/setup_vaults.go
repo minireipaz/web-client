@@ -10,7 +10,7 @@ import (
 func GetEnvsFromVault() {
 	envValues := GetAllEnvsFromRedis()
 	envsMaped := serializeEnvs(envValues)
-	setEnvs(envsMaped)
+	SetEnvs(envsMaped)
 }
 
 func serializeEnvs(envStr string) map[string]string {
@@ -21,7 +21,7 @@ func serializeEnvs(envStr string) map[string]string {
 	return envMap
 }
 
-func setEnvs(envsMapped map[string]string) {
+func SetEnvs(envsMapped map[string]string) {
 	for key, value := range envsMapped {
 		os.Setenv(key, value)
 	}

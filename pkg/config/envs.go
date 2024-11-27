@@ -2,38 +2,82 @@ package config
 
 import (
 	"log"
+	"minireipaz/pkg/common"
 	"minireipaz/pkg/vaults"
 	"os"
-	// "path/filepath"
+	"path/filepath"
 
 	"github.com/joho/godotenv"
 )
 
 func LoadEnvs(baseDir string) {
-	log.Printf("basedir %s", baseDir)
-	if err := godotenv.Load(); err != nil {
-		log.Printf("WARNING | Cannot read .env %v", err)
-		// envPath := filepath.Join(baseDir, ".env")
-		// if err := loadEnvFile(envPath); err != nil {
-		// 	log.Printf("WARNING | Cannot read envPath %s %v", envPath, err)
-		// 	localEnvPath := filepath.Join(baseDir, ".env.local")
-		// 	if err := loadEnvFile(localEnvPath); err != nil {
-		// 		log.Printf("ERROR | Initial LoadEnvs FAILED")
-		// 	}
-		// }
+	if err := loadCurrentEnv(); err != nil {
+		log.Printf("WARNING | Cannot read current .env: %v", err)
+		if err := loadBaseEnv(baseDir); err != nil {
+			log.Printf("WARNING | Cannot read base .env: %v", err)
+			if err := loadLocalEnv(baseDir); err != nil {
+				log.Printf("WARNING | Cannot read local .env: %v", err)
+				// Try to load envs
+				decryptedData, err := loadEnxEnvs("vars.txt", "readmeconcept.md")
+				if err != nil {
+					log.Printf("ERROR | Initial LoadEnvs FAILED")
+					return
+				}
+				envMap, err := godotenv.UnmarshalBytes(decryptedData)
+				if err != nil {
+					log.Printf("WARNING | Cannot unmarshal decrypted bytes: %v", err)
+					return
+				}
+				vaults.SetEnvs(envMap)
+			}
+		}
 	}
 
+	// Load environment variables from Vault
 	LoadEnvsFromVault()
 }
 
-func loadEnvFile(envFilePath string) error {
-	if _, err := os.Stat(envFilePath); err == nil {
-		if err := godotenv.Load(envFilePath); err != nil {
-			log.Printf("WARNING | Could not load .env file at %s: %v", envFilePath, err)
-			return err
-		}
+func loadCurrentEnv() error {
+	return godotenv.Load()
+}
+
+func loadBaseEnv(baseDir string) error {
+	envPath := filepath.Join(baseDir, ".env")
+	return loadEnvFile(envPath)
+}
+
+func loadLocalEnv(baseDir string) error {
+	localEnvPath := filepath.Join(baseDir, ".env.local")
+	return loadEnvFile(localEnvPath)
+}
+
+func loadEnxEnvs(varsFileName, keyFileName string) ([]byte, error) {
+	key, err := os.ReadFile(keyFileName)
+	if err != nil {
+		log.Printf("WARNING | Cannot read key file %s: %v", keyFileName, err)
+		return nil, err
 	}
-	return nil
+
+	dataByte, err := os.ReadFile(varsFileName)
+	if err != nil {
+		log.Printf("WARNING | Cannot read vars file %s: %v", varsFileName, err)
+		return nil, err
+	}
+
+	decryptedText, err := common.DecryptAESGCM(dataByte, key)
+	if err != nil {
+		log.Printf("WARNING | Cannot decrypt vars file: %v", err)
+		return nil, err
+	}
+
+	return decryptedText, nil
+}
+
+func loadEnvFile(envFilePath string) error {
+	if _, err := os.Stat(envFilePath); err != nil {
+		return err
+	}
+	return godotenv.Load(envFilePath)
 }
 
 func LoadEnvsFromVault() {
