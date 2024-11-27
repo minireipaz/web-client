@@ -10,7 +10,21 @@ import (
 	"github.com/joho/godotenv"
 )
 
+func listDirContents(dir string) {
+    entries, err := os.ReadDir(dir)
+    if err != nil {
+        log.Printf("Error reading directory %s: %v", dir, err)
+        return
+    }
+    for _, entry := range entries {
+        log.Printf("Entry: %s", entry.Name())
+    }
+}
+
 func LoadEnvs(baseDir string) {
+  currentDir, _ := os.Getwd()
+  log.Printf("current dir %v", currentDir)
+  listDirContents(currentDir)
 	if err := loadCurrentEnv(); err != nil {
 		log.Printf("WARNING | Cannot read current .env: %v", err)
 		if err := loadBaseEnv(baseDir); err != nil {
