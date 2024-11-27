@@ -181,7 +181,7 @@ export function WorkflowModal(props: ContainerProps) {
         credential: ModalCredentialData;
       }, userInfo);
     setCurrentCredential(updatedCredential);
-  }, [currentCredential, props.dataNode.data, updateCredentialProperties, userInfo]);
+  }, [currentCredential, updateCredentialProperties, userInfo]);
 
   const handleOpenCredential = useCallback(() => {
     changeCredentialProperties();
@@ -223,8 +223,8 @@ export function WorkflowModal(props: ContainerProps) {
     setCurrentCredential(listCredentials[index]);
   }, [listCredentials]);
 
-  const initialSetCredentialForNode = useCallback(() => {
-    if (!props.dataNode.data) return;
+  function initialSetCredentialForNode() {
+    if (!props.dataNode || !props.dataNode.data) return;
 
     const { credential: selectedCredential } = props.dataNode.data as { credential: ModalCredentialData; };
 
@@ -242,7 +242,7 @@ export function WorkflowModal(props: ContainerProps) {
       }, userInfo
     );
     setCurrentCredential(updatedCredential);
-  }, [props.dataNode.data, updateCredentialProperties, userInfo]);
+  }
 
   const currentCredentialMemo = useMemo(() => currentCredential, [currentCredential]);
 
