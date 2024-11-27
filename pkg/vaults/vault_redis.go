@@ -20,6 +20,7 @@ func GetAllEnvsFromRedis() string {
   if !exist {
     log.Printf("VAULT_URI exist: %v setted to %s", exist, uriVault)
   }
+  os.Setenv("SALEE", "O NOO")
   log.Printf("All ENVS=%v", os.Environ())
 	// uriVault := os.Getenv("VAULT_URI")
   vaulKeyFrontendEnvs := os.Getenv("VAULT_KEY_FRONTEND_ENVS_PROD")

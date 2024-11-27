@@ -3,6 +3,10 @@
   "installCommand": "pnpm install",
   "outputDirectory": "./dist",
   "framework": "vite",
+  "env": {
+    "MY_KEY": "this is the value",
+    "SECRET": "@VAULT_URI"
+  },
   "routes": [
     {
       "src": "/callback",
