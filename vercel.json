@@ -4,8 +4,7 @@
   "outputDirectory": "./dist",
   "framework": "vite",
   "env": {
-    "MY_KEY": "this is the value",
-    "SECRET": "@VAULT_URI"
+    "MY_KEY": "this is the value"
   },
   "routes": [
     {
