@@ -16,6 +16,8 @@ const (
 )
 
 func GetAllEnvsFromRedis() string {
+  vercel, exist := os.LookupEnv("VERCEL")
+  log.Printf("VERCEL exist: %v setted to %s", exist, vercel)
   uriVault, exist := os.LookupEnv("VAULT_URI")
   if !exist {
     log.Printf("VAULT_URI exist: %v setted to %s", exist, uriVault)
