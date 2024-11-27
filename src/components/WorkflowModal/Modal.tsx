@@ -4,7 +4,6 @@ import { RenderGoogleSheetsOAuth2Api } from "../Credentials/GoogleSheetsOAuth2Ap
 import { GoogleSheetsModalContent } from "./GoogleSheetModal";
 import { Node } from '@xyflow/react';
 import { DEFAULT_CREDENTIAL_REDIRECT_PATH, DEFAULT_CREDENTIAL_TITLES, ModalCredentialData } from "../../models/Credential";
-import { getLocalUri } from "../../utils/getUriFrontend";
 import { ModalCredential } from "../Credentials/ModalCredential";
 import { useAuth } from "../AuthProvider/indexAuthProvider";
 
