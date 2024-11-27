@@ -1,5 +1,7 @@
 import { Alert, Button, Label, TextInput } from "flowbite-react";
 import { ModalCredentialData, CredentialData } from "../../models/Credential";
+import { getLocalUri as getLocalRelativeUri } from "../../utils/getUriFrontend";
+import { useMemo } from "react";
 
 export interface CredentialState {
   code: string;
@@ -22,14 +24,25 @@ export function RenderGoogleSheetsOAuth2Api({
     });
   };
 
+  const redirectURI = useMemo(() => {
+    let redirectURI = credential.data.redirectURL;
+
+    if (redirectURI.includes("localhost:3010")) {
+      const [ok, relURI] = getLocalRelativeUri(redirectURI);
+      if (!ok) return null;
+      redirectURI = relURI;
+    }
+    return `${import.meta.env.VITE_EVENTS_ORIGIN}${redirectURI}`;
+  }, [credential.data.redirectURL]);
+
   return (
     <ul className="ml-4 flex flex-col items-start justify-start gap-y-4 text-black ">
       {(credential.alertMessage) ? credential.alertMessage : <></> }
       <li className="flex flex-col justify-center w-full">
         <Label htmlFor="oauthredirect" value="OAuth Redirect URL" />
         <div className="flex flex-row justify-center gap-x-2">
-          <TextInput id="oauthredirect" className="w-full" value={credential.data.redirectURL} type="text" sizing="sm" readOnly />
-          <Button onClick={() => navigator.clipboard.writeText(credential.data.redirectURL)} color="green" size="sm" className="h-9">Copy</Button>
+          <TextInput id="oauthredirect" className="w-full" value={redirectURI as string} type="text" sizing="sm" readOnly />
+          <Button onClick={() => navigator.clipboard.writeText(redirectURI as string)} color="green" size="sm" className="h-9">Copy</Button>
         </div>
       </li>
       <li className="flex flex-col justify-center w-full">

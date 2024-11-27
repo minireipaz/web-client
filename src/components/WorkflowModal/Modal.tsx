@@ -132,12 +132,8 @@ export function WorkflowModal(props: ContainerProps) {
     props.onClose();
   }, [props]);
 
-  const getOAuthRedirect = useCallback((nodeType: string) => {
-    const oauthRedirect = DEFAULT_CREDENTIAL_REDIRECT_PATH[nodeType] || DEFAULT_CREDENTIAL_REDIRECT_PATH.default;
-    const [ok, uriRedirect] = getLocalUri(oauthRedirect);
-    if (!ok) {
-      return "";
-    }
+  const getRedirectURL = useCallback((nodeType: string) => {
+    const uriRedirect = DEFAULT_CREDENTIAL_REDIRECT_PATH[nodeType] || DEFAULT_CREDENTIAL_REDIRECT_PATH.default;
     return uriRedirect;
   }, []);
 
@@ -151,7 +147,7 @@ export function WorkflowModal(props: ContainerProps) {
       // this data is used to override necessary data to maintain cohesion
       const { type: nodeType, nodeid, workflowid } = nodeData;
       const newTitle = DEFAULT_CREDENTIAL_TITLES[nodeType] || DEFAULT_CREDENTIAL_TITLES.default;
-      const oAuthRedirect = getOAuthRedirect(nodeType);
+      const redirectURL = getRedirectURL(nodeType);
 
       return {
         ...prevCredential,
@@ -162,11 +158,11 @@ export function WorkflowModal(props: ContainerProps) {
         sub: userInfo?.profile.sub || prevCredential.sub,
         data: {
           ...prevCredential.data,
-          redirectURL: oAuthRedirect,
+          redirectURL: redirectURL,
         },
       };
     },
-    [getOAuthRedirect]
+    [getRedirectURL]
   );
 
   const changeCredentialProperties = useCallback(() => {

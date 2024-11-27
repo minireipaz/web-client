@@ -14,13 +14,15 @@ export function getUriFrontend(extendUriBase: string): [boolean, string] {
 
 export function getLocalUri(extendUriBase: string): [boolean, string]  {
   try {
-    const uriBase = window.location.origin || "http://localhost:3010";
-    const uriComposed = `${uriBase}${extendUriBase}`;
-    const uriFrontend = new URL(uriComposed);
-    if (uriFrontend.href) {
-      return [true, uriFrontend.href]
+    // clean extenduribase in case contains localhost
+    // and not add 2 localhost:3010
+    if (extendUriBase.includes("localhost:3010")) { // dev development
+      const splitedUriBase = extendUriBase.split("localhost:3010")[1];
+      if (!splitedUriBase) return [false,""]
+
+      extendUriBase = splitedUriBase;
     }
-    return [false, ""]
+    return [true, extendUriBase];
   } catch (error) {
     return [false, ""];
   }
