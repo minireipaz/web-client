@@ -16,23 +16,15 @@ const (
 )
 
 func GetAllEnvsFromRedis() string {
-  vercel, exist := os.LookupEnv("VERCEL")
-  log.Printf("VERCEL exist: %v setted to %s", exist, vercel)
-  uriVault, exist := os.LookupEnv("VAULT_URI")
-  if !exist {
-    log.Printf("VAULT_URI exist: %v setted to %s", exist, uriVault)
-  }
-  os.Setenv("SALEE", "O NOO")
-  log.Printf("All ENVS=%v", os.Environ())
-	// uriVault := os.Getenv("VAULT_URI")
-  vaulKeyFrontendEnvs := os.Getenv("VAULT_KEY_FRONTEND_ENVS_PROD")
-  log.Printf("init vaulKeyFrontendEnvs %s", vaulKeyFrontendEnvs)
-	if os.Getenv("GO_ENV") == "dev" {
-    vaulKeyFrontendEnvs = os.Getenv("VAULT_KEY_FRONTEND_ENVS_DEV")
+	uriVault, exist := os.LookupEnv("VAULT_URI")
+	if !exist {
+		log.Panicf("VAULT_URI exist: %v setted to %s", exist, uriVault)
 	}
-  log.Printf("vaulturi %s", uriVault)
-  log.Printf("final vaulKeyFrontendEnvs %s", vaulKeyFrontendEnvs)
+	vaulKeyFrontendEnvs := os.Getenv("VAULT_KEY_FRONTEND_ENVS_PROD")
 
+	if os.Getenv("GO_ENV") == "dev" {
+		vaulKeyFrontendEnvs = os.Getenv("VAULT_KEY_FRONTEND_ENVS_DEV")
+	}
 	if uriVault == "" || vaulKeyFrontendEnvs == "" {
 		log.Panic("ERROR | Cannot load initial VAULT_URI")
 	}
