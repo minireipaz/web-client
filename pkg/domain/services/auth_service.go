@@ -43,7 +43,7 @@ func (s *AuthService) getServiceUserAccessToken() (string, error) {
 		// TODO: better control in case cannot get token auth
 		if err.Error() == "no token found" {
 			log.Printf("WARN | no token found, generating new one")
-			existingToken, err = s.GenerateNewToken() // better sync with external app designed to auth
+			existingToken, err = s.GenerateNewToken() // better sync with external service designed to auth
 			if err != nil {
 				log.Printf("WARN | failed to generate a new one token, try to read a new one")
 				existingToken, err = s.tokenRepo.GetToken()

@@ -19,6 +19,7 @@ type DataCredential struct {
 	Scopes       []string `json:"scopes,omitempty"`
 	State        string   `json:"state,omitempty"`
 	Code         string   `json:"code,omitempty"`
+	CodeVerifier string   `json:"codeverifier,omitempty"`
 	Token        string   `json:"token,omitempty"`
 	TokenRefresh string   `json:"tokenrefresh,omitempty"`
 }
@@ -31,17 +32,15 @@ type ResponseCreateCredential struct {
 }
 
 type ResponseExchangeCredential struct {
-	Token        string         `json:"token,omitempty"`        // in other iteration can be removed
-	TokenRefresh string         `json:"tokenrefresh,omitempty"` // in other iteration can be removed
-	Error        string         `json:"error,omitempty"`
-	Status       int            `json:"status,omitempty"`
-	ID           string         `json:"id,omitempty"`
-	Sub          string         `json:"sub,omitempty"`
-	Name         string         `json:"name,omitempty"`
-	Type         string         `json:"type,omitempty"`
-	WorkflowID   string         `json:"workflowid" binding:"required,max=255"`
-	NodeID       string         `json:"nodeid" binding:"required,max=255"`
-	Data         DataCredential `json:"data" binding:"required"`
+	Error      string         `json:"error,omitempty"`
+	Status     int            `json:"status,omitempty"`
+	ID         string         `json:"id,omitempty"`
+	Sub        string         `json:"sub,omitempty"`
+	Name       string         `json:"name,omitempty"`
+	Type       string         `json:"type,omitempty"`
+	WorkflowID string         `json:"workflowid" binding:"required,max=255"`
+	NodeID     string         `json:"nodeid" binding:"required,max=255"`
+	Data       DataCredential `json:"data" binding:"required"`
 }
 
 type ResponseGetAllCredential struct {

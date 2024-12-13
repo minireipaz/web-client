@@ -24,6 +24,7 @@ const (
 	RequestUpdateWorkflowContextKey = "requestupdate"
 	ValidateUserContextKey          = "user"
 	ValidateWorkflowContextKey      = "workflow"
+	ActionGoogleKey                 = "actiongoogle"
 )
 
 var PermitedPathList = map[string]bool{

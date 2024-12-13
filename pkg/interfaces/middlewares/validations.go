@@ -155,6 +155,26 @@ func ValidateCredentialExchange() gin.HandlerFunc {
 	}
 }
 
+func ValidateGetGoogleSheet() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var currentReq models.RequestGoogleAction
+		if err := ctx.ShouldBindBodyWithJSON(&currentReq); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": ErrorInvalidJSON})
+			ctx.Abort()
+			return
+		}
+
+		if !models.ValidCredentialTypes[currentReq.Type] {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": ErrorInvalidJSON})
+			ctx.Abort()
+			return
+		}
+
+		ctx.Set(models.ActionGoogleKey, currentReq)
+		ctx.Next()
+	}
+}
+
 func validateWorkflowFields(workflow *models.Workflow) error {
 	if strings.TrimSpace(workflow.Name) == "" {
 		return errors.New(ErrorWorkflowNameRequired)

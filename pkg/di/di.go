@@ -7,7 +7,13 @@ import (
 	"minireipaz/pkg/interfaces/controllers"
 )
 
-func InitDependencies() (*controllers.WorkflowController, *services.AuthService, *controllers.UserController, *controllers.DashboardController, *controllers.CredentialsController) {
+func InitDependencies() (*controllers.WorkflowController,
+	*services.AuthService,
+	*controllers.UserController,
+	*controllers.DashboardController,
+	*controllers.CredentialsController,
+	*controllers.ActionsController,
+) {
 	authContext := controllers.NewAuthContext()
 	authContext.GetAuthController()
 	authService := authContext.GetAuthService()
@@ -33,5 +39,10 @@ func InitDependencies() (*controllers.WorkflowController, *services.AuthService,
 	credentialsService := services.NewCredentialsService(credentialsRepo)
 	credentialsController := controllers.NewCredentialsController(credentialsService, authService)
 
-	return workflowController, authService, userController, dashboardController, credentialsController
+	actionsHTTPClient := httpclient.NewClientImpl(models.TimeoutRequest)
+	actionsRepo := httpclient.NewActionsRepository(actionsHTTPClient)
+	actionsService := services.NewActionsService(actionsRepo)
+	actionsController := controllers.NewActionsController(actionsService, authService)
+
+	return workflowController, authService, userController, dashboardController, credentialsController, actionsController
 }

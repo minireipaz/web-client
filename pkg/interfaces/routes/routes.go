@@ -9,7 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Register(app *gin.Engine, workflowController *controllers.WorkflowController, userController *controllers.UserController, dashboardController *controllers.DashboardController, credentialController *controllers.CredentialsController) {
+func Register(app *gin.Engine,
+	workflowController *controllers.WorkflowController,
+	userController *controllers.UserController,
+	dashboardController *controllers.DashboardController,
+	credentialController *controllers.CredentialsController,
+	actionsController *controllers.ActionsController,
+) {
 	app.NoRoute(ErrRouter)
 	route := app.Group("/api")
 	{
@@ -26,9 +32,15 @@ func Register(app *gin.Engine, workflowController *controllers.WorkflowControlle
 		route.GET("/credentials/:iduser", middlewares.ValidateUserID(), credentialController.GetAllCredentials)
 		// route.GET("/credentials/:iduser/:idcredential", middlewares.ValidateGetCredential(), credentialController.GetCredentialsByID)
 	}
+
 	creds := app.Group("/oauth2-credentials")
 	{
 		creds.POST("/save", middlewares.ValidateCredentialExchange(), credentialController.CallbackCredentials)
+	}
+
+	actions := app.Group("/actions")
+	{
+		actions.POST("/google/sheets", middlewares.ValidateGetGoogleSheet(), actionsController.GetGoogleSheetByID)
 	}
 }
 
