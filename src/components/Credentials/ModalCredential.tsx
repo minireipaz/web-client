@@ -1,6 +1,6 @@
 import { Alert, Button, Modal } from "flowbite-react";
 import { useEffect, useRef, useState } from "react";
-import { CredentialData, ModalCredentialData, ResponseCreateCredential } from "../../models/Credential";
+import { COLOR_ALERTS, CredentialData, ModalCredentialData, ResponseCreateCredential } from "../../models/Credential";
 import { getUriFrontend } from "../../utils/getUriFrontend";
 import { useAuth } from "../AuthProvider/indexAuthProvider";
 import { OAuthProvider, PostMessageData } from "../Callback/oauthCallback";
@@ -18,12 +18,6 @@ interface ContainerProps {
     onChange: (field: keyof ModalCredentialData, value: any) => void;
   }>;
 }
-
-enum COLOR_ALERTS {
-  failure = "failure",
-  ok = "green"
-};
-
 
 export function ModalCredential(props: ContainerProps) {
   const { userInfo } = useAuth();
