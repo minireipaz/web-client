@@ -19,6 +19,8 @@ export default function Login({ authenticated, userInfo, handleLogin }: Props) {
       </button>
       <h2>ayilezt485@nic.edu.pl</h2>
       <h2>123</h2>
+      <h2>fake@email.com</h2>
+      <h2>1234</h2>
     </div>
   );
 }
