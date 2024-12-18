@@ -12,8 +12,8 @@ interface ContainerProps {
 
 export function RecentWorkflows(props: ContainerProps) {
 
-  function formatDuration(durati: number): string {
-    if (!durati) return "N/A";
+  function formatDuration(durati: Number): string {
+    if (!durati || durati.toString() === "NaN") return "N/A";
 
     const duration = Number.parseInt(durati.toString() as string);
     if (duration === null || duration === undefined || !Number.isInteger(duration)) {
@@ -39,6 +39,9 @@ export function RecentWorkflows(props: ContainerProps) {
   }
 
   function formatTextIsActive(isActive: Number) {
+    if (isActive.toString() === "NaN") {
+      return activeMap[3].text;
+    }
     const index: string = isActive.toString();
     let activeText = activeMap[Number.parseInt(index)].text;
     if (!activeText) {
