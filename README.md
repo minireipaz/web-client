@@ -1,6 +1,10 @@
 # web-client
 This repository contains the user-facing frontend service for the minireipaz project. 
 
+
+# TODO:
+- ACL client frontend 
+
 ## Testing users
 
 Username: ayilezt485@nic.edu.pl
