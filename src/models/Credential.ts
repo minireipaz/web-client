@@ -51,3 +51,8 @@ export interface ModalCredentialData {
   sub: string;
   name: string;
 }
+
+export enum COLOR_ALERTS {
+  failure = "failure",
+  ok = "green"
+};
