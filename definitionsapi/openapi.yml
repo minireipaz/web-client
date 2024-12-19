@@ -1,0 +1,1467 @@
+openapi: 3.0.3
+info:
+  title: MiniReipaz API
+  description: >-
+    API for managing workflows, users, dashboards, authentication, and
+    credentials.
+  version: 1.0.0
+  contact:
+    name: API Support
+    url: fakeurl
+    email: fake@email.com
+tags:
+  - name: Workflows
+    description: Operations related to workflows.
+  - name: Users
+    description: Operations related to users.
+  - name: Dashboard
+    description: Operations related to user dashboards.
+  - name: Authentication
+    description: Operations related to user authentication.
+  - name: Credentials
+    description: Operations related to user credentials.
+paths:
+  /api/ping:
+    get:
+      operationId: ping
+      tags:
+        - Workflows
+      summary: Ping the API
+      description: A simple endpoint to check if the API is running.
+      responses:
+        '200':
+          description: API is running
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PingResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+        '406':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAcceptableResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        '429':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Default
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+
+  /api/workflows:
+    post:
+      operationId: createWorkflow
+      tags:
+        - Workflows
+      summary: Create a new workflow
+      description: Creates a new workflow in the system.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowFrontend'
+      responses:
+        '201':
+          description: Workflow created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+        '208':
+          description: Workflow name already exists for this user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '406':
+          description: >-
+            Not Acceptable. The server cannot generate content that matches the
+            Accept header.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAcceptableResponse'
+        "415":
+          description: Unsupported media type
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnsupportedMedia"
+        '429':
+          description: Too Many Requests. The client has exceeded the rate limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/api/workflows/{iduser}/{idworkflow}':
+    get:
+      operationId: getWorkflow
+      tags:
+        - Workflows
+      summary: Get a specific workflow
+      description: Retrieves a specific workflow by user ID and workflow ID.
+      parameters:
+        - name: iduser
+          in: path
+          required: true
+          description: ID of the user
+          schema:
+            type: string
+            pattern: ^[a-zA-Z0-9_-]$
+            maxLength: 255
+        - name: idworkflow
+          in: path
+          required: true
+          description: ID of the workflow
+          schema:
+            type: string
+            pattern: ^[a-zA-Z0-9_-]$
+            maxLength: 255
+      responses:
+        '200':
+          description: Workflow retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        '429':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsResponse'
+        default:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+  '/api/workflows/{iduser}':
+    get:
+      operationId: getAllWorkflows
+      tags:
+        - Workflows
+      summary: Get all workflows for a user
+      description: Retrieves all workflows associated with a specific user.
+      parameters:
+        - name: iduser
+          in: path
+          required: true
+          description: ID of the user
+          schema:
+            type: string
+            pattern: ^[a-zA-Z0-9_-]$
+            maxLength: 255
+      responses:
+        '200':
+          description: Workflows retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Workflow'
+                maxItems: 100
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        '429':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsResponse'
+        default:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+  /api/users:
+    post:
+      operationId: syncUser
+      tags:
+        - Users
+      summary: Sync a user with ID provider
+      description: Synchronizes a user with the specified ID provider.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: User synchronized successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '406':
+          description: >-
+            Not Acceptable. The server cannot generate content that matches the
+            Accept header.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAcceptableResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        '429':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsResponse'
+        "415":
+          description: Unsupported media type
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnsupportedMedia"
+        default:
+          description: Default
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+
+
+  '/api/users/{stub}':
+    get:
+      operationId: getUserByStub
+      tags:
+        - Users
+      summary: Get user by stub
+      description: Retrieves a user by their unique stub identifier.
+      parameters:
+        - name: stub
+          in: path
+          required: true
+          description: Unique identifier for the user
+          schema:
+            type: string
+            pattern: ^[a-zA-Z0-9_-]$
+            maxLength: 255
+      responses:
+        '200':
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '406':
+          description: >-
+            Not Acceptable. The server cannot generate content that matches the
+            Accept header.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAcceptableResponse'
+        '429':
+          description: Too Many Requests. The client has exceeded the rate limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Unexpected error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/api/dashboard/{iduser}':
+    get:
+      operationId: getUserDashboardByID
+      tags:
+        - Dashboard
+      summary: Get user dashboard by user ID
+      description: Retrieves the dashboard for a specific user by their ID.
+      parameters:
+        - name: iduser
+          in: path
+          required: true
+          description: ID of the user
+          schema:
+            type: string
+            pattern: ^[a-zA-Z0-9_-]$
+            maxLength: 255
+      responses:
+        '200':
+          description: User dashboard retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        '406':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAcceptableResponse'
+        '429':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsResponse'
+        default:
+          description: Default
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+
+  '/api/auth/verify/{id}':
+    get:
+      operationId: verifyUserToken
+      tags:
+        - Authentication
+      summary: Verify user token
+      description: Verifies the user token for authentication.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the user token
+          schema:
+            type: string
+            pattern: ^[a-zA-Z0-9_-]$
+            maxLength: 255
+      responses:
+        '200':
+          description: Token verified successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenVerificationResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+        '406':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAcceptableResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        '429':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsResponse'
+        default:
+          description: Default
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+
+  /api/google/credential:
+    post:
+      operationId: createCredential
+      tags:
+        - Credentials
+      summary: Create a new Google credential
+      description: Creates a new credential for Google authentication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Credential'
+      responses:
+        '200':
+          description: Credential created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Credential'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        '429':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsResponse'
+        '406':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAcceptableResponse'
+        "415":
+          description: Unsupported media type
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnsupportedMedia"
+        default:
+          description: Default
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+
+  /api/google/exchange:
+    post:
+      operationId: exchangeGoogleCode
+      tags:
+        - Credentials
+      summary: Exchange Google code for credentials
+      description: Exchanges a Google authorization code for credentials.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExchangeRequest'
+      responses:
+        '200':
+          description: Credentials exchanged successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Credential'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        "415":
+          description: Unsupported media type
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnsupportedMedia"
+        '429':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsResponse'
+        '406':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAcceptableResponse'
+        default:
+          description: Default
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+
+  /oauth2-credentials/save:
+    post:
+      operationId: callbackCredentials
+      tags:
+        - Credentials
+      summary: Save OAuth2 credentials
+      description: Saves the OAuth2 credentials.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CredentialExchangeRequest'
+      responses:
+        '200':
+          description: Credentials saved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Credential'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        '429':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+        '406':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAcceptableResponse'
+        "415":
+          description: Unsupported media type
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnsupportedMedia"
+        default:
+          description: Default
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+
+security:
+  - UserTokenAuth: []
+components:
+  securitySchemes:
+    UserTokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: >-
+        Bearer token de usuario proporcionado por Zitadel. Debe incluirse en el
+        encabezado `Authorization` como `Bearer <token>`.
+  schemas:
+    PingResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: pong
+          pattern: ^[a-zA-Z0-9_-]$
+          maxLength: 255
+      additionalProperties: false
+    TokenVerificationResponse:
+      type: object
+      properties:
+        verified:
+          type: boolean
+          example: true
+      additionalProperties: false
+    WorkflowFrontend:
+      type: object
+      required:
+        - WorkflowName
+        - DirectoryToSave
+      properties:
+        UserID:
+          type: string
+          example: user-123
+          pattern: ^[a-zA-Z0-9_-]$
+          maxLength: 255
+        UUID:
+          type: string
+          example: workflow-123
+          pattern: ^[a-zA-Z0-9_-]$
+          maxLength: 255
+        WorkflowName:
+          type: string
+          example: Sample Workflow
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        Description:
+          type: string
+          example: This is a sample workflow description.
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        DirectoryToSave:
+          type: string
+          example: path/to/save
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        CreatedAt:
+          type: string
+          format: date-time
+          example: '2023-10-01T12:00:00Z'
+          maxLength: 32
+        UpdatedAt:
+          type: string
+          format: date-time
+          example: '2023-10-02T12:00:00Z'
+          maxLength: 32
+        UserToken:
+          type: string
+          example: ya29.a0ARrda...
+          maxLength: 512
+          pattern: ^[a-zA-Z0-9_-]$
+        IsActive:
+          type: string
+          enum:
+            - active
+            - draft
+            - paused
+          example: active
+        WorkflowInit:
+          type: string
+          format: date-time
+          example: '2023-10-01T12:00:00Z'
+          maxLength: 32
+        WorkflowCompleted:
+          type: string
+          format: date-time
+          example: '2023-10-01T12:00:00Z'
+          maxLength: 32
+        Status:
+          type: string
+          enum:
+            - initial
+            - pending
+            - completed
+            - processing
+            - failed
+          example: initial
+        Duration:
+          type: integer
+          example: 120
+          maximum: 999999999
+          minimum: 0
+          format: int64
+        Nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Node'
+          maxItems: 100
+        Edges:
+          type: array
+          items:
+            $ref: '#/components/schemas/Edge'
+          maxItems: 100
+        Viewport:
+          $ref: '#/components/schemas/Viewport'
+      additionalProperties: false
+    Workflow:
+      type: object
+      required:
+        - UUID
+        - UserID
+        - Name
+        - DirectoryToSave
+      properties:
+        UUID:
+          type: string
+          example: workflow-123
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        UserID:
+          type: string
+          example: user-123
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        Name:
+          type: string
+          example: Sample Workflow
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        Description:
+          type: string
+          example: This is a sample workflow description.
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        IsActive:
+          type: string
+          enum:
+            - active
+            - draft
+            - paused
+          example: active
+        CreatedAt:
+          type: string
+          format: date-time
+          example: '2023-10-01T12:00:00Z'
+          maxLength: 32
+        UpdatedAt:
+          type: string
+          format: date-time
+          example: '2023-10-02T12:00:00Z'
+          maxLength: 32
+        WorkflowInit:
+          type: string
+          format: date-time
+          example: '2023-10-01T12:00:00Z'
+          maxLength: 32
+        WorkflowCompleted:
+          type: string
+          format: date-time
+          example: '2023-10-01T12:00:00Z'
+          maxLength: 32
+        Status:
+          type: string
+          enum:
+            - initial
+            - pending
+            - completed
+            - processing
+            - failed
+          example: initial
+        DirectoryToSave:
+          type: string
+          example: path/to/save
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        UserToken:
+          type: string
+          example: ya29.a0ARrda...
+          maxLength: 512
+          pattern: ^[a-zA-Z0-9_-]$
+        Duration:
+          type: integer
+          example: 120
+        Nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Node'
+          maxItems: 100
+        Edges:
+          type: array
+          items:
+            $ref: '#/components/schemas/Edge'
+          maxItems: 100
+        Viewport:
+          $ref: '#/components/schemas/Viewport'
+      additionalProperties: false
+    WorkflowUpdateRequest:
+      type: object
+      properties:
+        workflow_name:
+          type: string
+          example: Updated Workflow Name
+          maxLength: 255
+        description:
+          type: string
+          example: Updated description of the workflow.
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        is_active:
+          type: boolean
+          example: true
+      required:
+        - workflow_name
+        - is_active
+      additionalProperties: false
+    User:
+      type: object
+      required:
+        - stub
+        - name
+      properties:
+        stub:
+          type: string
+          example: user-123
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        name:
+          type: string
+          example: John Doe
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        createdAt:
+          type: string
+          format: date-time
+          example: '2023-10-01T12:00:00Z'
+          maxLength: 32
+      additionalProperties: false
+    Dashboard:
+      type: object
+      required:
+        - userId
+        - widgets
+      properties:
+        userId:
+          type: string
+          example: user-123
+          pattern: ^[a-zA-Z0-9_-]$
+          maxLength: 32
+        widgets:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                example: chart
+                pattern: ^[a-zA-Z0-9_-]$
+                maxLength: 255
+              data:
+                type: object
+                example:
+                  value: 100
+                  label: Sample Data
+            required:
+              - type
+              - data
+            additionalProperties: false
+          maxItems: 100
+      additionalProperties: false
+    Credential:
+      type: object
+      required:
+        - provider
+        - token
+      properties:
+        provider:
+          type: string
+          example: google
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        token:
+          type: string
+          example: ya29.a0ARrda...
+          maxLength: 512
+          pattern: ^[a-zA-Z0-9_-]$
+        expiresAt:
+          type: string
+          format: date-time
+          example: '2023-10-01T12:00:00Z'
+          maxLength: 32
+      additionalProperties: false
+    DataCredential:
+      type: object
+      properties:
+        id:
+          type: string
+          maxLength: 32
+          pattern: ^[a-zA-Z0-9_-]$
+        clientId:
+          type: string
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        clientSecret:
+          type: string
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        redirectURL:
+          type: string
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        oauthurl:
+          type: string
+          maxLength: 512
+          pattern: ^example-[0-9a-z]+$
+        scopes:
+          type: array
+          items:
+            type: string
+            maxLength: 255
+            pattern: ^example-[0-9a-z]+$
+          maxItems: 100
+        state:
+          type: string
+          maxLength: 32
+          pattern: ^[a-zA-Z0-9_-]$
+        code:
+          type: string
+          maxLength: 32
+          pattern: ^[a-zA-Z0-9_-]$
+        token:
+          type: string
+          maxLength: 512
+          pattern: ^[a-zA-Z0-9_-]$
+        tokenrefresh:
+          type: string
+          maxLength: 512
+          pattern: ^example-[0-9a-z]+$
+      additionalProperties: false
+      required:
+        - clientId
+        - clientSecret
+        - redirectURL
+    CredentialExchangeRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        sub:
+          type: string
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        name:
+          type: string
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        type:
+          type: string
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        workflowid:
+          type: string
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        nodeid:
+          type: string
+          maxLength: 255
+          pattern: ^[a-zA-Z0-9_-]$
+        data:
+          $ref: '#/components/schemas/DataCredential'
+      required:
+        - id
+        - sub
+        - name
+        - type
+        - workflowid
+        - nodeid
+        - data
+    ResponseCreateCredential:
+      type: object
+      properties:
+        data:
+          type: string
+        status:
+          type: integer
+        error:
+          type: string
+        authRedirectURL:
+          type: string
+      required:
+        - data
+        - status
+        - error
+    ResponseExchangeCredential:
+      type: object
+      properties:
+        token:
+          type: string
+        tokenrefresh:
+          type: string
+        error:
+          type: string
+        status:
+          type: integer
+        id:
+          type: string
+        sub:
+          type: string
+        name:
+          type: string
+          pattern: ^[a-zA-Z0-9_-]$
+        type:
+          type: string
+        workflowid:
+          type: string
+          maxLength: 255
+        nodeid:
+          type: string
+          maxLength: 255
+        data:
+          $ref: '#/components/schemas/DataCredential'
+      required:
+        - token
+        - tokenrefresh
+        - error
+        - status
+        - id
+        - sub
+        - name
+        - type
+        - workflowid
+        - nodeid
+        - data
+    ResponseGetAllCredential:
+      type: object
+      properties:
+        credentials:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResponseExchangeCredential'
+        status:
+          type: integer
+        error:
+          type: string
+      required:
+        - credentials
+        - status
+        - error
+    ExchangeRequest:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          example: 4/0AY0e-g...
+          pattern: ^[a-zA-Z0-9_-]$
+          maxLength: 512
+        redirectUri:
+          type: string
+          example: 'http://localhost:8080/callback'
+          pattern: ^[a-zA-Z0-9_-]$
+          maxLength: 512
+      additionalProperties: false
+    Node:
+      type: object
+      properties:
+        ID:
+          type: string
+          example: node-1
+          pattern: ^[a-zA-Z0-9_-]$
+          maxLength: 512
+        Type:
+          type: string
+          example: task
+          pattern: ^example-[0-9a-z]+$
+          maxLength: 32
+        Position:
+          $ref: '#/components/schemas/Position'
+        Data:
+          $ref: '#/components/schemas/DataNode'
+        Measured:
+          $ref: '#/components/schemas/Measured'
+      additionalProperties: false
+    Edge:
+      type: object
+      properties:
+        ID:
+          type: string
+          example: edge-1
+          pattern: ^[a-zA-Z0-9_-]$
+          maxLength: 512
+        Source:
+          type: string
+          example: node-1
+          maxLength: 32
+          pattern: ^example-[0-9a-z]+$
+        Target:
+          type: string
+          example: node-2
+          pattern: ^example-[0-9a-z]+$
+          maxLength: 32
+        Type:
+          type: string
+          example: link
+          pattern: ^example-[0-9a-z]+$
+          maxLength: 32
+        Animated:
+          type: boolean
+          example: true
+        Style:
+          $ref: '#/components/schemas/Style'
+      additionalProperties: false
+    Position:
+      type: object
+      properties:
+        X:
+          type: number
+          example: 100
+          maximum: 999999
+          minimum: 0
+          format: int64
+        Y:
+          type: number
+          example: 200
+          maximum: 999999
+          minimum: 0
+          format: int64
+      additionalProperties: false
+    DataNode:
+      type: object
+      properties:
+        ID:
+          type: string
+          example: data-1
+          maxLength: 512
+          pattern: ^[a-zA-Z0-9_-]$
+        Label:
+          type: string
+          example: Data Node
+          maxLength: 512
+          pattern: ^[a-zA-Z0-9_-]$
+        Options:
+          type: string
+          example: 'option1, option2'
+          maxLength: 512
+          pattern: ^[a-zA-Z0-9_-]$
+        Description:
+          type: string
+          example: This is a data node.
+          maxLength: 512
+          pattern: ^[a-zA-Z0-9_-]$
+      additionalProperties: false
+    Measured:
+      type: object
+      properties:
+        Width:
+          type: number
+          example: 300
+          maximum: 999999
+          minimum: 0
+          format: int64
+        Height:
+          type: number
+          example: 150
+          maximum: 999999
+          minimum: 0
+          format: int64
+      additionalProperties: false
+    Viewport:
+      type: object
+      properties:
+        X:
+          type: number
+          example: 0
+          maximum: 999999
+          minimum: 0
+          format: int64
+        Y:
+          type: number
+          example: 0
+          maximum: 999999
+          minimum: 0
+          format: int64
+        Zoom:
+          type: number
+          example: 1
+          maximum: 999999
+          minimum: 0
+          format: int64
+      additionalProperties: false
+    Style:
+      type: object
+      properties:
+        Stroke:
+          type: string
+          example: '#000000'
+      additionalProperties: false
+
+    UnauthorizedResponse:  # Esquema para la respuesta 401
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Unauthorized. The request requires user authentication."
+          pattern: ^[a-zA-Z0-9_-]$
+        status:
+          type: integer
+          example: 401
+      required:
+        - error
+        - status
+      additionalProperties: false
+
+    ForbiddenResponse:  # Esquema para la respuesta 403
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Forbidden. The server understood the request but refuses to authorize it."
+          pattern: ^[a-zA-Z0-9_-]$
+          maxLength: 255
+        status:
+          type: integer
+          example: 403
+      required:
+        - error
+        - status
+      additionalProperties: false
+
+    TooManyRequestsResponse:  # Esquema para la respuesta 429
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Too Many Requests. The client has exceeded the rate limit."
+          pattern: ^[a-zA-Z0-9_-]$
+          maxLength: 255
+        status:
+          type: integer
+          example: 429
+      required:
+        - error
+        - status
+      additionalProperties: false
+
+    NotFoundResponse:  # Esquema para la respuesta 404
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Not Found. The requested resource could not be found."
+          pattern: ^[a-zA-Z0-9_-]$
+          maxLength: 255
+        status:
+          type: integer
+          example: 404
+      required:
+        - error
+        - status
+      additionalProperties: false
+
+    NotAcceptableResponse:  # Esquema para la respuesta 406
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Not Acceptable. The server cannot generate content that matches the Accept header."
+          pattern: ^[a-zA-Z0-9_-]$
+          maxLength: 255
+        status:
+          type: integer
+          example: 406
+      required:
+        - error
+        - status
+      additionalProperties: false
+
+    UnsupportedMedia: # 415
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Not Supported media"
+          pattern: ^[a-zA-Z0-9_-]$
+          maxLength: 255
+        status:
+          type: integer
+          example: 415
+      required:
+        - error
+        - status
+      additionalProperties: false
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: An error occurred
+          pattern: ^[a-zA-Z0-9_-]$
+          maxLength: 255
+        status:
+          type: integer
+          example: 500
+      additionalProperties: false
