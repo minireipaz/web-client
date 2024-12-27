@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { User, UserManager } from 'oidc-client-ts';
 import { ensureUserExists } from '../Callback/authUserBackend';
-import { authConfig } from "../../authConfig.ts";
-import { createZitadelAuth } from "@zitadel/react";
+import { authConfig } from '../../authConfig.ts';
+import { createZitadelAuth } from '@zitadel/react';
 
 interface AuthContextType {
   authenticated: boolean | null;
@@ -24,7 +24,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [userInfo, setUserInfo] = useState<User | null>(null);
   const [_, setUserValidated] = useState(false); // not implemented int this block
-  const [userManager, setUserManager] = useState<UserManager | null>(zitadel.userManager as unknown as UserManager);
+  const [userManager, setUserManager] = useState<UserManager | null>(
+    zitadel.userManager as unknown as UserManager
+  );
   const fetchedRef = useRef(false);
 
   const setUserAndValidate = async (user: User): Promise<boolean> => {
@@ -72,12 +74,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const handleLogout = async () => {
-  setAuthenticated(false);
-  setUserInfo(null);
-  setUserValidated(false);
-  fetchedRef.current = false;
-  await userManager?.removeUser();
-  userManager?.signoutRedirect();
+    setAuthenticated(false);
+    setUserInfo(null);
+    setUserValidated(false);
+    fetchedRef.current = false;
+    await userManager?.removeUser();
+    userManager?.signoutRedirect();
   };
 
   async function handleTokenExpiration() {
@@ -112,4 +114,4 @@ export function useAuth() {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-};
+}

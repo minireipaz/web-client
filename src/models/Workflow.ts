@@ -4,12 +4,30 @@ import ButtonEdge from '../components/Workflow/ButtonEdge';
 import { CustomFlowbiteTheme } from 'flowbite-react';
 import { ModalCredentialData } from './Credential';
 
+export interface FormData {
+  [key: string]: any;
+  pollmode: string;
+  selectdocument: string;
+  document: string;
+  selectsheet: string;
+  sheet: string;
+  operation: string;
+  testmode: boolean;
+  credentialid: string; // not used
+  sub: string; // not used
+  type: string; // not used
+  workflowid: string; // not used
+  nodeid: string; // not used
+  redirecturl: string; // not used
+}
+
 export interface NodeData {
   id: string;
   type: string;
   label: string;
   description: string;
   options: string;
+  formdata: FormData;
   onClickFromNode?: (posX: number, posY: number, nodeID: string) => void;
 }
 
@@ -53,7 +71,7 @@ export interface WrapperNodeProps {
 export interface ResponseSyncWorkflow {
   error: string;
   status: number;
-  data: {}
+  data: {};
 }
 
 export interface ResponseUpdateWorkflow {
@@ -75,20 +93,19 @@ export interface ResponseGetAllWorkflows {
   credentials: ModalCredentialData[];
 }
 
-
 export interface MsgSaved {
   text: string;
   classText?: string;
 }
 
 export const savedStatus: Record<string, string> = {
-  "warn": 'text-sm bg-orange-100 text-yellow-800 select-none',
-  "notice": 'text-sm text-gray-400 select-none',
-  "done": 'text-sm text-green-800 select-none',
-  "alert": 'text-sm bg-red-100 text-red-800 select-none',
-  "none": "",
+  warn: 'text-sm bg-orange-100 text-yellow-800 select-none',
+  notice: 'text-sm text-gray-400 select-none',
+  done: 'text-sm text-green-800 select-none',
+  alert: 'text-sm bg-red-100 text-red-800 select-none',
+  none: '',
 };
 
-export const customTooltipTheme: CustomFlowbiteTheme["tooltip"] = {
-  target: "w-[-webkit-fill-available]"
+export const customTooltipTheme: CustomFlowbiteTheme['tooltip'] = {
+  target: 'w-[-webkit-fill-available]',
 };

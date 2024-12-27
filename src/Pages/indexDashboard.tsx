@@ -1,17 +1,23 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../components/AuthProvider/indexAuthProvider";
-import { NavDashboard } from "../components/Dashboard/NavDashboard";
-import { HeaderDashboard } from "../components/Header/Headers";
-import { DashboardData, ResponseDashboardData, WorkflowCounts } from "../models/Dashboard";
-import { getUriFrontend } from "../utils/getUriFrontend";
-import { ContentDashboard } from "../components/Dashboard/ContentDashboard";
-import { Workflow } from "../models/Workflow";
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../components/AuthProvider/indexAuthProvider';
+import { NavDashboard } from '../components/Dashboard/NavDashboard';
+import { HeaderDashboard } from '../components/Header/Headers';
+import {
+  DashboardData,
+  ResponseDashboardData,
+  WorkflowCounts,
+} from '../models/Dashboard';
+import { getUriFrontend } from '../utils/getUriFrontend';
+import { ContentDashboard } from '../components/Dashboard/ContentDashboard';
+import { Workflow } from '../models/Workflow';
 import { Node, Edge } from '@xyflow/react';
 
 export default function Dashboard() {
   const { authenticated, handleTokenExpiration, userInfo } = useAuth();
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+    null
+  );
   const navigate = useNavigate();
   const fetchedRef = useRef(false);
 
@@ -21,16 +27,18 @@ export default function Dashboard() {
     fetchedRef.current = true;
 
     try {
-      const [ok, uriFrontend] = getUriFrontend(`/api/dashboard/${userInfo?.profile.sub}`);
+      const [ok, uriFrontend] = getUriFrontend(
+        `/api/v1/dashboard/${userInfo?.profile.sub}`
+      );
       if (!ok) {
-        console.log("ERROR | cannot get uri frontend");
+        console.log('ERROR | cannot get uri frontend');
         return;
       }
       const response = await fetch(uriFrontend, {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${userInfo?.access_token}`,
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userInfo?.access_token}`,
         },
       });
 
@@ -47,15 +55,15 @@ export default function Dashboard() {
       }
 
       const data: ResponseDashboardData = await response.json();
-      if (data.error !== "" || data.status !== 200) {
-        console.log("ERROR | cannot get dashboard data");
+      if (data.error !== '' || data.status !== 200) {
+        console.log('ERROR | cannot get dashboard data');
         return;
       }
       let convertedDashboard: DashboardData = convertDashboardData(data);
       setDashboardData(convertedDashboard);
     } catch (error) {
       setDashboardData(null);
-      console.error("Error fetching dashboard data:", error);
+      console.error('Error fetching dashboard data:', error);
     }
   }, [handleTokenExpiration, navigate]);
 
@@ -70,7 +78,6 @@ export default function Dashboard() {
         fetchDashboardData();
       }
     }
-
   }, [userInfo, authenticated, fetchDashboardData, navigate]);
 
   useEffect(() => {
@@ -87,11 +94,13 @@ export default function Dashboard() {
     };
   }, [fetchDashboardData, dashboardData]);
 
-  function convertDashboardData(responseData: ResponseDashboardData): DashboardData {
+  function convertDashboardData(
+    responseData: ResponseDashboardData
+  ): DashboardData {
     let dashboard: DashboardData = {
       workflow_counts: [],
       workflows_recents: [],
-    }
+    };
 
     for (let i = 0; i < responseData.data.length; i++) {
       const stats: WorkflowCounts = {
@@ -118,7 +127,7 @@ export default function Dashboard() {
           viewport: JSON.parse(values[9]),
           directory_to_save: values[10],
           start_time: values[11],
-          duration: Number.parseInt(values[12])
+          duration: Number.parseInt(values[12]),
         };
         dashboard.workflows_recents.push(workflows);
       }
@@ -128,9 +137,9 @@ export default function Dashboard() {
 
   return (
     <>
-      <div className="grid min-h-screen w-full grid-cols-[240px_1fr] overflow-hidden" >
+      <div className="grid min-h-screen w-full grid-cols-[240px_1fr] overflow-hidden">
         <NavDashboard />
-        <div className="flex flex-col" >
+        <div className="flex flex-col">
           <HeaderDashboard title="Dashboard" />
           <ContentDashboard dashboardData={dashboardData} />
         </div>

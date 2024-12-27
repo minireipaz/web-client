@@ -1,30 +1,35 @@
-import { Tooltip, Dropdown } from "flowbite-react";
-import { useNavigate } from "react-router-dom";
-import { NavDashboard } from "../components/Dashboard/NavDashboard";
-import { HeaderDashboard } from "../components/Header/Headers";
-import { activeMap, statusMap } from "../models/Dashboard";
-import { customTooltipTheme } from "../models/Workflow";
-import { getUriFrontend } from "../utils/getUriFrontend";
-import { ModalCredentialData, ResponseGetAllCredentials } from "../models/Credential";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useAuth } from "../components/AuthProvider/indexAuthProvider";
-import { ModalCredential } from "../components/Credentials/ModalCredential";
-import { CredentialComponent } from "../components/WorkflowModal/Modal";
-import { RenderGoogleSheetsOAuth2Api } from "../components/Credentials/GoogleSheetsOAuth2Api";
+import { Tooltip, Dropdown } from 'flowbite-react';
+import { useNavigate } from 'react-router-dom';
+import { NavDashboard } from '../components/Dashboard/NavDashboard';
+import { HeaderDashboard } from '../components/Header/Headers';
+import { activeMap, statusMap } from '../models/Dashboard';
+import { customTooltipTheme } from '../models/Workflow';
+import { getUriFrontend } from '../utils/getUriFrontend';
+import {
+  ModalCredentialData,
+  ResponseGetAllCredentials,
+} from '../models/Credential';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useAuth } from '../components/AuthProvider/indexAuthProvider';
+import { ModalCredential } from '../components/Credentials/ModalCredential';
+import { CredentialComponent } from '../components/WorkflowModal/Modal';
+import { RenderGoogleSheetsOAuth2Api } from '../components/Credentials/GoogleSheetsOAuth2Api';
 
-interface ContainerProps {
-
-}
+interface ContainerProps {}
 
 export function Credentials(_: ContainerProps) {
   const { authenticated, handleTokenExpiration, userInfo } = useAuth();
   const navigate = useNavigate();
   const fetchedRef = useRef(false);
 
-  const [listCredentials, setListCredentials] = useState<ModalCredentialData[] | undefined>(undefined);
+  const [listCredentials, setListCredentials] = useState<
+    ModalCredentialData[] | undefined
+  >(undefined);
   const [isModalCredentialOpen, setIsModalCredentialOpen] = useState(false);
-  const [currentCredential, setCurrentCredential] = useState<ModalCredentialData>();
-  const [currentCredentialComponent, setCurrentCredentialComponent] = useState<CredentialComponent | null>(null);
+  const [currentCredential, setCurrentCredential] =
+    useState<ModalCredentialData>();
+  const [currentCredentialComponent, setCurrentCredentialComponent] =
+    useState<CredentialComponent | null>(null);
 
   const fetchAllCredentials = useCallback(async () => {
     if (fetchedRef.current) return;
@@ -32,16 +37,18 @@ export function Credentials(_: ContainerProps) {
     fetchedRef.current = true;
 
     try {
-      const [ok, uriFrontend] = getUriFrontend(`/api/credentials/${userInfo?.profile.sub}`);
+      const [ok, uriFrontend] = getUriFrontend(
+        `/api/v1/credentials/${userInfo?.profile.sub}`
+      );
       if (!ok) {
-        console.log("ERROR | cannot get uri frontend");
+        console.log('ERROR | cannot get uri frontend');
         return;
       }
       const response = await fetch(uriFrontend, {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${userInfo?.access_token}`,
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userInfo?.access_token}`,
         },
       });
 
@@ -57,15 +64,15 @@ export function Credentials(_: ContainerProps) {
       }
 
       const data: ResponseGetAllCredentials = await response.json();
-      if (data.error !== "" || data.status !== 200) {
-        console.log("ERROR | cannot get dashboard data");
+      if (data.error !== '' || data.status !== 200) {
+        console.log('ERROR | cannot get dashboard data');
         return;
       }
 
       setListCredentials(data.credentials);
       return;
     } catch (error) {
-      console.error("Error fetching dashboard data:", error);
+      console.error('Error fetching dashboard data:', error);
     }
   }, [handleTokenExpiration, navigate]);
 
@@ -77,9 +84,7 @@ export function Credentials(_: ContainerProps) {
 
     if (userInfo) {
       fetchAllCredentials();
-
     }
-
   }, [userInfo, authenticated, fetchAllCredentials, navigate]);
 
   function formatTextIsActive(isActive: Number) {
@@ -91,23 +96,24 @@ export function Credentials(_: ContainerProps) {
     return activeText;
   }
 
-
   function handleSaveModalCredential(newCredential: ModalCredentialData) {
-    const updatedListCredentials = handleSearchDuplicated(newCredential)
+    const updatedListCredentials = handleSearchDuplicated(newCredential);
     setListCredentials(updatedListCredentials);
     setCurrentCredential(newCredential);
     setIsModalCredentialOpen(false);
   }
 
   function handleSearchDuplicated(newCredential: ModalCredentialData) {
-    const updatedListCredentials = [...listCredentials as  ModalCredentialData[]];
+    const updatedListCredentials = [
+      ...(listCredentials as ModalCredentialData[]),
+    ];
     const index = updatedListCredentials.findIndex(
-      cred => cred.id === newCredential.id
+      (cred) => cred.id === newCredential.id
     );
     if (index !== -1) {
       updatedListCredentials[index] = {
         ...updatedListCredentials[index],
-        ...newCredential
+        ...newCredential,
       };
     } else {
       updatedListCredentials?.push(newCredential);
@@ -122,7 +128,7 @@ export function Credentials(_: ContainerProps) {
     setIsModalCredentialOpen(!isModalCredentialOpen);
     setCurrentCredential(selectedCredential);
 
-    if (selectedCredential.type === "googlesheets") {
+    if (selectedCredential.type === 'googlesheets') {
       setCurrentCredentialComponent(() => RenderGoogleSheetsOAuth2Api);
     }
   }
@@ -149,13 +155,15 @@ export function Credentials(_: ContainerProps) {
         initialCredential={currentCredential as ModalCredentialData}
         renderBody={currentCredentialComponent as CredentialComponent}
       />
-      <div className="grid min-h-screen w-full grid-cols-[240px_1fr] overflow-hidden" >
+      <div className="grid min-h-screen w-full grid-cols-[240px_1fr] overflow-hidden">
         <NavDashboard />
-        <div className="flex flex-col" >
+        <div className="flex flex-col">
           <HeaderDashboard title="Credentials" />
-          <div className="grid gap-6" >
+          <div className="grid gap-6">
             <div className="flex flex-col space-y-1.5 p-6">
-              <p className="text-sm">Lorem ipsum, dolor sit amet consectetur adipisicing elit.</p>
+              <p className="text-sm">
+                Lorem ipsum, dolor sit amet consectetur adipisicing elit.
+              </p>
             </div>
             <div className="pt-0 pr-4 pl-4 pb-4">
               <div className="relative w-full ">
@@ -178,38 +186,65 @@ export function Credentials(_: ContainerProps) {
                     <li className="py-4 px-4">
                       <div className="font-medium text-lg">No data</div>
                     </li>
-                  ) :
-                    (
-                      listCredentials.map((credential: ModalCredentialData, index: number) => (
+                  ) : (
+                    listCredentials.map(
+                      (credential: ModalCredentialData, index: number) => (
                         <li key={index} className="border-b last:border-b-0">
                           <div className="grid grid-cols-6 gap-4 py-2 items-center">
                             <div className="px-4">
                               <button
-                                onClick={() => handleClickOpenModal(credential.id)}
+                                onClick={() =>
+                                  handleClickOpenModal(credential.id)
+                                }
                                 className="w-fit font-medium flex flex-shrink-0 cursor-pointer items-center underline underline-offset-4 "
                               >
                                 <span>
-                                  <svg width="8" height="8" viewBox="0 0 50 50" fill="none" preserveAspectRatio="xMidYMin meet" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="25" cy="25" r="25" fill={formatTextIsActive(1)}></circle>
+                                  <svg
+                                    width="8"
+                                    height="8"
+                                    viewBox="0 0 50 50"
+                                    fill="none"
+                                    preserveAspectRatio="xMidYMin meet"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <circle
+                                      cx="25"
+                                      cy="25"
+                                      r="25"
+                                      fill={formatTextIsActive(1)}
+                                    ></circle>
                                   </svg>
                                 </span>
-                                <span title={credential.name} className='overflow-ellipsis overflow-hidden whitespace-nowrap ml-2  '>
+                                <span
+                                  title={credential.name}
+                                  className="overflow-ellipsis overflow-hidden whitespace-nowrap ml-2  "
+                                >
                                   {credential.name}
                                 </span>
                               </button>
                             </div>
                             <div className="px-4 flex items-center">
-                              <Tooltip theme={customTooltipTheme} placement="top" content={credential.name}>
-                                <div className="text-sm overflow-ellipsis overflow-hidden whitespace-nowrap">{credential.name}</div>
+                              <Tooltip
+                                theme={customTooltipTheme}
+                                placement="top"
+                                content={credential.name}
+                              >
+                                <div className="text-sm overflow-ellipsis overflow-hidden whitespace-nowrap">
+                                  {credential.name}
+                                </div>
                               </Tooltip>
                             </div>
                             <div className="px-4 flex items-center">
-                              <div className={`${statusMap[6].class} inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground`}>
+                              <div
+                                className={`${statusMap[6].class} inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground`}
+                              >
                                 {statusMap[6].text}
                               </div>
                             </div>
                             <div className="px-4 flex items-center">
-                              <div className={` inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground`}>
+                              <div
+                                className={` inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground`}
+                              >
                                 {credential.type.toString()}
                               </div>
                             </div>
@@ -223,8 +258,9 @@ export function Credentials(_: ContainerProps) {
                             </div>
                           </div>
                         </li>
-                      ))
-                    )}
+                      )
+                    )
+                  )}
                 </ul>
               </div>
             </div>

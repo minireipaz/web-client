@@ -1,12 +1,9 @@
-import { Workflow } from "./Workflow";
-
-
+import { Workflow } from './Workflow';
 
 export interface ResponseDashboardData {
   status: number;
   error: string;
   data: WorkflowCounts[];
-
 }
 
 export interface WorkflowCounts {
@@ -36,4 +33,4 @@ export const activeMap: Record<number, Record<string, string>> = {
   1: { text: '#27F795' },
   2: { text: '#eff727' },
   3: { text: '#f7272f' },
-}
+};

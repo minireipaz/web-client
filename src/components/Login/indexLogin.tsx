@@ -1,11 +1,11 @@
-import { User } from "oidc-client-ts";
-import { Navigate } from "react-router-dom";
+import { User } from 'oidc-client-ts';
+import { Navigate } from 'react-router-dom';
 
 interface Props {
   handleLogin: () => void;
   userInfo: User | null;
   authenticated: boolean | null;
-};
+}
 
 export default function Login({ authenticated, userInfo, handleLogin }: Props) {
   if (authenticated === true && userInfo) {

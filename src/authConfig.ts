@@ -1,4 +1,4 @@
-import { ZitadelConfig } from "@zitadel/react";
+import { ZitadelConfig } from '@zitadel/react';
 
 export const authConfig: ZitadelConfig = {
   authority: import.meta.env.VITE_AUTHORITY, //Replace this with your issuer URL

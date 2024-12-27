@@ -1,6 +1,6 @@
-import { ReactElement } from "react";
+import { ReactElement } from 'react';
 
-export interface ResponseCreateCredential{
+export interface ResponseCreateCredential {
   error: string;
   status: number;
   data?: string;
@@ -16,19 +16,18 @@ export interface ResponseGetAllCredentials {
 }
 
 export const DEFAULT_CREDENTIAL_TITLES: Record<string, string> = {
-  googlesheets: "Google Sheet OAuth",
-  gmail: "Gmail OAuth",
-  drive: "Google Drive OAuth",
-  default: "Select credential"
+  googlesheets: 'Google Sheet OAuth',
+  gmail: 'Gmail OAuth',
+  drive: 'Google Drive OAuth',
+  default: 'Select credential',
 };
 
 export const DEFAULT_CREDENTIAL_REDIRECT_PATH: Record<string, string> = {
-  googlesheets: "/oauth2-credential/callback",
-  gmail: "",
-  drive: "",
-  default: "/oauth2-credential/callback"
-}
-
+  googlesheets: '/oauth2-credential/callback',
+  gmail: '',
+  drive: '',
+  default: '/oauth2-credential/callback',
+};
 
 export interface CredentialData {
   clientId: string;
@@ -53,6 +52,6 @@ export interface ModalCredentialData {
 }
 
 export enum COLOR_ALERTS {
-  failure = "failure",
-  ok = "green"
-};
+  failure = 'failure',
+  ok = 'green',
+}

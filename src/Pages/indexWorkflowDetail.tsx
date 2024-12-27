@@ -18,7 +18,9 @@ interface ResponseExistWorkflow {
 export function WorkflowDetails() {
   const location = useLocation();
   const [workflow, setWorkflow] = useState<Workflow | null>(null);
-  const [credentials, setCredentials] = useState<ModalCredentialData[] | null>(null);
+  const [credentials, setCredentials] = useState<ModalCredentialData[] | null>(
+    null
+  );
   const [loading, setLoading] = useState(!workflow);
   const { userInfo, handleTokenExpiration } = useAuth();
   const navigate = useNavigate();
@@ -29,9 +31,13 @@ export function WorkflowDetails() {
       if (fetchedRef.current || workflow) return;
 
       fetchedRef.current = true;
-      const { currentWorkflow, exist, credentials: currentCredentials } = await getWorkflowData(location.pathname);
+      const {
+        currentWorkflow,
+        exist,
+        credentials: currentCredentials,
+      } = await getWorkflowData(location.pathname);
       if (!exist) {
-        navigate("/dashboard", { replace: true });
+        navigate('/dashboard', { replace: true });
         return;
       }
 
@@ -47,43 +53,51 @@ export function WorkflowDetails() {
     return <div></div>;
   }
 
-  if (!workflow || !workflow?.id || workflow?.id === "") {
+  if (!workflow || !workflow?.id || workflow?.id === '') {
     return <Navigate to="/dashboard" replace />;
   }
 
   async function getWorkflowData(path: string): Promise<ResponseExistWorkflow> {
     const workflowID = convertPathToID(path);
-    if (workflowID === "") {
+    if (workflowID === '') {
       return { currentWorkflow: null, exist: false, credentials: [] };
     }
     const [newWorkflow, credentials] = await getContent(workflowID);
-    return { currentWorkflow: newWorkflow, exist: !!newWorkflow, credentials: credentials as ModalCredentialData[] };
+    return {
+      currentWorkflow: newWorkflow,
+      exist: !!newWorkflow,
+      credentials: credentials as ModalCredentialData[],
+    };
   }
 
   function convertPathToID(path: string) {
-    const pathSplitted = path.split("/");
+    const pathSplitted = path.split('/');
     if (pathSplitted.length != 3) {
-      return "";
+      return '';
     }
     const workflowID = pathSplitted[2];
-    if (!workflowID || workflowID === "") {
-      return "";
+    if (!workflowID || workflowID === '') {
+      return '';
     }
     return workflowID;
   }
 
-  async function getContent(workflowID: string): Promise<[Workflow | null, ModalCredentialData[] | null]> {
+  async function getContent(
+    workflowID: string
+  ): Promise<[Workflow | null, ModalCredentialData[] | null]> {
     try {
-      const [ok, uriFrontend] = getUriFrontend(`/api/workflows/${userInfo?.profile.sub}/${workflowID}`);
+      const [ok, uriFrontend] = getUriFrontend(
+        `/api/v1/workflows/${userInfo?.profile.sub}/${workflowID}`
+      );
       if (!ok) {
-        console.log("ERROR | cannot get uri frontend");
+        console.log('ERROR | cannot get uri frontend');
         return [null, null];
       }
       const response = await fetch(uriFrontend, {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${userInfo?.access_token}`,
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userInfo?.access_token}`,
         },
       });
 
@@ -100,14 +114,14 @@ export function WorkflowDetails() {
       }
 
       const data: ResponseGetWorkflow = await response.json();
-      if (data.error !== "" || data.status !== 200) {
-        console.log("ERROR | cannot get dashboard data");
+      if (data.error !== '' || data.status !== 200) {
+        console.log('ERROR | cannot get dashboard data');
         return [null, null];
       }
 
       return [data.workflow, data.credentials];
     } catch (error) {
-      console.error("Error fetching workflow data:", error);
+      console.error('Error fetching workflow data:', error);
       return [null, null];
     }
   }
@@ -117,7 +131,10 @@ export function WorkflowDetails() {
       <div className="grid min-h-screen w-full grid-cols-[240px_1fr] overflow-hidden">
         <NavDashboard />
         <ReactFlowProvider>
-          <DetailWorkflow workflow={workflow} credentials={credentials as ModalCredentialData[]} />
+          <DetailWorkflow
+            workflow={workflow}
+            credentials={credentials as ModalCredentialData[]}
+          />
         </ReactFlowProvider>
       </div>
     </>

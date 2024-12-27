@@ -41,7 +41,10 @@ export default function CustomEdge({
           }}
           className="absolute"
         >
-          <button className="flex items-center justify-center w-2 h-2 bg-slate-400 cursor-pointer edgebutton text-[10px] text-black" onClick={onEdgeClick}>
+          <button
+            className="flex items-center justify-center w-2 h-2 bg-slate-400 cursor-pointer edgebutton text-[10px] text-black"
+            onClick={onEdgeClick}
+          >
             x
           </button>
         </div>

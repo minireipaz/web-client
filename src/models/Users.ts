@@ -1,9 +1,7 @@
-
-
 export interface ResponseSyncUser {
-  error: string
+  error: string;
   expired: boolean;
-  status: number
-  created: boolean
-  exist: boolean
+  status: number;
+  created: boolean;
+  exist: boolean;
 }

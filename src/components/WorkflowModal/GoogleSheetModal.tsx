@@ -1,16 +1,16 @@
-import { Label, Select, TextInput, Button } from "flowbite-react";
-import { ModalCredentialData } from "../../models/Credential";
-import { useMemo } from "react";
+import { Label, Select, TextInput, Button } from 'flowbite-react';
+import { COLOR_ALERTS, ModalCredentialData } from '../../models/Credential';
+import React, { useMemo, useState } from 'react';
+import { useRequest } from '../../utils/requests';
+import { getUriFrontend } from '../../utils/getUriFrontend';
+import { ResponseSaveFormData } from './Modal';
+import { useAuth } from '../AuthProvider/indexAuthProvider';
+import { FormData } from '../../models/Workflow';
 
 interface GoogleSheetsModalProps {
   currentCredential: ModalCredentialData;
   listCredentials: ModalCredentialData[];
-  pollMode: string;
-  selectDocument: string;
-  document: string;
-  selectSheet: string;
-  sheet: string;
-  operation: string;
+  formData: FormData;
   onCredentialChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
   onPollModeChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
   onOperationChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
@@ -21,53 +21,108 @@ interface GoogleSheetsModalProps {
   onOpenCredential: () => void;
 }
 
-export function GoogleSheetsModalContent(props: GoogleSheetsModalProps) {
+interface GoogleSheetButtonProps {
+  handleTest: (dataResponse: ResponseSaveFormData) => void;
+  showAlert: (title: string, color: string) => void;
+  formData: FormData;
+  dataNode: Record<string, unknown>;
+}
 
+export function GoogleSheetsModalContent(props: GoogleSheetsModalProps) {
   const recentCredentials = useMemo(() => {
     let recentCredentials = [];
     for (let i = 0; i < props.listCredentials.length; i++) {
       const element = props.listCredentials[i];
       recentCredentials.push(
-        <option key={element.id} value={element.id} >{element.name}</option>
+        <option key={element.id} value={element.id}>
+          {element.name}
+        </option>
       );
     }
     return recentCredentials;
   }, [props.listCredentials]);
 
+  const MemoizedLabelCredential = useMemo(
+    () => <Label htmlFor="credential" value="Credential to connect with" />,
+    []
+  );
+
+  const MemoizedButtonCredential = useMemo(
+    () => (
+      <Button
+        className="whitespace-nowrap w-max"
+        onClick={props.onOpenCredential}
+      >
+        {props.currentCredential?.id !== 'none' ? 'Edit' : 'New'} Credential
+      </Button>
+    ),
+    [props.onOpenCredential, props.currentCredential?.id]
+  );
+
+  const MemoizedLabelPollMode = useMemo(
+    () => <Label htmlFor="pollMode" value="Poll Times" />,
+    []
+  );
+
+  const MemoizedLabelOperation = useMemo(
+    () => <Label htmlFor="document" value="Operation" />,
+    []
+  );
+
+  const MemoizedLabelDocument = useMemo(
+    () => <Label htmlFor="document" value="Document" />,
+    []
+  );
+
+  const MemoizedLabelSheet = useMemo(
+    () => <Label htmlFor="sheet" value="Sheet" />,
+    []
+  );
+
   return (
     <div className="w-full">
+      <input
+        type="hidden"
+        name="nodeid"
+        value={props.currentCredential.nodeid}
+      />
+      <input
+        type="hidden"
+        name="workflowid"
+        value={props.currentCredential.workflowid}
+      />
+      <input type="hidden" name="type" value={props.currentCredential.type} />
+      <input
+        type="hidden"
+        name="redirecturl"
+        value={props.currentCredential.data.redirectURL}
+      />
       <ul className="flex flex-col gap-y-5">
         <li className="flex flex-col">
-          <Label htmlFor="credential" value="Credential to connect with" />
+          {MemoizedLabelCredential}
           <div className="flex flex-row gap-x-2 items-center">
             <Select
               id="credential"
+              name="credential"
               className="w-full"
               value={props.currentCredential?.id}
               onChange={props.onCredentialChange}
               required
             >
               {recentCredentials}
-              {/* {props.listCredentials?.map((element) => (
-                <option key={element.id} value={element.id}>{element.name}</option>
-              ))} */}
             </Select>
-            <Button
-              className="whitespace-nowrap w-max"
-              onClick={props.onOpenCredential}
-            >
-              {props.currentCredential?.id !== "none" ? 'Edit' : 'New'} Credential
-            </Button>
+            {MemoizedButtonCredential}
           </div>
         </li>
 
         <li className="flex flex-col justify-center">
-          <Label htmlFor="pollMode" value="Poll Times" />
+          {MemoizedLabelPollMode}
           <div className="flex flex-row gap-x-2 items-center">
             <Select
               id="pollMode"
+              name="pollmode"
               className="w-full"
-              value={props.pollMode}
+              value={props.formData.pollmode}
               onChange={props.onPollModeChange}
             >
               <option value="none">None</option>
@@ -78,12 +133,13 @@ export function GoogleSheetsModalContent(props: GoogleSheetsModalProps) {
         </li>
 
         <li className="flex flex-col justify-center">
-          <Label htmlFor="document" value="Operation" />
+          {MemoizedLabelOperation}
           <div className="flex flex-row gap-x-2 items-center">
             <Select
               id="operation"
+              name="operation"
               className="w-full"
-              value={props.operation}
+              value={props.formData.operation}
               onChange={props.onOperationChange}
             >
               <option value="getallcontent">Get All Content</option>
@@ -93,12 +149,13 @@ export function GoogleSheetsModalContent(props: GoogleSheetsModalProps) {
         </li>
 
         <li className="flex flex-col justify-center">
-          <Label htmlFor="document" value="Document" />
+          {MemoizedLabelDocument}
           <div className="flex flex-row gap-x-2 items-center">
             <Select
               id="selectdocument"
+              name="selectdocument"
               className="w-1/3"
-              value={props.selectDocument}
+              value={props.formData.selectdocument || 'byuri'}
               onChange={props.onSelectDocumentChange}
             >
               <option value="byuri">By URL</option>
@@ -106,21 +163,27 @@ export function GoogleSheetsModalContent(props: GoogleSheetsModalProps) {
             </Select>
             <TextInput
               id="document"
+              name="document"
               className="w-full"
-              value={props.document as string}
+              value={props.formData.document as string}
               onChange={props.onDocumentChange}
-              placeholder={props.selectDocument === "byuri" ? "Enter URL" : "Not implemented"}
+              placeholder={
+                props.formData.selectdocument === 'byuri'
+                  ? 'Enter URL'
+                  : 'Not Implemented'
+              }
             />
           </div>
         </li>
 
         <li className="flex flex-col justify-center">
-          <Label htmlFor="sheet" value="Sheet" />
+          {MemoizedLabelSheet}
           <div className="flex flex-row gap-x-2 items-center">
             <Select
               id="selectsheet"
+              name="selectsheet"
               className="w-1/3"
-              value={props.selectSheet}
+              value={props.formData.selectsheet}
               onChange={props.onSelectSheetChange}
             >
               <option value="byname">By Name</option>
@@ -128,14 +191,359 @@ export function GoogleSheetsModalContent(props: GoogleSheetsModalProps) {
             </Select>
             <TextInput
               id="sheet"
+              name="sheet"
               className="w-full"
-              value={props.sheet}
+              value={props.formData.sheet}
               onChange={props.onSheetChange}
-              placeholder={props.selectSheet === "byname" ? "Enter Name" : "Not implemented"}
+              placeholder={
+                props.formData.selectsheet === 'byname'
+                  ? 'Enter Name'
+                  : 'Not Implemented'
+              }
             />
           </div>
         </li>
       </ul>
     </div>
+  );
+}
+
+export function GoogleSheetButton(props: GoogleSheetButtonProps) {
+  const { userInfo } = useAuth();
+  const [disabledButtonTest, setDisabledButtonTest] = useState(false);
+  const { executeRequest } = useRequest();
+  const failConnection: ResponseSaveFormData = {
+    error: 'Conexion error',
+    status: 500,
+    data: '',
+  };
+  const MAX_ATTEMPTS = 10;
+  const DELAY = 15_000;
+
+  async function handleSubmitTest(event: any) {
+    event.preventDefault();
+    if (props.dataNode.type !== 'googlesheets') return;
+    if (!validateForm(props.formData)) return;
+    setDisabledButtonTest(true);
+    try {
+      const result = await executeRequest(
+        async (signal) => {
+          return await sendFormData(
+            props.formData,
+            props.dataNode as Record<string, ModalCredentialData>,
+            signal
+          );
+        },
+        {
+          onSuccess: () => {
+            console.log('ok');
+          },
+          onError: (error) => {
+            console.error('Error Testing:', error);
+            props.showAlert('Error testing credential', COLOR_ALERTS.failure);
+          },
+          onFinally: () => {
+            setDisabledButtonTest(false);
+          },
+        }
+      );
+
+      if (!result) {
+        setDisabledButtonTest(false);
+        console.error('Error Testing:', JSON.stringify(result));
+        props.showAlert('Error testing', COLOR_ALERTS.failure);
+        return;
+      }
+
+      const [isOk, dataResponse] = result as [boolean, ResponseSaveFormData];
+      if (!isOk) {
+        props.showAlert('Cannot connect', COLOR_ALERTS.failure);
+        return;
+      }
+
+      if (dataResponse.data === '') {
+        setDisabledButtonTest(false);
+        console.error('Error Testing:', JSON.stringify(result));
+        props.showAlert('Error testing', COLOR_ALERTS.failure);
+        return;
+      }
+
+      await startPolling(dataResponse.data);
+      setDisabledButtonTest(false);
+      return;
+    } catch (error: any) {
+      setDisabledButtonTest(false);
+      if (error.name === 'AbortError') {
+        return console.log('canceled');
+      }
+      console.error('Error Testing:', error);
+      return props.showAlert('Error testing', COLOR_ALERTS.failure);
+    }
+  }
+
+  async function sendFormData(
+    formData: FormData,
+    node: Record<string, ModalCredentialData>,
+    signal: AbortSignal | undefined
+  ): Promise<[boolean, ResponseSaveFormData]> {
+    try {
+      const [ok, uriFrontend] = getUriFrontend('/actions/google/sheets');
+      if (!ok) {
+        return [false, failConnection];
+      }
+      const body: FormData = createBodySendFormData(formData, node);
+      const response = await fetch(uriFrontend, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userInfo?.access_token}`,
+        },
+        body: JSON.stringify(body),
+        signal,
+      });
+
+      if (!response.ok) {
+        return [false, failConnection];
+      }
+
+      const data: ResponseSaveFormData = await response.json();
+      if (!data || data.status !== 200) {
+        return [false, failConnection];
+      }
+      return [true, data];
+    } catch (error) {
+      return [false, failConnection];
+    }
+  }
+
+  function createBodySendFormData(
+    formData: FormData,
+    node: Record<string, ModalCredentialData>
+  ): FormData {
+    return {
+      pollmode: formData.pollmode,
+      selectdocument: formData.selectdocument,
+      document: formData.document,
+      selectsheet: formData.selectsheet,
+      sheet: formData.sheet,
+      operation: formData.operation,
+      credentialid: node.credential.id,
+      sub: node.credential.sub,
+      type: node.credential.type,
+      workflowid: node.credential.workflowid,
+      nodeid: node.credential.nodeid,
+      redirecturl: node.credential.data.redirectURL,
+      testmode: true,
+    };
+  }
+
+  function validateForm(formdata: FormData): boolean {
+    if (formdata.document === '') {
+      props.showAlert('Document cannot be empty', COLOR_ALERTS.failure);
+      return false;
+    }
+    return true;
+  }
+
+  // async function startPolling(actionID: string) {
+  //   if (actionID === "") return;
+  //   // enable animation for button
+  //   /// -----
+  //   let recieved = false
+  //   for (let i = 0; i < 10; i++) {
+  //     try {
+  //       recieved = await pollingActionTest(actionID);
+  //       if (recieved) {
+  //         break;
+  //       }
+  //     } catch (error) {
+  //       console.error("Error during polling:", error);
+  //     }
+  //     await new Promise((resolve) => setTimeout(resolve, 15000));
+  //   }
+
+  //   if (!recieved) {
+  //     // console.error("Error Testing:", JSON.stringify());
+  //     props.showAlert("Error testing", COLOR_ALERTS.failure);
+  //   }
+  //   return;
+  // }
+
+  // async function pollingActionTest(actionID: string): Promise<boolean> {
+  //   try {
+  //     const result = await executeRequest(
+  //       async (signal) => {
+  //         return await pollTest(props.formData, props.dataNode as Record<string, ModalCredentialData>, signal);
+  //       },
+  //       {
+  //         onSuccess: () => {
+  //           console.log("ok");
+  //         },
+  //         onError: (error) => {
+  //           console.error("Error Testing:", error);
+  //           props.showAlert("Error testing credential", COLOR_ALERTS.failure);
+  //         },
+  //         onFinally: () => {
+  //           setDisabledButtonTest(false);
+  //         }
+  //       }
+  //     );
+
+  //     if (!result) {
+  //       // setDisabledButtonTest(false);
+  //       // console.error("Error Testing:", JSON.stringify(result));
+  //       // props.showAlert("Error testing", COLOR_ALERTS.failure);
+  //       return false;
+  //     }
+
+  //     const [isOk, dataResponse] = result as [boolean, ResponseSaveFormData];
+  //     if (!isOk) {
+  //       // props.showAlert("Cannot connect", COLOR_ALERTS.failure);
+  //       return false;
+  //     }
+
+  //     if (dataResponse.data === "") {
+  //       // setDisabledButtonTest(false);
+  //       // console.error("Error Testing:", JSON.stringify(result));
+  //       // props.showAlert("Error testing", COLOR_ALERTS.failure);
+  //       return false;
+  //     }
+
+  //     props.handleTest(dataResponse);
+  //     return true;
+  //   } catch(error) {
+  //     return false;
+  //   }
+  // }
+
+  // async function pollTest(formData: FormData, node: Record<string, ModalCredentialData>, signal: AbortSignal | undefined): Promise<[boolean, ResponseSaveFormData]> {
+  //   try {
+  //     const [ok, uriFrontend] = getUriFrontend("/actions/google/sheets");
+  //     if (!ok) {
+  //       return [false, failConnection];
+  //     }
+  //     const body: FormData = createBodySendFormData(formData, node);
+  //     const response = await fetch(uriFrontend, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "Authorization": `Bearer ${userInfo?.access_token}`,
+  //       },
+  //       body: JSON.stringify(body),
+  //       signal
+  //     });
+
+  //     if (!response.ok) {
+  //       return [false, failConnection];
+  //     }
+
+  //     const data: ResponseSaveFormData = await response.json();
+  //     if (!data || data.status !== 200) {
+  //       return [false, failConnection];
+  //     }
+  //     return [true, data];
+  //   } catch (error) {
+  //     return [false, failConnection];
+  //   }
+  // }
+
+  async function startPolling(actionID: string) {
+    if (actionID === '') return;
+
+    let abortController = new AbortController();
+
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      try {
+        const success = await pollingActionTest(
+          actionID,
+          abortController.signal
+        );
+        if (success) {
+          return;
+        }
+      } catch (error) {
+        console.error('Error: ', error);
+      }
+      await new Promise((resolve) => setTimeout(resolve, DELAY));
+    }
+
+    props.showAlert('Error conection', COLOR_ALERTS.failure);
+    abortController.abort();
+  }
+
+  // props.formData, props.dataNode as Record<string, ModalCredentialData>
+  async function pollingActionTest(
+    actionID: string,
+    signal: AbortSignal
+  ): Promise<boolean> {
+    try {
+      const result = await executeRequest(
+        async () => {
+          return await pollTest(actionID, signal as AbortSignal);
+        },
+        {
+          onSuccess: () => console.log('Request successful.'),
+          onError: (error) => console.error('Request error:', error),
+          onFinally: () => setDisabledButtonTest(false),
+        }
+      );
+
+      if (!result) return false;
+
+      const [isOk, dataResponse] = result as [boolean, ResponseSaveFormData];
+      if (!isOk || dataResponse.data === '') return false;
+
+      props.handleTest(dataResponse);
+      return true;
+    } catch (error) {
+      console.error('Error in pollingActionTest:', error);
+      return false;
+    }
+  }
+  // formData: FormData, node: Record<string, ModalCredentialData>
+  async function pollTest(
+    actionID: string,
+    signal: AbortSignal
+  ): Promise<[boolean, ResponseSaveFormData]> {
+    try {
+      const [ok, uriFrontend] = getUriFrontend(
+        `/actions/google/sheets/${userInfo?.profile.sub}/${actionID}`
+      );
+      if (!ok) return [false, failConnection];
+
+      // const body = createBodySendFormData(formData, node);
+      const response = await fetch(uriFrontend, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userInfo?.access_token}`,
+        },
+        // body: JSON.stringify(body),
+        signal,
+      });
+
+      if (!response.ok) return [false, failConnection];
+
+      const data: ResponseSaveFormData = await response.json();
+      if (!data || data.status !== 200) return [false, failConnection];
+
+      return [true, data];
+    } catch (error) {
+      console.error('Error in pollTest:', error);
+      return [false, failConnection];
+    }
+  }
+
+  return (
+    <>
+      <Button
+        color="blue"
+        type="submit"
+        onClick={handleSubmitTest}
+        disabled={disabledButtonTest}
+      >
+        Test
+      </Button>
+    </>
   );
 }

@@ -1,37 +1,54 @@
-import { Button, Modal } from "flowbite-react";
-import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { RenderGoogleSheetsOAuth2Api } from "../Credentials/GoogleSheetsOAuth2Api";
-import { GoogleSheetsModalContent } from "./GoogleSheetModal";
+import { Alert, Button, Modal } from 'flowbite-react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { RenderGoogleSheetsOAuth2Api } from '../Credentials/GoogleSheetsOAuth2Api';
+import {
+  GoogleSheetButton,
+  GoogleSheetsModalContent,
+} from './GoogleSheetModal';
 import { Node } from '@xyflow/react';
-import { DEFAULT_CREDENTIAL_REDIRECT_PATH, DEFAULT_CREDENTIAL_TITLES, ModalCredentialData } from "../../models/Credential";
-import { ModalCredential } from "../Credentials/ModalCredential";
-import { useAuth } from "../AuthProvider/indexAuthProvider";
+import {
+  DEFAULT_CREDENTIAL_REDIRECT_PATH,
+  DEFAULT_CREDENTIAL_TITLES,
+  ModalCredentialData,
+} from '../../models/Credential';
+import { ModalCredential } from '../Credentials/ModalCredential';
+import { useAuth } from '../AuthProvider/indexAuthProvider';
+import { FormData } from '../../models/Workflow';
 
 interface ContainerProps {
   isOpen: boolean;
   dataNode: Node;
   credentials: ModalCredentialData[];
-  onSave: (newCredentialData: ModalCredentialData) => void;
+  onSaveNode: (newCredentialData: ModalCredentialData) => void;
+  onSaveModal: (formData: FormData, dataNode: Node) => void;
   onClose: () => void;
 }
 
+interface NodeData {
+  type: string;
+  nodeid: string;
+  workflowid: string;
+  credential: ModalCredentialData;
+  formdata: FormData;
+}
+
 export const defaultCredential: ModalCredentialData = {
-  id: "none",
-  type: "none",
+  id: 'none',
+  type: 'none',
   alertMessage: <></>,
-  workflowid: "",
-  nodeid: "",
-  sub: "",
-  name: "Select credential",
+  workflowid: '',
+  nodeid: '',
+  sub: '',
+  name: 'Select credential',
   data: {
-    clientId: "",
-    clientSecret: "",
-    redirectURL: "",
-    code: "",
-    scopes: [""],
-    state: "",
-    token: "",
-    tokenrefresh: "",
+    clientId: '',
+    clientSecret: '',
+    redirectURL: '',
+    code: '',
+    scopes: [''],
+    state: '',
+    token: '',
+    tokenrefresh: '',
   },
 };
 
@@ -43,12 +60,7 @@ export type CredentialComponent = React.ComponentType<{
 type ModalComponent = React.ComponentType<{
   currentCredential: ModalCredentialData;
   listCredentials: ModalCredentialData[];
-  pollMode: string;
-  selectDocument: string;
-  document: string;
-  selectSheet: string;
-  sheet: string;
-  operation: string;
+  formData: FormData;
   onCredentialChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
   onPollModeChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
   onOperationChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
@@ -59,80 +71,66 @@ type ModalComponent = React.ComponentType<{
   onOpenCredential: () => void;
 }>;
 
+type ModalButtonComponent = React.ComponentType<{
+  handleTest: (dataResponse: ResponseSaveFormData) => void;
+  formData: FormData;
+  dataNode: Record<string, unknown>;
+  showAlert: (title: string, color: string) => void;
+}>;
+
+export interface ResponseSaveFormData {
+  status: number;
+  error: string;
+  data: string;
+}
+
+const enum ERRORTEXT {
+  notvalidurl = 'Not valid URL in Document',
+  notvalidoptiondocument = 'Select Document not valid option',
+}
 
 export function WorkflowModal(props: ContainerProps) {
-  const [currentCredential, setCurrentCredential] = useState<ModalCredentialData>(defaultCredential);
-  const [listCredentials, setListCredentials] = useState<ModalCredentialData[]>([defaultCredential]);
-  const [pollMode, setPollMode] = useState('none');
-  const [selectDocument, setSelectDocument] = useState('byuri');
-  const [document, setDocument] = useState('');
-  const [selectSheet, setSelectSheet] = useState('byname');
-  const [sheet, setSheet] = useState('');
-  const [operation, setOperation] = useState('getallcontent');
-  const [currentCredentialComponent, setCurrentCredentialComponent] = useState<CredentialComponent | null>(null);
-  const [CurrentModalComponent, setCurrentModalComponent] = useState<ModalComponent | null>(null);
-  const [content, setContent] = useState<React.ReactElement>();
-  const [sizeModal, setSizeModal] = useState("xl");
+  const [currentCredential, setCurrentCredential] =
+    useState<ModalCredentialData>(defaultCredential);
+  const [listCredentials, setListCredentials] = useState<ModalCredentialData[]>(
+    [defaultCredential]
+  );
+  const [currentCredentialComponent, setCurrentCredentialComponent] =
+    useState<CredentialComponent | null>(null);
+  const [CurrentModalComponent, setCurrentModalComponent] =
+    useState<ModalComponent | null>(null);
+  const [CurrentButtonComponent, setCurrentButtonComponent] =
+    useState<ModalButtonComponent | null>(null);
+  const [contentTest, setContentTest] = useState<React.ReactElement>();
+  const [sizeModal, setSizeModal] = useState('xl');
   const { userInfo } = useAuth();
+  const [alertMessage, setAlertMessage] = useState(<></>);
+  // set default values from formularyData btw
+  // already setted in WorkflowDrawer
+  // TODO: maybe later can be removed
+  const [formularyData, setFormularyData] = useState<FormData>({
+    pollmode: 'none',
+    selectdocument: 'byuri',
+    document: '',
+    selectsheet: 'byname',
+    sheet: '',
+    operation: 'getallcontent',
+    credentialid: '',
+    sub: '',
+    type: '',
+    workflowid: '',
+    nodeid: '',
+    redirecturl: '',
+    testmode: false,
+  });
 
   const [isModalCredentialOpen, setIsModalCredentialOpen] = useState(false);
 
-  useEffect(() => {
-    if (!props.dataNode) return;
-    if (props.dataNode.data.type === "googlesheets") {
-      setCurrentCredentialComponent(() => RenderGoogleSheetsOAuth2Api);
-      setCurrentModalComponent(() => GoogleSheetsModalContent);
-      setListCredentials(props.credentials);
-    }
-    initialSetCredentialForNode();
-    // changeCredentialProperties();
-  }, [props.dataNode, props.credentials]);
-
-  const handleSelectDocument = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectDocument(event.target.value);
-    setDocument("");
-  }, []);
-
-  const handleDocument = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setDocument(event.target.value);
-  }, []);
-
-  const handleSelectSheet = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectSheet(event.target.value);
-    setSheet("");
-  }, []);
-
-  const handleSheet = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setSheet(event.target.value);
-  }, []);
-
-  const handleOperation = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
-    setOperation(event.target.value);
-  }, []);
-
-  const handlePollModeChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
-    setPollMode(event.target.value);
-  }, []);
-
-  const handleTest = useCallback((_: React.MouseEvent) => {
-    setSizeModal("7xl");
-    setContent(
-      <>
-        <div className="w-full h-auto p-2 border border-black-400 text-black" id="content" aria-hidden="true">
-          !"#!"#!"#!"#
-        </div>
-      </>
-    );
-  }, []);
-
-  const handlClose = useCallback(() => {
-    setSizeModal("xl");
-    setContent(<></>);
-    props.onClose();
-  }, [props]);
-
+  // default relative paths from diferent type providers
   const getRedirectURL = useCallback((nodeType: string) => {
-    const uriRedirect = DEFAULT_CREDENTIAL_REDIRECT_PATH[nodeType] || DEFAULT_CREDENTIAL_REDIRECT_PATH.default;
+    const uriRedirect =
+      DEFAULT_CREDENTIAL_REDIRECT_PATH[nodeType] ||
+      DEFAULT_CREDENTIAL_REDIRECT_PATH.default;
     return uriRedirect;
   }, []);
 
@@ -144,14 +142,15 @@ export function WorkflowModal(props: ContainerProps) {
     ): ModalCredentialData => {
       // extract the node type, node ID, and workflow ID from the node data
       // this data is used to override necessary data to maintain cohesion
-      const { type: nodeType, nodeid, workflowid } = nodeData;
-      const newTitle = DEFAULT_CREDENTIAL_TITLES[nodeType] || DEFAULT_CREDENTIAL_TITLES.default;
-      const redirectURL = getRedirectURL(nodeType);
-
+      const { type, nodeid, workflowid } = nodeData;
+      const newTitle =
+        DEFAULT_CREDENTIAL_TITLES[type] || DEFAULT_CREDENTIAL_TITLES.default;
+      const redirectURL = getRedirectURL(type);
+      // TODO: improve
       return {
         ...prevCredential,
         name: newTitle,
-        type: nodeType,
+        type: type,
         nodeid: nodeid,
         workflowid: workflowid,
         sub: userInfo?.profile.sub || prevCredential.sub,
@@ -164,8 +163,152 @@ export function WorkflowModal(props: ContainerProps) {
     [getRedirectURL]
   );
 
+  // const initialSetCredentialForNode = useCallback(() => {
+  //   if (!props.dataNode || !props.dataNode.data) return;
+
+  //   const { credential: selectedCredential, formdata: currentFormData } = props.dataNode.data as { credential: ModalCredentialData; formdata: FormData };
+  //   if (!currentFormData) {
+  //     setFormData(formData)
+  //   } else {
+  //     setFormData({ ...currentFormData });
+  //   }
+  //   if (selectedCredential && selectedCredential.id !== "none") {
+  //     setCurrentCredential(selectedCredential);
+  //     return;
+  //   }
+  //   // TODO: maybe not needed
+  //   const updatedCredential = updateCredentialProperties(defaultCredential,
+  //     props.dataNode.data as {
+  //       type: string;
+  //       nodeid: string;
+  //       workflowid: string;
+  //       credential: ModalCredentialData;
+  //       formdata: FormData;
+  //     }, userInfo
+  //   );
+  //   setCurrentCredential(updatedCredential);
+  // }, [props.dataNode, updateCredentialProperties, userInfo, formData]);
+
+  // Update the initialSetCredentialForNode function
+  const initialSetCredentialForNode = useCallback(() => {
+    if (!props.dataNode || !props.dataNode.data) return;
+    // unkown because props.dataNode is Record<string, unkown>
+    // nodeData used
+    const nodeData = props.dataNode.data as unknown as NodeData;
+    const { credential, formdata } = nodeData;
+
+    // merge formdata with default values
+    // values with "" replaced with default value
+    // default formdata gets from workflowdrawer.tsx
+    // TODO: maybe later not necesary to do this
+    const mergedData = mergeFormData(formularyData, formdata);
+    setFormularyData({ ...mergedData });
+
+    if (credential && credential.id !== 'none') {
+      setCurrentCredential(credential);
+      return;
+    }
+
+    const updatedCredential = updateCredentialProperties(
+      defaultCredential,
+      nodeData,
+      userInfo
+    );
+    setCurrentCredential(updatedCredential);
+  }, [props.dataNode, updateCredentialProperties, userInfo, formularyData]);
+
+  function mergeFormData(defaultValues: FormData, formdata: FormData) {
+    const mergedData = { ...defaultValues };
+    Object.keys(formdata).forEach((key) => {
+      if (formdata[key] !== '') {
+        mergedData[key] = formdata[key];
+      }
+    });
+    return mergedData;
+  }
+
+  useEffect(() => {
+    if (!props.dataNode) return;
+    if (props.dataNode.data.type === 'googlesheets') {
+      setCurrentCredentialComponent(() => RenderGoogleSheetsOAuth2Api);
+      setCurrentModalComponent(() => GoogleSheetsModalContent);
+      setCurrentButtonComponent(() => GoogleSheetButton);
+      setListCredentials(props.credentials);
+    }
+    initialSetCredentialForNode();
+  }, [props.dataNode, props.credentials]);
+
+  const handleInputChange = useCallback((event: any) => {
+    setFormularyData((prevFormData) => ({
+      ...prevFormData,
+      [event.target.name]: event.target.value,
+    }));
+  }, []);
+
+  const handleTest = useCallback((dataResponse: ResponseSaveFormData) => {
+    setSizeModal('7xl');
+    console.log('response=' + JSON.stringify(dataResponse));
+    setContentTest(
+      <>
+        <div
+          className="w-full h-auto p-2 border border-black-400 text-black"
+          id="content"
+          aria-hidden="true"
+        >
+          !"#!"#!"#!"#
+        </div>
+      </>
+    );
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setSizeModal('xl');
+    setContentTest(<></>);
+    props.onClose();
+  }, [props]);
+
+  const handleSave = useCallback(() => {
+    if (!validateForm(formularyData)) {
+      return;
+    }
+
+    setFormularyData({
+      ...formularyData,
+    });
+    // console.log("formData=" + JSON.stringify(formData))
+    setSizeModal('xl');
+    setContentTest(<></>);
+    props.onSaveModal(formularyData, props.dataNode);
+  }, [props, formularyData]);
+
+  function validateForm(formData: FormData): boolean {
+    if (
+      formData.selectdocument !== 'byuri' &&
+      formData.selectdocument !== 'byothers'
+    ) {
+      showAlert(ERRORTEXT.notvalidoptiondocument, 'red');
+      return false;
+    }
+    if (formData.document !== '') {
+      try {
+        if (!URL.canParse(formData.document)) {
+          showAlert(ERRORTEXT.notvalidurl, 'red');
+          return false;
+        }
+      } catch (error) {
+        showAlert(ERRORTEXT.notvalidurl, 'red');
+        return false;
+      }
+    }
+
+    if (formData.sheet !== '') {
+    }
+    return true;
+  }
+
   const changeCredentialProperties = useCallback(() => {
-    if (currentCredential.id !== "none") return;
+    if (currentCredential.id !== 'none') return;
+    if (!props.dataNode.data) return;
 
     const updatedCredential = updateCredentialProperties(
       currentCredential,
@@ -174,9 +317,22 @@ export function WorkflowModal(props: ContainerProps) {
         nodeid: string;
         workflowid: string;
         credential: ModalCredentialData;
-      }, userInfo);
+        formdata: FormData;
+      },
+      userInfo
+    );
+
+    setFormularyData({
+      ...formularyData,
+      credentialid: updatedCredential.id,
+      sub: updatedCredential.sub,
+      type: updatedCredential.type,
+      workflowid: updatedCredential.workflowid,
+      nodeid: updatedCredential.nodeid,
+      redirecturl: updatedCredential.data.redirectURL,
+    });
     setCurrentCredential(updatedCredential);
-  }, [currentCredential, updateCredentialProperties, userInfo]);
+  }, [currentCredential, updateCredentialProperties, userInfo, formularyData]);
 
   const handleOpenCredential = useCallback(() => {
     changeCredentialProperties();
@@ -187,93 +343,127 @@ export function WorkflowModal(props: ContainerProps) {
     setIsModalCredentialOpen(false);
   }, []);
 
-  const handleSearchDuplicated = useCallback((newCredential: ModalCredentialData) => {
-    const updatedListCredentials = [...listCredentials];
-    const index = updatedListCredentials.findIndex(
-      cred => cred.id === newCredential.id
+  const handleSearchDuplicated = useCallback(
+    (newCredential: ModalCredentialData) => {
+      const updatedListCredentials = [...listCredentials];
+      const index = updatedListCredentials.findIndex(
+        (cred) => cred.id === newCredential.id
+      );
+      if (index !== -1) {
+        updatedListCredentials[index] = {
+          ...updatedListCredentials[index],
+          ...newCredential,
+        };
+      } else {
+        updatedListCredentials?.push(newCredential);
+      }
+      return updatedListCredentials;
+    },
+    [listCredentials]
+  );
+
+  const handleSaveModalCredential = useCallback(
+    (newCredential: ModalCredentialData) => {
+      const updatedListCredentials = handleSearchDuplicated(newCredential);
+      setListCredentials(updatedListCredentials);
+      setCurrentCredential(newCredential);
+      setFormularyData({
+        ...formularyData,
+        credentialid: newCredential.id,
+        sub: newCredential.sub,
+        type: newCredential.type,
+        workflowid: newCredential.workflowid,
+        nodeid: newCredential.nodeid,
+        redirecturl: newCredential.data.redirectURL,
+      });
+      setIsModalCredentialOpen(false);
+      props.onSaveNode(newCredential);
+    },
+    [handleSearchDuplicated, props, formularyData]
+  );
+
+  const handleSetCredential = useCallback(
+    (event: React.ChangeEvent<HTMLSelectElement>) => {
+      if (!listCredentials) return;
+      const index = event.target.selectedIndex;
+      const newCredential = listCredentials[index];
+      setCurrentCredential(newCredential);
+      setFormularyData({
+        ...formularyData,
+        credentialid: newCredential.id,
+        sub: newCredential.sub,
+        type: newCredential.type,
+        workflowid: newCredential.workflowid,
+        nodeid: newCredential.nodeid,
+        redirecturl: newCredential.data.redirectURL,
+      });
+    },
+    [listCredentials, formularyData]
+  );
+
+  const showAlert = useCallback((title: string, color: string) => {
+    setAlertMessage(
+      <>
+        <Alert color={color} className="w-full">
+          <span className="font-medium">{title.toString()}.</span>
+        </Alert>
+      </>
     );
-    if (index !== -1) {
-      updatedListCredentials[index] = {
-        ...updatedListCredentials[index],
-        ...newCredential
-      };
-    } else {
-      updatedListCredentials?.push(newCredential);
-    }
-    return updatedListCredentials;
-  }, [listCredentials]);
+    setTimeout(() => {
+      setAlertMessage(<></>);
+    }, 2000);
+  }, []);
 
-  const handleSaveModalCredential = useCallback((newCredential: ModalCredentialData) => {
-    const updatedListCredentials = handleSearchDuplicated(newCredential);
-    setListCredentials(updatedListCredentials);
-    setCurrentCredential(newCredential);
-    setIsModalCredentialOpen(false);
-    props.onSave(newCredential);
-  }, [handleSearchDuplicated, props]);
+  const currentCredentialMemo = useMemo(
+    () => currentCredential,
+    [currentCredential]
+  );
 
-  const handleSetCredential = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
-    if (!listCredentials) return;
-    const index = event.target.selectedIndex;
-    // if (index === 0) { setCurrentCredential(defaultCredential); return; }
-    setCurrentCredential(listCredentials[index]);
-  }, [listCredentials]);
-
-  function initialSetCredentialForNode() {
-    if (!props.dataNode || !props.dataNode.data) return;
-
-    const { credential: selectedCredential } = props.dataNode.data as { credential: ModalCredentialData; };
-
-    if (selectedCredential && selectedCredential.id !== "none") {
-      setCurrentCredential(selectedCredential);
-      return;
-    }
-
-    const updatedCredential = updateCredentialProperties(defaultCredential,
-      props.dataNode.data as {
-        type: string;
-        nodeid: string;
-        workflowid: string;
-        credential: ModalCredentialData;
-      }, userInfo
-    );
-    setCurrentCredential(updatedCredential);
-  }
-
-  const currentCredentialMemo = useMemo(() => currentCredential, [currentCredential]);
-
-  if (!props.dataNode) return (<></>);
+  if (!props.dataNode) return <></>;
 
   return (
     <>
       <form action="#">
-        <Modal show={props.isOpen} onClose={handlClose} size={sizeModal} position="center-left">
-          <Modal.Header className="h-[60px]">{props.dataNode.data.label as string}</Modal.Header>
+        <Modal
+          show={props.isOpen}
+          onClose={handleClose}
+          size={sizeModal}
+          position="center-left"
+        >
+          <Modal.Header className="h-[60px]">
+            {props.dataNode.data.label as string}
+          </Modal.Header>
           <Modal.Body className="flex flex-row gap-x-4">
             {CurrentModalComponent && (
               <CurrentModalComponent
                 currentCredential={currentCredentialMemo}
                 listCredentials={listCredentials}
-                pollMode={pollMode}
-                selectDocument={selectDocument}
-                document={document}
-                selectSheet={selectSheet}
-                sheet={sheet}
-                operation={operation}
+                formData={formularyData}
                 onCredentialChange={handleSetCredential}
-                onPollModeChange={handlePollModeChange}
-                onOperationChange={handleOperation}
-                onSelectDocumentChange={handleSelectDocument}
-                onDocumentChange={handleDocument}
-                onSelectSheetChange={handleSelectSheet}
-                onSheetChange={handleSheet}
+                onPollModeChange={handleInputChange}
+                onOperationChange={handleInputChange}
+                onSelectDocumentChange={handleInputChange}
+                onDocumentChange={handleInputChange}
+                onSelectSheetChange={handleInputChange}
+                onSheetChange={handleInputChange}
                 onOpenCredential={handleOpenCredential}
               />
             )}
-            {content}
+            {contentTest}
           </Modal.Body>
           <Modal.Footer className="flex flex-row justify-between h-[60px]">
-            <Button onClick={handlClose} color="green">Save</Button>
-            <Button color="blue" onClick={handleTest}>Test</Button>
+            <Button onClick={handleSave} color="green">
+              Save
+            </Button>
+            {alertMessage}
+            {CurrentButtonComponent && (
+              <CurrentButtonComponent
+                showAlert={showAlert}
+                handleTest={handleTest}
+                dataNode={props.dataNode.data}
+                formData={formularyData}
+              />
+            )}
           </Modal.Footer>
         </Modal>
         {isModalCredentialOpen && (

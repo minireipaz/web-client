@@ -1,16 +1,21 @@
-import { useEffect } from "react";
-import { UserManager, User } from "oidc-client-ts";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../AuthProvider/indexAuthProvider";
+import { useEffect } from 'react';
+import { UserManager, User } from 'oidc-client-ts';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../AuthProvider/indexAuthProvider';
 
 interface Props {
   authenticated: boolean | null;
   setAuth: (authenticated: boolean | null) => void;
   userManager: UserManager;
   handleLogout: any;
-};
+}
 
-export default function Callback({ authenticated, setAuth, userManager, handleLogout }: Props) {
+export default function Callback({
+  authenticated,
+  setAuth,
+  userManager,
+  handleLogout,
+}: Props) {
   const navigate = useNavigate();
   const { setUserAndValidate } = useAuth();
 
