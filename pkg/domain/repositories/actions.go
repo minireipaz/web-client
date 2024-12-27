@@ -3,5 +3,6 @@ package repositories
 import "minireipaz/pkg/domain/models"
 
 type ActionsRepository interface {
-	GetGoogleSheetByID(newAction models.RequestGoogleAction, serviceUser *string) *models.ResponseGetGoogleSheetByID
+	CreateActionsGoogleSheet(newAction models.RequestGoogleAction, serviceUser *string) *models.ResponseGetGoogleSheetByID
+  GetGoogleSheetByID(actionID *string, userID *string, serviceUser *string) *string
 }

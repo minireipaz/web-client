@@ -69,6 +69,11 @@ func getBackendURL(endpoint string) (string, error) {
 	return validateURL(baseURI)
 }
 
+func getPollingURL(endpoint string) (string, error) {
+	baseURI := fmt.Sprintf("%s%s", config.GetEnv("URI_POLLING", "http://localhost:4050"), endpoint)
+	return validateURL(baseURI)
+}
+
 func NewBuffer(data []byte) io.Reader {
 	return bytes.NewBuffer(data)
 }

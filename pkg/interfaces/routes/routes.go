@@ -17,13 +17,13 @@ func Register(app *gin.Engine,
 	actionsController *controllers.ActionsController,
 ) {
 	app.NoRoute(ErrRouter)
-	route := app.Group("/api")
+	route := app.Group("/api/v1")
 	{
 		route.GET("/ping", common.Ping)
 		route.POST("/workflows", middlewares.ValidateWorkflow(), workflowController.CreateWorkflow)
 		route.GET("/workflows/:iduser", middlewares.ValidateUserID(), workflowController.GetAllWorkflows)
 		route.GET("/workflows/:iduser/:idworkflow", middlewares.ValidateGetWorkflow(), workflowController.GetWorkflowByID)
-		route.PUT("/workflows/:id", middlewares.ValidateUpdateWorkflow(), workflowController.UpdateWorkflow)
+		route.PUT("/workflows/:iduser/:idworkflow", middlewares.ValidateUpdateWorkflow(), workflowController.UpdateWorkflow)
 		// route.DELETE("/workflows/:id", controllers.DeleteWorkflow)
 		route.POST("/users", middlewares.ValidateUser(), userController.SyncUser)
 		route.GET("/dashboard/:iduser", middlewares.ValidateUserID(), dashboardController.GetUserDashboardByID)
@@ -40,12 +40,21 @@ func Register(app *gin.Engine,
 
 	actions := app.Group("/actions")
 	{
-		actions.POST("/google/sheets", middlewares.ValidateGetGoogleSheet(), actionsController.GetGoogleSheetByID)
+		actions.POST("/google/sheets", middlewares.ValidateGetGoogleSheet(), actionsController.CreateActionsGoogleSheet)
+		actions.GET("/google/sheets/:iduser/:idaction", middlewares.ValidateUserID(), middlewares.ValidateIDAction(), actionsController.PollingGetGoogleSheetByID)
 	}
 }
 
 func ErrRouter(ctx *gin.Context) {
 	ctx.JSON(http.StatusBadRequest, gin.H{
-		"errors": "this page could not be found",
+		"meta": gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "Bad Request",
+			"time":    common.GetUTCTimeInMillis(),
+		},
+		"status": http.StatusBadRequest,
+		"error":  "this page could not be found",
+		// "data": gin.H{
+		// },
 	})
 }
