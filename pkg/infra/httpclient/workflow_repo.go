@@ -17,7 +17,7 @@ func NewWorkflowRepository(client HTTPClient) *WorkflowRepository {
 }
 
 func (r *WorkflowRepository) CreateWorkflow(workflow models.Workflow, serviceUserAccessToken string) models.ResponseWorkflow {
-	url, err := getBackendURL("/api/workflows")
+	url, err := getBackendURL("/api/v1/workflows")
 	if err != nil {
 		return models.ResponseWorkflow{Status: http.StatusInternalServerError}
 	}
@@ -36,7 +36,7 @@ func (r *WorkflowRepository) CreateWorkflow(workflow models.Workflow, serviceUse
 }
 
 func (r *WorkflowRepository) GetWorkflow(userID, workflowID, userToken, serviceUserAccessToken *string) models.ResponseWorkflow {
-	url, err := getBackendURL(fmt.Sprintf("/api/workflows/%s/workflow/%s/%s", *userID, *workflowID, *userToken))
+	url, err := getBackendURL(fmt.Sprintf("/api/v1/workflows/%s/workflow/%s/%s", *userID, *workflowID, *userToken))
 	if err != nil {
 		log.Printf("ERROR | %v", err)
 		return models.ResponseWorkflow{
@@ -69,7 +69,7 @@ func (r *WorkflowRepository) GetWorkflow(userID, workflowID, userToken, serviceU
 }
 
 func (r *WorkflowRepository) GetAllWorkflow(userID, userToken, serviceUserAccessToken *string) models.ResponseAllWorkflow {
-	url, err := getBackendURL(fmt.Sprintf("/api/workflows/%s/%s", *userID, *userToken))
+	url, err := getBackendURL(fmt.Sprintf("/api/v1/workflows/%s/%s", *userID, *userToken))
 	if err != nil {
 		log.Printf("ERROR | %v", err)
 		return models.ResponseAllWorkflow{
@@ -102,7 +102,7 @@ func (r *WorkflowRepository) GetAllWorkflow(userID, userToken, serviceUserAccess
 }
 
 func (r *WorkflowRepository) UpdateWorkflow(workflow models.Workflow, serviceUserAccessToken string) models.ResponseUpdatedWorkflow {
-	url, err := getBackendURL(fmt.Sprintf("/api/workflows/%s", workflow.UUID))
+	url, err := getBackendURL(fmt.Sprintf("/api/v1/workflows/%s", workflow.UUID))
 	if err != nil {
 		return models.ResponseUpdatedWorkflow{Status: http.StatusInternalServerError}
 	}

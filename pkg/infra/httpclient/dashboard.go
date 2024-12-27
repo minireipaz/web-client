@@ -16,7 +16,7 @@ func NewDashboardRepository(client HTTPClient) *DashboardRepository {
 }
 
 func (d *DashboardRepository) GetDashboardInfoByUserID(user *models.Users, serviceUserAccessToken *string) models.ResponseInfoDashboard {
-	url, err := getBackendURL(fmt.Sprintf("/api/dashboard/%s", user.UserID))
+	url, err := getBackendURL(fmt.Sprintf("/api/v1/dashboard/%s", user.UserID))
 	if err != nil {
 		return models.ResponseInfoDashboard{
 			Error: err.Error(),

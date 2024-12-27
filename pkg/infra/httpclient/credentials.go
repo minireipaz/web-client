@@ -17,7 +17,7 @@ func NewCredentialsRepository(client HTTPClient) *CredentialsRepository {
 }
 
 func (c *CredentialsRepository) GenerateGoogleOAuthURL(credential *models.RequestCreateCredential, serviceUserAccessToken *string) models.ResponseCreateCredential {
-	url, err := getBackendURL("/api/google/credential")
+	url, err := getBackendURL("/api/v1/google/credential")
 	if err != nil {
 		return models.ResponseCreateCredential{Status: http.StatusInternalServerError}
 	}
@@ -36,7 +36,7 @@ func (c *CredentialsRepository) GenerateGoogleOAuthURL(credential *models.Reques
 }
 
 func (c *CredentialsRepository) ExchangeGogleOAuth(response *models.ResponseExchangeCredential, serviceUserAccessToken *string) *models.ResponseExchangeCredential {
-	url, err := getBackendURL("/api/google/exchange")
+	url, err := getBackendURL("/api/v1/google/exchange")
 	if err != nil {
 		return &models.ResponseExchangeCredential{Status: http.StatusInternalServerError}
 	}
@@ -54,7 +54,7 @@ func (c *CredentialsRepository) ExchangeGogleOAuth(response *models.ResponseExch
 }
 
 func (c *CredentialsRepository) GetAllCredentials(userID, userToken, serviceUserToken *string) (response *models.ResponseGetAllCredential, err error) {
-	url, err := getBackendURL(fmt.Sprintf("/api/credentials/%s/%s", *userID, *userToken))
+	url, err := getBackendURL(fmt.Sprintf("/api/v1/credentials/%s/%s", *userID, *userToken))
 	if err != nil {
 		log.Printf("ERROR | %v", err)
 		return &models.ResponseGetAllCredential{

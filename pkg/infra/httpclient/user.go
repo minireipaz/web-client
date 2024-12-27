@@ -16,7 +16,7 @@ func NewUserRepository(client HTTPClient) *UserRepository {
 }
 
 func (ur *UserRepository) CheckExistUser(user *models.Users, serviceUserAccessToken *string) models.ResponseExistUser {
-	url, err := getBackendURL("/api/users")
+	url, err := getBackendURL("/api/v1/users")
 	if err != nil {
 		return models.ResponseExistUser{
 			Exist:   false,

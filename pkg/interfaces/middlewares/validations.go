@@ -233,3 +233,21 @@ func validateCredentialFields(credential models.Credential) error {
 	}
 	return nil
 }
+
+func ValidateIDAction() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		idaction := ctx.Param("idaction")
+
+		if err := validateActionID(idaction); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			ctx.Abort()
+			return
+		}
+
+		ctx.Next()
+	}
+}
+
+func validateActionID(_ string) error {
+	return nil
+}
