@@ -112,12 +112,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotAcceptableResponse'
-        "415":
+        '415':
           description: Unsupported media type
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UnsupportedMedia"
+                $ref: '#/components/schemas/UnsupportedMedia'
         '429':
           description: Too Many Requests. The client has exceeded the rate limit.
           content:
@@ -323,19 +323,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TooManyRequestsResponse'
-        "415":
+        '415':
           description: Unsupported media type
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UnsupportedMedia"
+                $ref: '#/components/schemas/UnsupportedMedia'
         default:
           description: Default
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedResponse'
-
 
   '/api/users/{stub}':
     get:
@@ -581,12 +580,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotAcceptableResponse'
-        "415":
+        '415':
           description: Unsupported media type
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UnsupportedMedia"
+                $ref: '#/components/schemas/UnsupportedMedia'
         default:
           description: Default
           content:
@@ -638,12 +637,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ForbiddenResponse'
-        "415":
+        '415':
           description: Unsupported media type
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UnsupportedMedia"
+                $ref: '#/components/schemas/UnsupportedMedia'
         '429':
           description: Unauthorized
           content:
@@ -725,12 +724,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotAcceptableResponse'
-        "415":
+        '415':
           description: Unsupported media type
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UnsupportedMedia"
+                $ref: '#/components/schemas/UnsupportedMedia'
         default:
           description: Default
           content:
@@ -1358,12 +1357,12 @@ components:
           example: '#000000'
       additionalProperties: false
 
-    UnauthorizedResponse:  # Esquema para la respuesta 401
+    UnauthorizedResponse: # Esquema para la respuesta 401
       type: object
       properties:
         error:
           type: string
-          example: "Unauthorized. The request requires user authentication."
+          example: 'Unauthorized. The request requires user authentication.'
           pattern: ^[a-zA-Z0-9_-]$
         status:
           type: integer
@@ -1373,12 +1372,12 @@ components:
         - status
       additionalProperties: false
 
-    ForbiddenResponse:  # Esquema para la respuesta 403
+    ForbiddenResponse: # Esquema para la respuesta 403
       type: object
       properties:
         error:
           type: string
-          example: "Forbidden. The server understood the request but refuses to authorize it."
+          example: 'Forbidden. The server understood the request but refuses to authorize it.'
           pattern: ^[a-zA-Z0-9_-]$
           maxLength: 255
         status:
@@ -1389,12 +1388,12 @@ components:
         - status
       additionalProperties: false
 
-    TooManyRequestsResponse:  # Esquema para la respuesta 429
+    TooManyRequestsResponse: # Esquema para la respuesta 429
       type: object
       properties:
         error:
           type: string
-          example: "Too Many Requests. The client has exceeded the rate limit."
+          example: 'Too Many Requests. The client has exceeded the rate limit.'
           pattern: ^[a-zA-Z0-9_-]$
           maxLength: 255
         status:
@@ -1405,12 +1404,12 @@ components:
         - status
       additionalProperties: false
 
-    NotFoundResponse:  # Esquema para la respuesta 404
+    NotFoundResponse: # Esquema para la respuesta 404
       type: object
       properties:
         error:
           type: string
-          example: "Not Found. The requested resource could not be found."
+          example: 'Not Found. The requested resource could not be found.'
           pattern: ^[a-zA-Z0-9_-]$
           maxLength: 255
         status:
@@ -1421,12 +1420,12 @@ components:
         - status
       additionalProperties: false
 
-    NotAcceptableResponse:  # Esquema para la respuesta 406
+    NotAcceptableResponse: # Esquema para la respuesta 406
       type: object
       properties:
         error:
           type: string
-          example: "Not Acceptable. The server cannot generate content that matches the Accept header."
+          example: 'Not Acceptable. The server cannot generate content that matches the Accept header.'
           pattern: ^[a-zA-Z0-9_-]$
           maxLength: 255
         status:
@@ -1442,7 +1441,7 @@ components:
       properties:
         error:
           type: string
-          example: "Not Supported media"
+          example: 'Not Supported media'
           pattern: ^[a-zA-Z0-9_-]$
           maxLength: 255
         status:
