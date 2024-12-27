@@ -1,15 +1,15 @@
 # web-client
-This repository contains the user-facing frontend service for the minireipaz project. 
 
+This repository contains the user-facing frontend service for the minireipaz project.
 
 # TODO:
-- ACL client frontend 
+
+- ACL client frontend
 
 ## Testing users
 
 Username: ayilezt485@nic.edu.pl
 Password: 123
-
 
 ## Repo Structure
 
@@ -196,7 +196,6 @@ Zitadel is a modern identity and access management solution designed to provide 
 
 > Notes:
 > The authorization code protocol is part of OAuth 2.0 (defined in [OAuth 2.0 RFC 7636](https://tools.ietf.org/html/rfc7636)). It involves the exchange of an authorization code for a token. This is the recommended authorization code flow in the [OAuth 2.1 draft](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-07#section-10).
-> 
 >
 > ```mermaid
 > ---
@@ -205,26 +204,24 @@ Zitadel is a modern identity and access management solution designed to provide 
 > sequenceDiagram
 >   actor User
 >   User->>App: Click sign-in link (1)
-> 
+>
 >   activate App
 >   Note right of App: Generate code_verifier and<br/>code_challenge
 >   App->>Identity Provider: Authorization code request & code_challenge (2)
 >   deactivate App
-> 
+>
 >   Identity Provider-->>User: Redirect to login/authorization prompt (3)
 >   User-->>Identity Provider: Authenticate (3)
 >   Identity Provider->>App: Authorization code (3)
-> 
+>
 >   activate App
 >   App->>Identity Provider: Authorization code & code verifier (4)
 >   Note right of Identity Provider: Validate authorization code &<br/>code_verifier
 >   Identity Provider->>App: Access token and ID token (4)
 >   deactivate App
-> 
+>
 >   App->>Your API: Request protected data with access token (5)
 > ```
-
-
 
 ## Flow in Quick action new workflow
 
@@ -256,12 +253,12 @@ graph TD
 4. **User Enters Workflow Name**: The user enters the name of the workflow in the provided input field.
 5. **User Clicks Create**: The user clicks the "Create" button to proceed.
 6. **Is Workflow Name Valid?**: The system checks if the entered workflow name is valid.
-    - **Yes**: If the name is valid, proceed to send a POST request to the API endpoint `/api/workflows`.
-    - **No**: If the name is not valid, show an alert indicating the name is missing or invalid and return to the modal.
+   - **Yes**: If the name is valid, proceed to send a POST request to the API endpoint `/api/workflows`.
+   - **No**: If the name is not valid, show an alert indicating the name is missing or invalid and return to the modal.
 7. **Send POST Request to /api/workflows**: The system sends a request to create the workflow.
 8. **Request Successful?**: The system checks if the request was successful.
-    - **Yes**: If the request is successful, receive the workflow data.
-    - **No**: If the request fails, show an error message and return to the modal.
+   - **Yes**: If the request is successful, receive the workflow data.
+   - **No**: If the request fails, show an error message and return to the modal.
 9. **Receive Workflow Data**: The system receives the data of the newly created workflow.
 10. **Close Modal**: The modal window closes.
 11. **Redirect to New Workflow Page**: The system redirects the user to the page for the new workflow.
@@ -269,8 +266,8 @@ graph TD
 13. **Fill Information on New Page**: Populate the new workflow page with the received workflow information.
 14. **End**: The process ends.
 
-
 ## Flow within selected types of nodes and display information about each node
+
 ![](./images/node_worflow.svg)
 
 ###### Notes:
@@ -284,10 +281,11 @@ To ensure the security and quality of the code, it is crucial to enable code sca
 ```
 
 ## Notes for Using .env Files in GitHub Actions (needs improve)
+
 To properly run tests and other workflows in GitHub Actions, it is essential to use environment variables stored in a .env file. There are a couple of methods to securely manage these environment variables in your GitHub Actions workflows.
 
 1. Generating .env from Repository Secrets
-GitHub allows you to store secrets securely in your repository settings. These secrets can then be used to generate a .env file within your GitHub Actions workflows.
+   GitHub allows you to store secrets securely in your repository settings. These secrets can then be used to generate a .env file within your GitHub Actions workflows.
 
 ```yaml
 - name: Set up environment variables
@@ -303,8 +301,9 @@ GitHub allows you to store secrets securely in your repository settings. These s
 If you prefer to use an encrypted .env file, you can encrypt it locally and decrypt it during the GitHub Actions workflow.
 
 Steps:
+
 - Encrypt .env File:
-Use a tool like gpg to encrypt your .env file.
+  Use a tool like gpg to encrypt your .env file.
   ```sh
   gpg --symmetric --cipher-algo AES256 .env
   ```
@@ -315,6 +314,7 @@ Use a tool like gpg to encrypt your .env file.
 
 - Decrypt and Use .env File in Workflow:
   Modify your GitHub Actions workflow YAML file to decrypt the .env file during the workflow.
+
 ```sh
 - name: Decrypt .env file
   run: |
@@ -337,7 +337,6 @@ make fmt
 `make lint`: Analyzes the source code to identify and report stylistic errors and programming mistakes.
 `make test`: Runs the test suite to ensure that the code is functioning correctly.
 `make fmt`: Formats the source code according to the project's style.
-
 
 ### openapi_http
 
@@ -363,11 +362,13 @@ Lints the Go codebase using golangci-lint.
 Installation (optional):
 
 If you need to install `golangci-lint` and `go-cleanarch`, run the script with the -install option:
+
 ```
 ./scripts/lint.sh -install
 ```
 
 This will:
+
 - Download and install `golangci-lint` version v1.59.1.
 - Display the installed version of `golangci-lint`.
 - Install the `go-cleanarch` tool.
@@ -380,9 +381,10 @@ This will execute `golangci-lint` with the specified options:
 --timeout=2m: Set the timeout to 2 minutes.
 --config ./.golangci.yaml: Use the specified configuration file for `golangci-lint`.
 
-
 ### fmt
+
 This command will format all Go files in the current directory and its subdirectories using `goimports`.
+
 ```
 make fmt
 ```
@@ -398,12 +400,12 @@ goimports -l -w -d -v ./
 -d: Displays the diffs instead of applying them.
 -v: Verbose mode, providing detailed output.
 
-
 ### test
 
-By running the make test command, both the unit and E2E test suites will be executed sequentially. 
+By running the make test command, both the unit and E2E test suites will be executed sequentially.
 
 To run the tests, execute the following command. The tests will automatically retrieve the necessary environment variables:
+
 ```
 make test
 ```
