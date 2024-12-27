@@ -17,3 +17,7 @@ fmt:
 test:
 	@./scripts/test.sh .env
 	@./scripts/test.sh .e2e.env
+
+efficient_structs:
+	@echo "Fixing structs..."
+	@./scripts/structs_efficient.sh

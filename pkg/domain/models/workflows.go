@@ -23,36 +23,36 @@ const (
 )
 
 type Workflow struct {
-	UserID            string    `json:"user_id,omitempty"`
-	UserToken         string    `json:"access_token,omitempty"`
-	Name              string    `json:"name" binding:"required,alphanum,max=255"`
-	Description       string    `json:"description,omitempty"`
-	IsActive          IsActive  `json:"is_active,omitempty"` // Enum8('active' = 1, 'draft' = 2, 'paused' = 3) DEFAULT 'active'
-	UUID              string    `json:"id,omitempty"`
-	CreatedAt         string    `json:"created_at,omitempty"`
-	UpdatedAt         string    `json:"updated_at,omitempty"`
 	WorkflowInit      time.Time `json:"workflow_init,omitempty"`
 	WorkflowCompleted time.Time `json:"workflow_completed,omitempty"`
-	DirectoryToSave   string    `json:"directory_to_save" binding:"required,alphanum,max=255"`
-	Status            *Status   `json:"status,omitempty"`
 	Duration          *int64    `json:"duration,omitempty"`
+	Status            *Status   `json:"status,omitempty"`
+	Viewport          *Viewport `json:"viewport,omitempty"`
+	UserToken         string    `json:"access_token,omitempty"`
+	CreatedAt         string    `json:"created_at,omitempty"`
+	UpdatedAt         string    `json:"updated_at,omitempty"`
+	Name              string    `json:"name" binding:"required,alphanum,max=255"`
+	Description       string    `json:"description,omitempty"`
+	DirectoryToSave   string    `json:"directory_to_save" binding:"required,alphanum,max=255"`
+	UUID              string    `json:"id,omitempty"`
+	UserID            string    `json:"user_id,omitempty"`
 	Nodes             []Node    `json:"nodes,omitempty"`
 	Edges             []Edge    `json:"edges,omitempty"`
-	Viewport          *Viewport `json:"viewport,omitempty"`
+	IsActive          IsActive  `json:"is_active,omitempty"`
 }
 
 type ResponseWorkflow struct {
 	Error       string                       `json:"error"`
+	Credentials []ResponseExchangeCredential `json:"credentials"`
 	Workflow    Workflow                     `json:"workflow"`
 	Status      int                          `json:"status"`
-	Credentials []ResponseExchangeCredential `json:"credentials"`
 }
 
 type ResponseAllWorkflow struct {
 	Error       string       `json:"error"`
 	Workflow    []Workflow   `json:"workflow"`
-	Status      int          `json:"status"`
 	Credentials []Credential `json:"credentials"`
+	Status      int          `json:"status"`
 }
 
 type ResponseUpdatedWorkflow struct {
@@ -61,13 +61,13 @@ type ResponseUpdatedWorkflow struct {
 }
 
 type WorkflowDetail struct {
-	WorkflowID          string     `json:"workflow_id"`
-	WorkflowName        string     `json:"workflow_name"`
 	WorkflowDescription *string    `json:"workflow_description,omitempty"`
 	WorkflowStatus      *int       `json:"workflow_status,omitempty"`
 	ExecutionStatus     *int       `json:"execution_status,omitempty"`
 	StartTime           *time.Time `json:"start_time,omitempty"`
 	Duration            *int       `json:"duration,omitempty"`
+	WorkflowID          string     `json:"workflow_id"`
+	WorkflowName        string     `json:"workflow_name"`
 }
 
 type WorkflowsCount struct {
@@ -78,17 +78,17 @@ type WorkflowsCount struct {
 }
 
 type RecentWorkflow struct {
-	WorkflowName        string     `json:"workflow_name"`
 	WorkflowDescription *string    `json:"workflow_description,omitempty"`
 	ExecutionStatus     *int       `json:"execution_status,omitempty"`
 	StartTime           *time.Time `json:"start_time,omitempty"`
 	Duration            *int       `json:"duration,omitempty"`
+	WorkflowName        string     `json:"workflow_name"`
 }
 
 type RequestUpdateWorkflow struct {
-	WorkflowFrontend Workflow `json:"data"`
 	UserID           string   `json:"user_id"`
 	AccessToken      string   `json:"access_token"`
+	WorkflowFrontend Workflow `json:"data"`
 }
 
 type RequestInfoWorkflow struct {
@@ -127,8 +127,8 @@ type DataNode struct {
 	WorkflowID     *string                 `json:"workflowid,omitempty"`
 	NodeID         *string                 `json:"nodeid,omitempty"`
 	Type           *string                 `json:"type,omitempty"`
-	CredentialData RequestCreateCredential `json:"credential"`
 	ContentData    FormData                `json:"formdata"`
+	CredentialData RequestCreateCredential `json:"credential"`
 }
 
 type Measured struct {

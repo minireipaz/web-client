@@ -6,6 +6,7 @@ const (
 )
 
 type RequestGoogleAction struct {
+	ActionID       string `json:"actionid"` // not setted in frontend
 	Pollmode       string `json:"pollmode"`
 	Selectdocument string `json:"selectdocument"`
 	Document       string `json:"document"`
@@ -18,10 +19,11 @@ type RequestGoogleAction struct {
 	Workflowid     string `json:"workflowid"`
 	Nodeid         string `json:"nodeid"`
 	Redirecturl    string `json:"redirecturl"`
+	Testmode       bool   `json:"testmode"`
 }
 
 type ResponseGetGoogleSheetByID struct {
-	Status int    `json:"status"`
 	Error  string `json:"error"`
 	Data   string `json:"data"`
+	Status int    `json:"status"`
 }

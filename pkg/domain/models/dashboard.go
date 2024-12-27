@@ -3,9 +3,9 @@ package models
 // ResponseInfoDashboard represents response containing workflow counts
 // also a list of the most recent workflows
 type ResponseInfoDashboard struct {
+	Error  string          `json:"error"`
 	Data   []InfoDashboard `json:"data"`
 	Status int             `json:"status"`
-	Error  string          `json:"error"`
 }
 
 type InfoDashboard struct {
