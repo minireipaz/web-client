@@ -3,7 +3,7 @@ import { COLOR_ALERTS, ModalCredentialData } from '../../models/Credential';
 import React, { useMemo, useState } from 'react';
 import { useRequest } from '../../utils/requests';
 import { getUriFrontend } from '../../utils/getUriFrontend';
-import { ResponseSaveFormData } from './Modal';
+import { ERRORTEXT, ResponseSaveFormData } from './Modal';
 import { useAuth } from '../AuthProvider/indexAuthProvider';
 import { FormData } from '../../models/Workflow';
 
@@ -29,7 +29,20 @@ interface GoogleSheetButtonProps {
 }
 
 export function GoogleSheetsModalContent(props: GoogleSheetsModalProps) {
-  const recentCredentials = useMemo(() => {
+  // const recentCredentials = useMemo(() => {
+  //   let recentCredentials = [];
+  //   for (let i = 0; i < props.listCredentials.length; i++) {
+  //     const element = props.listCredentials[i];
+  //     recentCredentials.push(
+  //       <option key={element.id} value={element.id}>
+  //         {element.name}
+  //       </option>
+  //     );
+  //   }
+  //   return recentCredentials;
+  // }, [props.listCredentials]);
+
+  function transformCredentialsInOptions() {
     let recentCredentials = [];
     for (let i = 0; i < props.listCredentials.length; i++) {
       const element = props.listCredentials[i];
@@ -40,7 +53,8 @@ export function GoogleSheetsModalContent(props: GoogleSheetsModalProps) {
       );
     }
     return recentCredentials;
-  }, [props.listCredentials]);
+
+  }
 
   const MemoizedLabelCredential = useMemo(
     () => <Label htmlFor="credential" value="Credential to connect with" />,
@@ -109,7 +123,7 @@ export function GoogleSheetsModalContent(props: GoogleSheetsModalProps) {
               onChange={props.onCredentialChange}
               required
             >
-              {recentCredentials}
+              {transformCredentialsInOptions()}
             </Select>
             {MemoizedButtonCredential}
           </div>
@@ -302,10 +316,17 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
         signal,
       });
 
+      if (response.status === 401) {
+        // Token maybe has expired, handle expiration and redirect
+        // handleTokenExpiration();
+        // navigate('/', { replace: true });
+        // return [false, failConnection, undefined];
+      }
+
       if (!response.ok) {
         return [false, failConnection];
       }
-
+      // response is id to polling
       const data: ResponseSaveFormData = await response.json();
       if (!data || data.status !== 200) {
         return [false, failConnection];
@@ -338,114 +359,42 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
   }
 
   function validateForm(formdata: FormData): boolean {
-    if (formdata.document === '') {
-      props.showAlert('Document cannot be empty', COLOR_ALERTS.failure);
+    if (formdata.credentialid === '' || formdata.credentialid === "none") {
+      props.showAlert('Select valid credential', COLOR_ALERTS.failure);
       return false;
     }
+
+    if (formdata.document.trim() === "") {
+      props.showAlert(ERRORTEXT.notvalidurl, COLOR_ALERTS.failure);
+      return false;
+    }
+
+    if (formdata.document.trim() !== '') {
+      try {
+        if (!URL.canParse(formdata.document)) {
+          props.showAlert(ERRORTEXT.notvalidurl, COLOR_ALERTS.failure);
+          return false;
+        }
+        if (formdata.sheet !== '') {
+          props.showAlert("sheet name not implemented", COLOR_ALERTS.failure);
+          return false;
+        }
+      } catch (error) {
+        props.showAlert(ERRORTEXT.notvalidurl, COLOR_ALERTS.failure);
+        return false;
+      }
+    }
+
+    if (
+      formdata.selectdocument !== 'byuri' &&
+      formdata.selectdocument !== 'byothers'
+    ) {
+      props.showAlert(ERRORTEXT.notvalidoptiondocument, COLOR_ALERTS.failure);
+      return false;
+    }
+
     return true;
   }
-
-  // async function startPolling(actionID: string) {
-  //   if (actionID === "") return;
-  //   // enable animation for button
-  //   /// -----
-  //   let recieved = false
-  //   for (let i = 0; i < 10; i++) {
-  //     try {
-  //       recieved = await pollingActionTest(actionID);
-  //       if (recieved) {
-  //         break;
-  //       }
-  //     } catch (error) {
-  //       console.error("Error during polling:", error);
-  //     }
-  //     await new Promise((resolve) => setTimeout(resolve, 15000));
-  //   }
-
-  //   if (!recieved) {
-  //     // console.error("Error Testing:", JSON.stringify());
-  //     props.showAlert("Error testing", COLOR_ALERTS.failure);
-  //   }
-  //   return;
-  // }
-
-  // async function pollingActionTest(actionID: string): Promise<boolean> {
-  //   try {
-  //     const result = await executeRequest(
-  //       async (signal) => {
-  //         return await pollTest(props.formData, props.dataNode as Record<string, ModalCredentialData>, signal);
-  //       },
-  //       {
-  //         onSuccess: () => {
-  //           console.log("ok");
-  //         },
-  //         onError: (error) => {
-  //           console.error("Error Testing:", error);
-  //           props.showAlert("Error testing credential", COLOR_ALERTS.failure);
-  //         },
-  //         onFinally: () => {
-  //           setDisabledButtonTest(false);
-  //         }
-  //       }
-  //     );
-
-  //     if (!result) {
-  //       // setDisabledButtonTest(false);
-  //       // console.error("Error Testing:", JSON.stringify(result));
-  //       // props.showAlert("Error testing", COLOR_ALERTS.failure);
-  //       return false;
-  //     }
-
-  //     const [isOk, dataResponse] = result as [boolean, ResponseSaveFormData];
-  //     if (!isOk) {
-  //       // props.showAlert("Cannot connect", COLOR_ALERTS.failure);
-  //       return false;
-  //     }
-
-  //     if (dataResponse.data === "") {
-  //       // setDisabledButtonTest(false);
-  //       // console.error("Error Testing:", JSON.stringify(result));
-  //       // props.showAlert("Error testing", COLOR_ALERTS.failure);
-  //       return false;
-  //     }
-
-  //     props.handleTest(dataResponse);
-  //     return true;
-  //   } catch(error) {
-  //     return false;
-  //   }
-  // }
-
-  // async function pollTest(formData: FormData, node: Record<string, ModalCredentialData>, signal: AbortSignal | undefined): Promise<[boolean, ResponseSaveFormData]> {
-  //   try {
-  //     const [ok, uriFrontend] = getUriFrontend("/actions/google/sheets");
-  //     if (!ok) {
-  //       return [false, failConnection];
-  //     }
-  //     const body: FormData = createBodySendFormData(formData, node);
-  //     const response = await fetch(uriFrontend, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         "Authorization": `Bearer ${userInfo?.access_token}`,
-  //       },
-  //       body: JSON.stringify(body),
-  //       signal
-  //     });
-
-  //     if (!response.ok) {
-  //       return [false, failConnection];
-  //     }
-
-  //     const data: ResponseSaveFormData = await response.json();
-  //     if (!data || data.status !== 200) {
-  //       return [false, failConnection];
-  //     }
-  //     return [true, data];
-  //   } catch (error) {
-  //     return [false, failConnection];
-  //   }
-  // }
 
   async function startPolling(actionID: string) {
     if (actionID === '') return;
@@ -522,15 +471,41 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
         signal,
       });
 
+      if (response.status === 401) {
+        // Token maybe has expired, handle expiration and redirect
+        // handleTokenExpiration();
+        // navigate('/', { replace: true });
+        // return [false, failConnection, undefined];
+      }
       if (!response.ok) return [false, failConnection];
 
       const data: ResponseSaveFormData = await response.json();
       if (!data || data.status !== 200) return [false, failConnection];
 
-      return [true, data];
+      const values = transformPollingData(data);
+      return [true, values];
     } catch (error) {
       console.error('Error in pollTest:', error);
       return [false, failConnection];
+    }
+  }
+
+  function transformPollingData(data: ResponseSaveFormData): ResponseSaveFormData {
+    try {
+      const parsedData = JSON.parse(data.data) as ResponseSaveFormData;
+      const valuesRaw = JSON.parse(parsedData.data);
+      const transformedData = JSON.stringify(valuesRaw.values);
+      return {
+        status: 200,
+        error: "",
+        data: transformedData,
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        error: "",
+        data: "",
+      };
     }
   }
 

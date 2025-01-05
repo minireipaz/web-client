@@ -1,5 +1,6 @@
 import { Alert, Button, Modal } from 'flowbite-react';
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   COLOR_ALERTS,
   CredentialData,
@@ -14,6 +15,7 @@ import {
   ProcessGoogleOAuthMessage,
 } from './GoogleSheetsOAuth2Api';
 import { useRequest } from '../../utils/requests';
+// import { ERRORTEXT } from '../WorkflowModal/Modal';
 
 interface ContainerProps {
   isOpen: boolean;
@@ -24,10 +26,12 @@ interface ContainerProps {
     credential: ModalCredentialData;
     onChange: (field: keyof ModalCredentialData, value: any) => void;
   }>;
+  showAlert: (title: string, color: string) => void;
 }
 
 export function ModalCredential(props: ContainerProps) {
-  const { userInfo } = useAuth();
+  const { userInfo, handleTokenExpiration } = useAuth();
+  const navigate = useNavigate();
   const [credential, setCredential] = useState<ModalCredentialData>({
     id: '',
     type: '',
@@ -48,15 +52,15 @@ export function ModalCredential(props: ContainerProps) {
 
   const oauthHandlers: Record<OAuthProvider, Function> = {
     google: ProcessGoogleOAuthMessage,
-    github: () => {},
-    microsoft: () => {},
-    facebook: () => {},
+    github: () => { },
+    microsoft: () => { },
+    facebook: () => { },
   };
 
   const [disabledButtonTest, setDisabledButtonTest] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const { executeRequest, cancelRequest } = useRequest();
-  const [messageSaved, setMessageSaved] = useState('');
+  const [messageSaved, setMessageSaved] = useState(<></>);
 
   const failConnection: ResponseCreateCredential = {
     error: 'Conexion error',
@@ -82,7 +86,7 @@ export function ModalCredential(props: ContainerProps) {
     }));
   }
 
-  function generateUniqueId(): string {
+  function generateTemporalUniqueId(): string {
     //
     return `credential_${userInfo?.profile.sub}_${credential.workflowid}_${credential.nodeid}_${credential.type}`;
   }
@@ -99,7 +103,8 @@ export function ModalCredential(props: ContainerProps) {
 
       if (!isOk) {
         setDisabledButtonTest(false);
-        return showAlert('Cannot connect', COLOR_ALERTS.failure);
+        showAlert('Cannot connect', COLOR_ALERTS.failure);
+        return
       }
       openNewWindow(data.auth_url as string);
       return;
@@ -109,7 +114,8 @@ export function ModalCredential(props: ContainerProps) {
         return console.log('canceled');
       }
       console.error('Error Testing:', error);
-      return showAlert('Error testing credential', COLOR_ALERTS.failure);
+      showAlert('Error testing credential', COLOR_ALERTS.failure);
+      return;
     }
     return;
   }
@@ -137,15 +143,17 @@ export function ModalCredential(props: ContainerProps) {
 
   async function handleMessagesCredentials(event: MessageEvent<any>) {
     if (event.origin !== import.meta.env.VITE_EVENTS_ORIGIN) {
+      // TODO: 401
       console.error('Not authorized', event.origin);
       return;
     }
     if (!window.location.href.includes('/workflow/')) return;
-    const { type, data, provider } = event.data as PostMessageData;
+    const { type, data: stateStr, provider } = event.data as PostMessageData;
     if (type != 'oauthmessage') return;
-    if (!data) return;
-    const result = oauthHandlers[provider as OAuthProvider](data);
+    if (!stateStr) return;
+    const result = oauthHandlers[provider as OAuthProvider](stateStr);
     if (!result) return;
+    window.removeEventListener('message', handleMessagesCredentials);
     await handleSaveCredentials(result);
     console.log('Mensaje recibido:', event.data);
   }
@@ -182,25 +190,42 @@ export function ModalCredential(props: ContainerProps) {
   }
 
   function showAlert(title: string, color: string) {
-    setCredential((prev) => ({
-      ...prev,
-      alertMessage: (
-        <>
-          <li className="w-full">
-            <Alert color={color} className="w-full">
-              <span className="font-medium">{title.toString()}.</span>
-            </Alert>
-          </li>
-        </>
-      ),
-    }));
+    // maybe not necesary
+    // setCredential((prev) => ({
+    //   ...prev,
+    //   alertMessage: (
+    //     <>
+    //       <li className="w-full">
+    //         <Alert color={color} className="w-full">
+    //           <span className="font-medium">{title.toString()}.</span>
+    //         </Alert>
+    //       </li>
+    //     </>
+    //   ),
+    // }));
+
+    // setTimeout(() => {
+    //   setCredential((prev) => ({
+    //     ...prev,
+    //     alertMessage: <></>,
+    //   }));
+    // }, 1000);
+
+    setMessageSaved(
+      <>
+        <Alert color={color} className="w-full">
+          <span className="font-medium">{title.toString()}.</span>
+        </Alert>
+      </>
+    );
 
     setTimeout(() => {
-      setCredential((prev) => ({
-        ...prev,
-        alertMessage: <></>,
-      }));
-    }, 1000);
+      setMessageSaved(<></>);
+    }, 2000);
+
+
+
+
   }
 
   async function collectCredentials(
@@ -222,6 +247,13 @@ export function ModalCredential(props: ContainerProps) {
         body: JSON.stringify(body),
         signal,
       });
+
+      if (response.status === 401) {
+        // Token maybe has expired, handle expiration and redirect
+        handleTokenExpiration();
+        navigate('/', { replace: true });
+        return [false, failConnection];
+      }
 
       if (!response.ok) {
         return [false, failConnection];
@@ -258,8 +290,8 @@ export function ModalCredential(props: ContainerProps) {
     credentialState: CredentialState
   ): ModalCredentialData {
     return {
-      id: credential.id,
-      alertMessage: <></>, // not needed
+      id: credential.id, // currently is setted temp to none when saved will change ID
+      alertMessage: <></>, // not needed to send
       sub: userInfo?.profile.sub as string,
       name: credential.name,
       type: credential.type,
@@ -272,22 +304,35 @@ export function ModalCredential(props: ContainerProps) {
         code: credentialState.code,
         scopes: credentialState.scope,
         state: credentialState.state,
-        token: '',
-        tokenrefresh: '',
+        // token: '',
+        // tokenrefresh: '',
       },
     };
   }
 
+  // this function recives state from credential
+  // this state will send to frontend to recreate credential
+  // throught state
   async function handleSaveCredentials(
     credentialState: CredentialState | undefined
   ) {
     if (!checkValidations(credential)) return;
     if (!credentialState) return;
     setDisabledButtonTest(false);
+
+    // decople insert and update
+    // btw in credential datasource clickhouse use MergeTreeReplace
+    // // new credential
+    // if (credential.id === "none") {
+
+    // } else {
+    //   // update credential
+    // }
+
     try {
       const result = await executeRequest(
         async (signal) => {
-          return await sendCredentials(credential, credentialState, signal);
+          return await sendNewCredential(credential, credentialState, signal);
         },
         {
           onSuccess: () => {
@@ -312,12 +357,12 @@ export function ModalCredential(props: ContainerProps) {
         showAlert('Cannot connect', COLOR_ALERTS.failure);
         return;
       }
-      showAlert('Saved', COLOR_ALERTS.ok);
-      showTextMessage('Saved');
       handleUpdateCredential(
         newCredential as ModalCredentialData,
-        dataResponse
+        dataResponse as ModalCredentialData
       );
+      // showAlert('Saved', COLOR_ALERTS.ok);
+      // props.showAlert(ERRORTEXT.notsavedyet, COLOR_ALERTS.warning); // si esta no funciona ningun showalert
     } catch (error: any) {
       setDisabledButtonTest(false);
       if (error.name === 'AbortError') {
@@ -326,44 +371,49 @@ export function ModalCredential(props: ContainerProps) {
       console.error('Error Testing:', error);
       return showAlert('Error testing credential', 'failure');
     }
-    return;
   }
 
   async function handleUpdateCredential(
     newCredential: ModalCredentialData,
-    responseData: ResponseCreateCredential
+    responseData: ModalCredentialData
+
   ) {
     if (!checkValidations(credential)) return;
 
-    const newId =
+    let newId =
       credential.id && credential.id !== 'none'
         ? credential.id
-        : generateUniqueId();
+        : responseData.id as string;
 
+    // something went wrong because newid get from backend
+    // maybe client cannot parsed corretly
+    if (!newId || newId === "undefined") {
+      newId = generateTemporalUniqueId();
+    }
+    // newCredential.id = newId;
+    // newCredential.data = responseData.data;
     newCredential = {
       ...credential,
       id: newId,
       data: {
-        ...credential.data,
-        token: responseData.token as string,
-        tokenrefresh: responseData.tokenrefresh as string,
+        ...responseData.data,
       },
     };
 
     props.onSave(newCredential);
   }
 
-  async function sendCredentials(
+  async function sendNewCredential(
     credential: ModalCredentialData,
     credentialState: CredentialState,
     signal?: AbortSignal
   ): Promise<
-    [boolean, ResponseCreateCredential, ModalCredentialData | undefined]
+    [boolean, ModalCredentialData | undefined, ModalCredentialData | undefined]
   > {
     try {
       const [ok, uriFrontend] = getUriFrontend(`/oauth2-credentials/save`);
       if (!ok) {
-        return [false, failConnection, undefined];
+        return [false, undefined, undefined];
       }
       const body: ModalCredentialData = createBodySaveCredential(
         credential,
@@ -379,23 +429,30 @@ export function ModalCredential(props: ContainerProps) {
         signal,
       });
 
-      if (!response.ok) {
-        return [false, failConnection, undefined];
+      if (response.status === 401) {
+        // Token maybe has expired, handle expiration and redirect
+        handleTokenExpiration();
+        navigate('/', { replace: true });
+        return [false, undefined, undefined];
       }
 
-      const data: ResponseCreateCredential = await response.json();
+      if (!response.ok) {
+        return [false, undefined, undefined];
+      }
+
+      const data: ModalCredentialData = await response.json();
       if (!data || data.status !== 200) {
-        return [false, failConnection, undefined];
+        return [false, undefined, undefined];
       }
       return [true, data, body];
     } catch (error) {
-      return [false, failConnection, undefined];
+      return [false, undefined, undefined];
     }
   }
 
-  function showTextMessage(msg: string) {
-    setMessageSaved(msg);
-  }
+  // function showTextMessage(msg: string) {
+  //   setMessageSaved(msg);
+  // }
 
   if (credential.id == '') return <></>;
 

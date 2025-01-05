@@ -42,7 +42,11 @@ export function WorkflowDetails() {
       }
 
       setWorkflow(currentWorkflow);
-      setCredentials([defaultCredential, ...currentCredentials]);
+      if (currentCredentials.length === 0) {
+        setCredentials([defaultCredential]);
+      } else {
+        setCredentials([defaultCredential, ...currentCredentials]);
+      }
       setLoading(false);
     }
 

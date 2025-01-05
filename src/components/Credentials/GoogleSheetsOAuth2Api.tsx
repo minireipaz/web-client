@@ -36,7 +36,6 @@ export function RenderGoogleSheetsOAuth2Api({
 
   return (
     <ul className="ml-4 flex flex-col items-start justify-start gap-y-4 text-black ">
-      {credential.alertMessage ? credential.alertMessage : <></>}
       <li className="flex flex-col justify-center w-full">
         <Label htmlFor="oauthredirect" value="OAuth Redirect URL" />
         <div className="flex flex-row justify-center gap-x-2">
@@ -105,7 +104,6 @@ export function RenderGoogleSheetsOAuth2Api({
           type="text"
           sizing="sm"
           value={credential.data.clientSecret}
-          // onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange("clientSecret", e.target.value)}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             handleDataChange('clientSecret', e.target.value)
           }
@@ -211,6 +209,7 @@ export function RenderGoogleSheetsOAuth2Api({
           </span>
         </Alert>
       </li>
+      {credential.alertMessage}
     </ul>
   );
 }
@@ -229,7 +228,6 @@ export function ProcessGoogleOAuthMessage(
   const scopesStr = params.get('scope');
   const scopes = scopesStr?.split(',');
 
-  console.log('scopesStr=' + scopesStr);
   return {
     code: params.get('code') || '',
     state: params.get('state') || '',

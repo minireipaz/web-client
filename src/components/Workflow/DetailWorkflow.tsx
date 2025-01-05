@@ -1,10 +1,10 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { memo } from 'react';
 import {
   ReactFlow,
   addEdge,
-  useNodesState,
-  useEdgesState,
+  // useNodesState,
+  // useEdgesState,
   Node,
   Controls,
   Background,
@@ -15,6 +15,8 @@ import {
   ReactFlowJsonObject,
   NodeOrigin,
   applyNodeChanges,
+  applyEdgeChanges,
+  // NodeChange,
 } from '@xyflow/react';
 import {
   edgeTypes,
@@ -52,12 +54,21 @@ export const DetailWorkflow = memo(function DetailWorkflow(
   }, [props.workflow]);
 
   const [workflow, setWorkflow] = useState(props.workflow);
-  const [listCredentials, setListCredentials] = useState(props.credentials);
-  const [nodes, setNodes, onNodesChange] =
-    useNodesState<Node>(transformedNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(
+  // const [listCredentials, setListCredentials] = useState(props.credentials);
+  // const [nodes, setNodes] = useNodesState<Node>(transformedNodes);
+  const [nodes, setNodes] = useState<Node[]>(transformedNodes);
+  const nodesDataRef = useRef(nodes);
+  nodesDataRef.current = nodes;
+
+  // const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(
+  //   props.workflow?.edges || []
+  // );
+
+  const [edges, setEdges] = useState<Edge[]>(
     props.workflow?.edges || []
   );
+
+
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [clickPosition, setClickPosition] = useState({ x: 0, y: 0 });
@@ -164,7 +175,7 @@ export const DetailWorkflow = memo(function DetailWorkflow(
           },
         },
       };
-
+      // nodesDataRef.current.push(newNode);
       setNodes((prevNodes) => [...prevNodes, newNode]);
       setEdges((prevEdges) => [
         ...prevEdges,
@@ -217,7 +228,7 @@ export const DetailWorkflow = memo(function DetailWorkflow(
   async function sendChangedWorkflow(currentWorkflow: Workflow) {
     try {
       const [ok, uriFrontend] = getUriFrontend(
-        `/api/v1/v1/workflows/${userInfo?.profile.sub}/${currentWorkflow.id}`
+        `/api/v1/workflows/${userInfo?.profile.sub}/${currentWorkflow.id}`
       );
       if (!ok) {
         return false;
@@ -227,11 +238,7 @@ export const DetailWorkflow = memo(function DetailWorkflow(
       currentWorkflow.access_token = userInfo?.access_token;
       currentWorkflow.status =
         Number.parseInt(currentWorkflow.status.toString()) || 1;
-      // console.log(JSON.stringify({
-      //   user_id: userInfo?.profile.sub,
-      //   access_token: userInfo?.access_token,
-      //   data: currentWorkflow
-      // }));
+
       const response = await fetch(uriFrontend, {
         method: 'PUT',
         headers: {
@@ -244,6 +251,13 @@ export const DetailWorkflow = memo(function DetailWorkflow(
           data: currentWorkflow,
         }),
       });
+
+      if (response.status === 401) {
+        // Token maybe has expired, handle expiration and redirect
+        // handleTokenExpiration();
+        // navigate('/', { replace: true });
+        // return [false, failConnection, undefined];
+      }
 
       if (!response.ok) {
         // TODO: better redirect
@@ -268,28 +282,48 @@ export const DetailWorkflow = memo(function DetailWorkflow(
 
   const handleUpdateNodes = useCallback(
     async (newDataForNode: ModalCredentialData) => {
-      setNodes((prevNodes) =>
-        prevNodes.map((node) => {
-          if (node.id === newDataForNode.nodeid) {
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                credential: {
-                  id: newDataForNode.id,
-                  sub: workflow.user_id,
-                  name: newDataForNode.name,
-                  workflowid: node.data.workflowid,
-                  nodeid: node.data.nodeid,
-                  type: newDataForNode.type,
-                  data: { ...newDataForNode.data },
-                },
-              },
-            };
+      // updating node from Nodes without re-rendering
+      // for testing performance
+      for (let i = 0; i < nodesDataRef.current.length; i++) {
+        if (nodesDataRef.current[i].id === newDataForNode.nodeid) {
+          nodesDataRef.current[i].data = {
+            ...nodesDataRef.current[i].data,
+            credential: {
+              id: newDataForNode.id,
+              sub: workflow.user_id,
+              name: newDataForNode.name,
+              workflowid: nodesDataRef.current[i].data.workflowid,
+              nodeid: nodesDataRef.current[i].data.nodeid,
+              type: newDataForNode.type,
+              data: { ...newDataForNode.data },
+            },
           }
-          return node;
-        })
-      );
+          setCustomDataNode(nodesDataRef.current[i])
+        }
+      }
+
+      // setNodes((prevNodes) =>
+      //   prevNodes.map((node) => {
+      //     if (node.id === newDataForNode.nodeid) {
+      //       return {
+      //         ...node,
+      //         data: {
+      //           ...node.data,
+      //           credential: {
+      //             id: newDataForNode.id,
+      //             sub: workflow.user_id,
+      //             name: newDataForNode.name,
+      //             workflowid: node.data.workflowid,
+      //             nodeid: node.data.nodeid,
+      //             type: newDataForNode.type,
+      //             data: { ...newDataForNode.data },
+      //           },
+      //         },
+      //       };
+      //     }
+      //     return node;
+      //   })
+      // );
     },
     [workflow.user_id, handleSaveWorkflow]
   );
@@ -317,13 +351,25 @@ export const DetailWorkflow = memo(function DetailWorkflow(
 
   const onNodeChange = useCallback(
     (changes: any) => {
+      console.log("changeing")
       setNodes((eds) => applyNodeChanges(changes, eds));
     },
     [nodes]
   );
 
+  const onEdgesChange = useCallback(
+    (changes: any) => {
+      setEdges((eds) => applyEdgeChanges(changes, eds));
+    },
+    [edges]
+  );
+
   const handleSaveModal = useCallback(
     async (formData: FormData, dataNode: Node) => {
+      // update listcredentials ?
+      //
+
+
       const currentNode = {
         ...dataNode,
         data: {
@@ -335,7 +381,8 @@ export const DetailWorkflow = memo(function DetailWorkflow(
       } as Node;
       setCustomDataNode(currentNode);
       const nodesUpdated = updateNodeByNodeID(nodes, currentNode);
-      setNodes(nodesUpdated);
+      nodesDataRef.current = nodesUpdated;
+      // setNodes(nodesUpdated);
       await handleSaveWorkflow();
     },
     [nodes]
@@ -345,10 +392,10 @@ export const DetailWorkflow = memo(function DetailWorkflow(
     setIsOpenModal(false);
   }, []);
 
-  const memoizedListCredentials = useMemo(
-    () => listCredentials,
-    [listCredentials]
-  );
+  // const memoizedListCredentials = useMemo(
+  //   () => listCredentials,
+  //   [listCredentials]
+  // );
   const memoizedDataNode = useMemo(() => customDataNode, [customDataNode]);
   const memoizedControls = useMemo(() => <Controls />, []);
   const memoizedBackground = useMemo(
@@ -408,12 +455,13 @@ export const DetailWorkflow = memo(function DetailWorkflow(
               onClick={handleClickDrawer}
             />
             <WorkflowModal
-              onSaveNode={handleUpdateNodes}
+              onUpdateNode={handleUpdateNodes}
               onSaveModal={handleSaveModal}
               isOpen={isOpenModal}
               onClose={handleCloseModal}
+              // dataNode={nodesDataRef.current}
               dataNode={memoizedDataNode as Node}
-              credentials={memoizedListCredentials}
+              credentials={props.credentials} // listcredentials
             />
           </div>
         </div>

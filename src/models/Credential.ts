@@ -5,8 +5,7 @@ export interface ResponseCreateCredential {
   status: number;
   data?: string;
   auth_url?: string;
-  token?: string;
-  tokenrefresh?: string;
+  // newid?: string;
 }
 
 export interface ResponseGetAllCredentials {
@@ -36,8 +35,6 @@ export interface CredentialData {
   code: string;
   scopes: string[];
   state: string;
-  token: string;
-  tokenrefresh: string;
 }
 
 export interface ModalCredentialData {
@@ -49,9 +46,11 @@ export interface ModalCredentialData {
   nodeid: string;
   sub: string;
   name: string;
+  status?: number;
 }
 
 export enum COLOR_ALERTS {
   failure = 'failure',
   ok = 'green',
+  warning = "orange",
 }

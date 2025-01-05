@@ -7,6 +7,7 @@ import {
 } from './GoogleSheetModal';
 import { Node } from '@xyflow/react';
 import {
+  COLOR_ALERTS,
   DEFAULT_CREDENTIAL_REDIRECT_PATH,
   DEFAULT_CREDENTIAL_TITLES,
   ModalCredentialData,
@@ -19,7 +20,7 @@ interface ContainerProps {
   isOpen: boolean;
   dataNode: Node;
   credentials: ModalCredentialData[];
-  onSaveNode: (newCredentialData: ModalCredentialData) => void;
+  onUpdateNode: (newCredentialData: ModalCredentialData) => void;
   onSaveModal: (formData: FormData, dataNode: Node) => void;
   onClose: () => void;
 }
@@ -47,8 +48,8 @@ export const defaultCredential: ModalCredentialData = {
     code: '',
     scopes: [''],
     state: '',
-    token: '',
-    tokenrefresh: '',
+    // token: '',
+    // tokenrefresh: '',
   },
 };
 
@@ -84,16 +85,17 @@ export interface ResponseSaveFormData {
   data: string;
 }
 
-const enum ERRORTEXT {
+export const enum ERRORTEXT {
   notvalidurl = 'Not valid URL in Document',
   notvalidoptiondocument = 'Select Document not valid option',
+  notsavedyet = "Already not saved"
 }
 
 export function WorkflowModal(props: ContainerProps) {
   const [currentCredential, setCurrentCredential] =
     useState<ModalCredentialData>(defaultCredential);
   const [listCredentials, setListCredentials] = useState<ModalCredentialData[]>(
-    [defaultCredential]
+    [...props.credentials]
   );
   const [currentCredentialComponent, setCurrentCredentialComponent] =
     useState<CredentialComponent | null>(null);
@@ -204,11 +206,15 @@ export function WorkflowModal(props: ContainerProps) {
     const mergedData = mergeFormData(formularyData, formdata);
     setFormularyData({ ...mergedData });
 
-    if (credential && credential.id !== 'none') {
-      setCurrentCredential(credential);
-      return;
+    // if already credential exist in nodedata
+    if (credential.id) {
+      if (credential && credential.id !== 'none') {
+        setCurrentCredential(credential);
+        return;
+      }
     }
 
+    // not exist credential, just show default credential
     const updatedCredential = updateCredentialProperties(
       defaultCredential,
       nodeData,
@@ -233,10 +239,13 @@ export function WorkflowModal(props: ContainerProps) {
       setCurrentCredentialComponent(() => RenderGoogleSheetsOAuth2Api);
       setCurrentModalComponent(() => GoogleSheetsModalContent);
       setCurrentButtonComponent(() => GoogleSheetButton);
-      setListCredentials(props.credentials);
+      // if (listCredentials.length === 1 )
+      // setListCredentials(props.credentials);
     }
     initialSetCredentialForNode();
-  }, [props.dataNode, props.credentials]);
+  }, [props.dataNode
+    //  ,props.credentials
+    ]);
 
   const handleInputChange = useCallback((event: any) => {
     setFormularyData((prevFormData) => ({
@@ -247,6 +256,7 @@ export function WorkflowModal(props: ContainerProps) {
 
   const handleTest = useCallback((dataResponse: ResponseSaveFormData) => {
     setSizeModal('7xl');
+    // const valuesRaw = JSON.parse(dataResponse.data);
     console.log('response=' + JSON.stringify(dataResponse));
     setContentTest(
       <>
@@ -255,7 +265,7 @@ export function WorkflowModal(props: ContainerProps) {
           id="content"
           aria-hidden="true"
         >
-          !"#!"#!"#!"#
+          {dataResponse.data}
         </div>
       </>
     );
@@ -277,32 +287,44 @@ export function WorkflowModal(props: ContainerProps) {
     });
     // console.log("formData=" + JSON.stringify(formData))
     setSizeModal('xl');
-    setContentTest(<></>);
     props.onSaveModal(formularyData, props.dataNode);
   }, [props, formularyData]);
 
   function validateForm(formData: FormData): boolean {
+    if (formData.credentialid === '' || formData.credentialid === "none") {
+      showAlert('Select valid credential', COLOR_ALERTS.failure);
+      return false;
+    }
+
+    if (formData.sheet !== '') {
+      showAlert("sheet name not implemented", COLOR_ALERTS.failure);
+      return false;
+    }
+
     if (
       formData.selectdocument !== 'byuri' &&
       formData.selectdocument !== 'byothers'
     ) {
-      showAlert(ERRORTEXT.notvalidoptiondocument, 'red');
+      showAlert(ERRORTEXT.notvalidoptiondocument, COLOR_ALERTS.failure);
       return false;
     }
+
     if (formData.document !== '') {
       try {
         if (!URL.canParse(formData.document)) {
-          showAlert(ERRORTEXT.notvalidurl, 'red');
+          showAlert(ERRORTEXT.notvalidurl, COLOR_ALERTS.failure);
           return false;
         }
+        // if (formData.sheet !== '') {
+        //   showAlert("sheet name not implemented", COLOR_ALERTS.failure);
+        //   return false;
+        // }
       } catch (error) {
-        showAlert(ERRORTEXT.notvalidurl, 'red');
+        showAlert(ERRORTEXT.notvalidurl, COLOR_ALERTS.failure);
         return false;
       }
     }
 
-    if (formData.sheet !== '') {
-    }
     return true;
   }
 
@@ -343,7 +365,7 @@ export function WorkflowModal(props: ContainerProps) {
     setIsModalCredentialOpen(false);
   }, []);
 
-  const handleSearchDuplicated = useCallback(
+  const handleInsertCredentialInList = useCallback(
     (newCredential: ModalCredentialData) => {
       const updatedListCredentials = [...listCredentials];
       const index = updatedListCredentials.findIndex(
@@ -364,7 +386,7 @@ export function WorkflowModal(props: ContainerProps) {
 
   const handleSaveModalCredential = useCallback(
     (newCredential: ModalCredentialData) => {
-      const updatedListCredentials = handleSearchDuplicated(newCredential);
+      const updatedListCredentials = handleInsertCredentialInList(newCredential);
       setListCredentials(updatedListCredentials);
       setCurrentCredential(newCredential);
       setFormularyData({
@@ -377,9 +399,9 @@ export function WorkflowModal(props: ContainerProps) {
         redirecturl: newCredential.data.redirectURL,
       });
       setIsModalCredentialOpen(false);
-      props.onSaveNode(newCredential);
+      props.onUpdateNode(newCredential);
     },
-    [handleSearchDuplicated, props, formularyData]
+    [handleInsertCredentialInList, props, formularyData]
   );
 
   const handleSetCredential = useCallback(
@@ -388,6 +410,7 @@ export function WorkflowModal(props: ContainerProps) {
       const index = event.target.selectedIndex;
       const newCredential = listCredentials[index];
       setCurrentCredential(newCredential);
+      props.onUpdateNode(newCredential); // podria ser no necesario
       setFormularyData({
         ...formularyData,
         credentialid: newCredential.id,
@@ -414,10 +437,10 @@ export function WorkflowModal(props: ContainerProps) {
     }, 2000);
   }, []);
 
-  const currentCredentialMemo = useMemo(
-    () => currentCredential,
-    [currentCredential]
-  );
+  // const currentCredentialMemo = useMemo(
+  //   () => currentCredential,
+  //   [currentCredential]
+  // );
 
   if (!props.dataNode) return <></>;
 
@@ -436,7 +459,7 @@ export function WorkflowModal(props: ContainerProps) {
           <Modal.Body className="flex flex-row gap-x-4">
             {CurrentModalComponent && (
               <CurrentModalComponent
-                currentCredential={currentCredentialMemo}
+                currentCredential={currentCredential}
                 listCredentials={listCredentials}
                 formData={formularyData}
                 onCredentialChange={handleSetCredential}
@@ -471,8 +494,9 @@ export function WorkflowModal(props: ContainerProps) {
             isOpen={isModalCredentialOpen}
             onClose={handleCloseModalCredential}
             onSave={handleSaveModalCredential}
-            initialCredential={currentCredentialMemo}
+            initialCredential={currentCredential}
             renderBody={currentCredentialComponent as CredentialComponent}
+            showAlert={showAlert}
           />
         )}
       </form>

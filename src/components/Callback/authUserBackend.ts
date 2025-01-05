@@ -33,6 +33,13 @@ export async function ensureUserExists(
         access_token: userInfo.access_token,
       }),
     });
+    // TODO: 401
+    if (response.status === 401) {
+      // Token maybe has expired, handle expiration and redirect
+      // handleTokenExpiration();
+      // navigate('/', { replace: true });
+      // return [false, failConnection, undefined];
+    }
 
     if (!response.ok) {
       // TODO: better redirect
@@ -41,7 +48,7 @@ export async function ensureUserExists(
 
     const data: ResponseSyncUser = await response.json();
     console.log('User response:', JSON.stringify(data));
-    if (response.status === 401 && data.error === userTokenExpired) {
+    if (data.status === 401 && data.error === userTokenExpired) {
       return [data.exist, data.expired];
     }
     if (data.error !== '') {

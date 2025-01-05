@@ -119,7 +119,7 @@ export const QuickActions = memo(function QuickActions() {
         body: JSON.stringify(body),
       });
 
-      console.log('JSON=>' + JSON.stringify(response));
+      
       const data: ResponseGenerateWorkflow = await response.json();
       if (!data) {
         return [false, data];

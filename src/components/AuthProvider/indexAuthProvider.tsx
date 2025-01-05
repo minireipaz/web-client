@@ -82,11 +82,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     userManager?.signoutRedirect();
   };
 
-  async function handleTokenExpiration() {
-    await zitadel.userManager.removeUser();
-    setAuthenticated(false);
-    setUserInfo(null);
-    setUserManager(null);
+  function handleTokenExpiration() {
+    handleLogout();
   }
 
   return (
