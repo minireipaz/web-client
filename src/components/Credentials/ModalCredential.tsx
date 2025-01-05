@@ -26,7 +26,7 @@ interface ContainerProps {
     credential: ModalCredentialData;
     onChange: (field: keyof ModalCredentialData, value: any) => void;
   }>;
-  showAlert: (title: string, color: string) => void;
+  // showAlert: (title: string, color: string) => void;
 }
 
 export function ModalCredential(props: ContainerProps) {

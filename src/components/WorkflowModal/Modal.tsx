@@ -1,5 +1,5 @@
 import { Alert, Button, Modal } from 'flowbite-react';
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { RenderGoogleSheetsOAuth2Api } from '../Credentials/GoogleSheetsOAuth2Api';
 import {
   GoogleSheetButton,
@@ -496,7 +496,6 @@ export function WorkflowModal(props: ContainerProps) {
             onSave={handleSaveModalCredential}
             initialCredential={currentCredential}
             renderBody={currentCredentialComponent as CredentialComponent}
-            showAlert={showAlert}
           />
         )}
       </form>
