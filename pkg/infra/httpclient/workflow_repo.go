@@ -26,7 +26,7 @@ func (r *WorkflowRepository) CreateWorkflow(workflow models.Workflow, serviceUse
 	if err != nil {
 		return models.ResponseWorkflow{Status: http.StatusInternalServerError}
 	}
-
+	// TODO: coupled to this model
 	var createdWorkflow models.ResponseWorkflow
 	if err := json.Unmarshal(body, &createdWorkflow); err != nil {
 		return models.ResponseWorkflow{Status: http.StatusInternalServerError}

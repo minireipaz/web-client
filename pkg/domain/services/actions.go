@@ -14,13 +14,13 @@ func NewActionsService(repo repositories.ActionsRepository) *ActionsService {
 }
 
 func (a *ActionsService) CreateActionsGoogleSheet(newAction models.RequestGoogleAction, serviceUser *string) *models.ResponseGetGoogleSheetByID {
-  // model coupled
+	// model coupled
 	response := a.actionsRepo.CreateActionsGoogleSheet(newAction, serviceUser)
 	return response
 }
 
 func (a *ActionsService) GetGoogleSheetByID(actionID *string, userID *string, serviceUser *string) *string {
-  // model coupled
+	// model coupled
 	data := a.actionsRepo.GetGoogleSheetByID(actionID, userID, serviceUser)
 	return data
 }

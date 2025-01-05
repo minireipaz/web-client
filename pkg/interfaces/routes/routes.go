@@ -24,7 +24,6 @@ func Register(app *gin.Engine,
 		route.GET("/workflows/:iduser", middlewares.ValidateUserID(), workflowController.GetAllWorkflows)
 		route.GET("/workflows/:iduser/:idworkflow", middlewares.ValidateGetWorkflow(), workflowController.GetWorkflowByID)
 		route.PUT("/workflows/:iduser/:idworkflow", middlewares.ValidateUpdateWorkflow(), workflowController.UpdateWorkflow)
-		// route.DELETE("/workflows/:id", controllers.DeleteWorkflow)
 		route.POST("/users", middlewares.ValidateUser(), userController.SyncUser)
 		route.GET("/dashboard/:iduser", middlewares.ValidateUserID(), dashboardController.GetUserDashboardByID)
 

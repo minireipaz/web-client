@@ -59,12 +59,19 @@ func (a *ActionsController) PollingGetGoogleSheetByID(ctx *gin.Context) {
 		return
 	}
 	response := models.ResponseGetGoogleSheetByID{
-		Error:  models.NotAccept,
-		Status: http.StatusInternalServerError,
+		Error:  "",
+		Status: http.StatusOK,
 	}
-
-	data := *a.service.GetGoogleSheetByID(&actionID, &userID, serviceUserToken)
-
-	response.Data = data
+	// coupled response
+	data := a.service.GetGoogleSheetByID(&actionID, &userID, serviceUserToken)
+	if data == nil {
+		response = models.ResponseGetGoogleSheetByID{
+			Error:  models.NotAccept,
+			Status: http.StatusInternalServerError,
+		}
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	response.Data = *data
 	ctx.JSON(response.Status, response)
 }

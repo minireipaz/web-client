@@ -44,10 +44,10 @@ func (a *ActionsRepository) GetGoogleSheetByID(actionID *string, userID *string,
 		return nil
 	}
 
-	var response *string
-	if err := json.Unmarshal(body, &response); err != nil {
+	if len(body) == 0 {
 		return nil
 	}
 
-	return response
+	responseString := string(body)
+	return &responseString
 }

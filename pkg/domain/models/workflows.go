@@ -31,9 +31,9 @@ type Workflow struct {
 	UserToken         string    `json:"access_token,omitempty"`
 	CreatedAt         string    `json:"created_at,omitempty"`
 	UpdatedAt         string    `json:"updated_at,omitempty"`
-	Name              string    `json:"name" binding:"required,alphanum,max=255"`
+	Name              string    `json:"name" binding:"required,max=255"`
 	Description       string    `json:"description,omitempty"`
-	DirectoryToSave   string    `json:"directory_to_save" binding:"required,alphanum,max=255"`
+	DirectoryToSave   string    `json:"directory_to_save" binding:"required,max=255"`
 	UUID              string    `json:"id,omitempty"`
 	UserID            string    `json:"user_id,omitempty"`
 	Nodes             []Node    `json:"nodes,omitempty"`

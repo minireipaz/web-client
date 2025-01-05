@@ -2,6 +2,8 @@ package services
 
 import (
 	"errors"
+	"fmt"
+	"minireipaz/pkg/config"
 	"minireipaz/pkg/domain/models"
 	"minireipaz/pkg/domain/repositories"
 	"net/http"
@@ -23,13 +25,35 @@ func (c *CredentialsService) CreateGoogleCredential(currentCredential *models.Re
 			Status: http.StatusBadRequest,
 		}
 	}
+	currentCredential = c.validateRedirectURL(currentCredential)
+	if currentCredential == nil {
+		return models.ResponseCreateCredential{
+			Error:  "bad request",
+			Status: http.StatusBadRequest,
+		}
+	}
 	return c.credentialsRepo.GenerateGoogleOAuthURL(currentCredential, serviceUserAccessToken)
+}
+
+// this function remove bad formated uris
+func (c *CredentialsService) validateRedirectURL(currentCredential *models.RequestCreateCredential) *models.RequestCreateCredential {
+	// in case contains localhost, removed
+	// in case there is more than 2 parts, bad formatted redirect url
+	if strings.Contains(currentCredential.Data.RedirectURL, "http://localhost:3010") {
+		splitted := strings.Split(currentCredential.Data.RedirectURL, "http://localhost:3010")
+		if len(splitted) > 2 {
+			return nil
+		}
+		currentCredential.Data.RedirectURL = splitted[1]
+	}
+	currentCredential.Data.RedirectURL = fmt.Sprintf("%s%s", config.GetEnv("VITE_EVENTS_ORIGIN", "http://localhost:3010"), currentCredential.Data.RedirectURL)
+	return currentCredential
 }
 
 // dummy validations
 func (c *CredentialsService) validateGoogleCredentials(cred *models.RequestCreateCredential) error {
-	if !strings.HasPrefix(cred.Data.RedirectURL, "http") {
-		return errors.New("redirect URL must use HTTPS/HTTP")
+	if strings.Contains(cred.Data.RedirectURL, ".") {
+		return errors.New("redirect url .. dont use")
 	}
 
 	if len(cred.Data.ClientID) < 20 {

@@ -31,7 +31,7 @@ func (wc *WorkflowController) CreateWorkflow(ctx *gin.Context) {
 		})
 		return
 	}
-
+	// coupled model from repo
 	createdWorkflow := wc.service.CreateWorkflow(newWorkflow, serviceUserToken)
 
 	ctx.JSON(createdWorkflow.Status, createdWorkflow)
@@ -68,7 +68,7 @@ func (wc *WorkflowController) GetWorkflowByID(ctx *gin.Context) {
 	}
 
 	newWorkflow := wc.service.GetWorkflow(&userID, &workflowID, &userToken, serviceUserToken)
-
+	// coupled
 	ctx.JSON(newWorkflow.Status, newWorkflow)
 }
 
@@ -82,7 +82,7 @@ func (wc *WorkflowController) UpdateWorkflow(ctx *gin.Context) {
 		})
 		return
 	}
-
+	// coupled
 	workflowUpdated := wc.service.UpdateWorkflow(request.WorkflowFrontend, serviceUserToken)
 
 	ctx.JSON(workflowUpdated.Status, workflowUpdated)
