@@ -3,6 +3,7 @@ package httpclient
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"minireipaz/pkg/domain/models"
 )
 
@@ -47,7 +48,7 @@ func (a *ActionsRepository) GetGoogleSheetByID(actionID *string, userID *string,
 	if len(body) == 0 {
 		return nil
 	}
-
 	responseString := string(body)
+  log.Printf("%v", responseString)
 	return &responseString
 }
