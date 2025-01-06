@@ -10,19 +10,34 @@ import { UserManager } from 'oidc-client-ts';
 import { Credentials } from '../../Pages/indexCredentials.tsx';
 import { OAuthCallBack } from '../Callback/oauthCallback.tsx';
 
+// const ProtectedRoute = ({ children }: { children: ReactNode }) => {
+//   const { authenticated, loading, userInfo } = useAuth();
+
+//   if (loading) {
+//     return <div>Loading protected route...</div>;
+//   }
+
+//   if (!authenticated || !userInfo) {
+//     return <Navigate to="/" replace />;
+//   }
+
+//   return <>{children}</>;
+// };
+
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
-  const { authenticated, loading, userInfo } = useAuth();
+  const { authenticated, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading protected route...</div>;
+    return <div>Loading...</div>;
   }
 
-  if (!authenticated || !userInfo) {
+  if (!authenticated) {
     return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;
 };
+
 
 export function AppRouter() {
   const {
@@ -107,9 +122,9 @@ export function AppRouter() {
         <Route
           path="/oauth2-credential/callback"
           element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <OAuthCallBack />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           }
         />
       </Routes>

@@ -412,7 +412,7 @@ export function ModalCredential(props: ContainerProps) {
     [boolean, ModalCredentialData | undefined, ModalCredentialData | undefined]
   > {
     try {
-      const [ok, uriFrontend] = getUriFrontend(`/oauth2-credential/save`);
+      const [ok, uriFrontend] = getUriFrontend(`/oauth2-credentials/save`);
       if (!ok) {
         return [false, undefined, undefined];
       }

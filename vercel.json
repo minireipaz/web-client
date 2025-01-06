@@ -16,7 +16,7 @@
       "dest": "/api/index.go"
     },
     {
-      "src": "/oauth2-credential/(.*)",
+      "src": "/oauth2-credentials/(.*)",
       "dest": "/api/index.go"
     },
     {
