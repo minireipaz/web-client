@@ -132,6 +132,7 @@ export function ModalCredential(props: ContainerProps) {
     );
     if (!authWindow) {
       console.error('Cannot open window');
+      setDisabledButtonTest(false);
       return;
     }
 
