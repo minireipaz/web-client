@@ -480,7 +480,7 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
       if (!response.ok) return [false, failConnection];
 
       const data: ResponseSaveFormData = await response.json();
-      if (!data || data.status !== 200) return [false, failConnection];
+      if (!data || (data.status !== 200 && data.status !== 202)) return [false, failConnection];
 
       const values = transformPollingData(data);
       return [true, values];
