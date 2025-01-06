@@ -32,7 +32,7 @@ func Register(app *gin.Engine,
 		// route.GET("/credentials/:iduser/:idcredential", middlewares.ValidateGetCredential(), credentialController.GetCredentialsByID)
 	}
 
-	creds := app.Group("/oauth2-credentials")
+	creds := app.Group("/oauth2-credential")
 	{
 		creds.POST("/save", middlewares.ValidateCredentialExchange(), credentialController.CallbackCredentials)
 	}

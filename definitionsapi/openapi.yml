@@ -662,7 +662,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnauthorizedResponse'
 
-  /oauth2-credentials/save:
+  /oauth2-credential/save:
     post:
       operationId: callbackCredentials
       tags:
