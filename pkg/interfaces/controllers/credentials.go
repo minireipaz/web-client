@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"minireipaz/pkg/domain/models"
 	"minireipaz/pkg/domain/services"
 	"net/http"
@@ -47,8 +48,10 @@ func (c *CredentialsController) CreateCredentials(ctx *gin.Context) {
 }
 
 func (c *CredentialsController) CallbackCredentials(ctx *gin.Context) {
+  log.Print("3 pased")
 	currentCredential := ctx.MustGet(models.CredentialExchangeContextKey).(models.ResponseExchangeCredential)
 	serviceUserAccessToken, err := c.authService.GetServiceUserAccessToken()
+  log.Print("4 pased")
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":  fmt.Sprintf("Failed to authenticate: %v", err),
@@ -68,6 +71,7 @@ func (c *CredentialsController) CallbackCredentials(ctx *gin.Context) {
 		response.Error = "Type not acceptable"
 		response.Status = http.StatusInternalServerError
 	}
+  log.Print("5 pased")
 	ctx.JSON(response.Status, response)
 }
 
