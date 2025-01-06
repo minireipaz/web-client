@@ -50,7 +50,6 @@ func (a *ActionsController) CreateActionsGoogleSheet(ctx *gin.Context) {
 func (a *ActionsController) PollingGetGoogleSheetByID(ctx *gin.Context) {
 	actionID := ctx.Param("idaction")
 	userID := ctx.Param("iduser")
-  log.Print("5")
 	serviceUserToken, err := a.authService.GetServiceUserAccessToken()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -59,7 +58,6 @@ func (a *ActionsController) PollingGetGoogleSheetByID(ctx *gin.Context) {
 		})
 		return
 	}
-  log.Print("6")
 	response := models.ResponseGetGoogleSheetByID{
 		Error:  "",
 		Status: http.StatusOK,

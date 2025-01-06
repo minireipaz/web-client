@@ -39,13 +39,15 @@ func (a *ActionsRepository) GetGoogleSheetByID(actionID *string, userID *string,
 	if err != nil {
 		return nil
 	}
-
+  log.Printf("%s", url)
 	body, err := a.client.DoRequest("GET", url, *serviceUser, nil)
 	if err != nil {
+    log.Printf("ERROR | GetGoogleSheetByID cannot get response from action %v for actionID %s and userID %s", err, *actionID, *userID)
 		return nil
 	}
 
 	if len(body) == 0 {
+    log.Printf("body empty %v for actionID %s and userID %s", string(body), *actionID, *userID)
 		return nil
 	}
 	responseString := string(body)

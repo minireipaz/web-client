@@ -64,7 +64,6 @@ func ValidateUser() gin.HandlerFunc {
 
 func ValidateUserID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-    log.Print("1")
 		idUser := ctx.Param("iduser")
 
 		if err := validateUserID(idUser); err != nil {
@@ -72,7 +71,6 @@ func ValidateUserID() gin.HandlerFunc {
 			ctx.Abort()
 			return
 		}
-    log.Print("2")
 		ctx.Next()
 	}
 }
@@ -241,13 +239,11 @@ func validateCredentialFields(credential models.Credential) error {
 func ValidateIDAction() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		idaction := ctx.Param("idaction")
-    log.Print("3")
 		if err := validateActionID(idaction); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			ctx.Abort()
 			return
 		}
-    log.Print("4")
 		ctx.Next()
 	}
 }
