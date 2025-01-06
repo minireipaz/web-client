@@ -141,6 +141,7 @@ func ValidateCredentialExchange() gin.HandlerFunc {
     log.Print("2 pased")
 		var currentReq models.ResponseExchangeCredential
 		if err := ctx.ShouldBindJSON(&currentReq); err != nil {
+      log.Print("!!!2 pased")
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": ErrorInvalidJSON})
 			ctx.Abort()
 			return
