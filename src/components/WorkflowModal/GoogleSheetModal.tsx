@@ -283,7 +283,6 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
       }
 
       await startPolling(dataResponse.data);
-      setDisabledButtonTest(false);
       return;
     } catch (error: any) {
       setDisabledButtonTest(false);
@@ -415,12 +414,11 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
       }
       await new Promise((resolve) => setTimeout(resolve, DELAY));
     }
-
+    setDisabledButtonTest(false);
     props.showAlert('Error conection', COLOR_ALERTS.failure);
     abortController.abort();
   }
 
-  // props.formData, props.dataNode as Record<string, ModalCredentialData>
   async function pollingActionTest(
     actionID: string,
     signal: AbortSignal
@@ -449,7 +447,7 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
       return false;
     }
   }
-  // formData: FormData, node: Record<string, ModalCredentialData>
+
   async function pollTest(
     actionID: string,
     signal: AbortSignal
