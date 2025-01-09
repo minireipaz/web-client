@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"errors"
-	"log"
 	"minireipaz/pkg/domain/models"
 	"net/http"
 	"strings"
@@ -137,10 +136,8 @@ func ValidateCredential() gin.HandlerFunc {
 
 func ValidateCredentialExchange() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-    log.Print("2 pased")
 		var currentReq models.ResponseExchangeCredential
 		if err := ctx.ShouldBindJSON(&currentReq); err != nil {
-      log.Print("!!!2 pased")
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": ErrorInvalidJSON})
 			ctx.Abort()
 			return

@@ -12,10 +12,7 @@ import (
 
 func AuthMiddleware(authService *services.AuthService) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		log.Printf("fullpath=%s", ctx.FullPath())
-    log.Printf("RequestURI=%s", ctx.Request.RequestURI)
 		if models.PermitedPathList[ctx.Request.RequestURI] {
-      log.Print("pased")
 			ctx.Next()
 			return
 		}
