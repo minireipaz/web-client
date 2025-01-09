@@ -269,10 +269,7 @@ export const DetailWorkflow = memo(function DetailWorkflow(
       if (data.error !== '') {
         return false;
       }
-      if (data.status !== 200) {
-        return false;
-      }
-      return true;
+      return data.status === 200;
     } catch (error) {
       console.error('Error registering user in backend:', error);
       return false;

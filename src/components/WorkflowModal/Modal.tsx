@@ -33,6 +33,22 @@ interface NodeData {
   formdata: FormData;
 }
 
+export const defaultFormModal: FormData = {
+  pollmode: 'none',
+  selectdocument: 'byuri',
+  document: '',
+  selectsheet: 'byname',
+  sheet: '',
+  operation: 'getallcontent',
+  credentialid: '',
+  sub: '',
+  type: '',
+  workflowid: '',
+  nodeid: '',
+  redirecturl: '',
+  testmode: false,
+};
+
 export const defaultCredential: ModalCredentialData = {
   id: 'none',
   type: 'none',
@@ -110,21 +126,7 @@ export function WorkflowModal(props: ContainerProps) {
   // set default values from formularyData btw
   // already setted in WorkflowDrawer
   // TODO: maybe later can be removed
-  const [formularyData, setFormularyData] = useState<FormData>({
-    pollmode: 'none',
-    selectdocument: 'byuri',
-    document: '',
-    selectsheet: 'byname',
-    sheet: '',
-    operation: 'getallcontent',
-    credentialid: '',
-    sub: '',
-    type: '',
-    workflowid: '',
-    nodeid: '',
-    redirecturl: '',
-    testmode: false,
-  });
+  const [formularyData, setFormularyData] = useState<FormData>(defaultFormModal);
 
   const [isModalCredentialOpen, setIsModalCredentialOpen] = useState(false);
 
@@ -274,6 +276,7 @@ export function WorkflowModal(props: ContainerProps) {
   const handleClose = useCallback(() => {
     setSizeModal('xl');
     setContentTest(<></>);
+    setFormularyData(defaultFormModal);
     props.onClose();
   }, [props]);
 
