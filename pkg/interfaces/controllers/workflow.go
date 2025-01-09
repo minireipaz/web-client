@@ -67,8 +67,8 @@ func (wc *WorkflowController) GetWorkflowByID(ctx *gin.Context) {
 		return
 	}
 
-	newWorkflow := wc.service.GetWorkflow(&userID, &workflowID, &userToken, serviceUserToken)
 	// coupled
+	newWorkflow := wc.service.GetWorkflow(&userID, &workflowID, &userToken, serviceUserToken)
 	ctx.JSON(newWorkflow.Status, newWorkflow)
 }
 

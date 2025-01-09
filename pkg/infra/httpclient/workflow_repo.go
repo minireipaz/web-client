@@ -38,7 +38,7 @@ func (r *WorkflowRepository) CreateWorkflow(workflow models.Workflow, serviceUse
 func (r *WorkflowRepository) GetWorkflow(userID, workflowID, userToken, serviceUserAccessToken *string) models.ResponseWorkflow {
 	url, err := getBackendURL(fmt.Sprintf("/api/v1/workflows/%s/workflow/%s/%s", *userID, *workflowID, *userToken))
 	if err != nil {
-		log.Printf("ERROR | %v", err)
+		log.Printf("ERROR | Cannot fetch workflow for userid %s workflowid %s error: %v", *userID, *workflowID, err)
 		return models.ResponseWorkflow{
 			Status:   http.StatusInternalServerError,
 			Error:    err.Error(),
@@ -48,7 +48,7 @@ func (r *WorkflowRepository) GetWorkflow(userID, workflowID, userToken, serviceU
 
 	body, err := r.client.DoRequest("GET", url, *serviceUserAccessToken, nil)
 	if err != nil {
-		log.Printf("ERROR | %v", err)
+		log.Printf("ERROR | Cannot fetch workflow for userid %s workflowid %s error %v", *userID, *workflowID, err)
 		return models.ResponseWorkflow{
 			Status:   http.StatusInternalServerError,
 			Error:    err.Error(),
