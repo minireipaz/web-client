@@ -231,8 +231,8 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
     status: 500,
     data: '',
   };
-  const MAX_ATTEMPTS = 10;
-  const DELAY = 15_000;
+  const MAX_ATTEMPTS = 11;
+  const DELAY = 1_000; // 1sec
 
   async function handleSubmitTest(event: any) {
     event.preventDefault();
@@ -400,7 +400,7 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
 
     let abortController = new AbortController();
 
-    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    for (let attempt = 1; attempt < MAX_ATTEMPTS; attempt++) {
       try {
         const success = await pollingActionTest(
           actionID,
@@ -412,7 +412,8 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
       } catch (error) {
         console.error('Error: ', error);
       }
-      await new Promise((resolve) => setTimeout(resolve, DELAY));
+      // incremental delay btw maybe not need +random offset
+      await new Promise((resolve) => setTimeout(resolve, DELAY * attempt));
     }
     setDisabledButtonTest(false);
     props.showAlert('Error conection', COLOR_ALERTS.failure);
@@ -465,7 +466,6 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${userInfo?.access_token}`,
         },
-        // body: JSON.stringify(body),
         signal,
       });
 
