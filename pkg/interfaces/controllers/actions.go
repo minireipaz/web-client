@@ -64,7 +64,6 @@ func (a *ActionsController) PollingGetGoogleSheetByID(ctx *gin.Context) {
 	}
 	// coupled response
 	data := a.service.GetGoogleSheetByID(&actionID, &userID, serviceUserToken)
-  log.Printf("7 data %v", data)
 	if data == nil {
 		response = models.ResponseGetGoogleSheetByID{
 			Error:  models.NotAccept,
@@ -73,7 +72,6 @@ func (a *ActionsController) PollingGetGoogleSheetByID(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, response)
 		return
 	}
-  log.Print("8")
 	response.Data = *data
 	ctx.JSON(response.Status, response)
 }
