@@ -301,6 +301,8 @@ export function WorkflowModal(props: ContainerProps) {
   }, [props, formularyData]);
 
   function validateForm(formData: FormData): boolean {
+    /// TODO: when workflow loaded and dobleclicked on node, credential NOT set in formulary if node has it
+    // ----- 
     if (formData.credentialid === '' || formData.credentialid === "none") {
       showAlert('Select valid credential', COLOR_ALERTS.failure);
       return false;
@@ -444,7 +446,7 @@ export function WorkflowModal(props: ContainerProps) {
     );
     setTimeout(() => {
       setAlertMessage(<></>);
-    }, 2000);
+    }, 5000);
   }, []);
 
   // const currentCredentialMemo = useMemo(
