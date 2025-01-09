@@ -21,7 +21,7 @@ interface ContainerProps {
   dataNode: Node;
   credentials: ModalCredentialData[];
   onUpdateNode: (newCredentialData: ModalCredentialData) => void;
-  onSaveModal: (formData: FormData, dataNode: Node) => void;
+  onSaveModal: (formData: FormData, dataNode: Node) => Promise<boolean | undefined>;
   onClose: () => void;
 }
 
@@ -104,7 +104,9 @@ export interface ResponseSaveFormData {
 export const enum ERRORTEXT {
   notvalidurl = 'Not valid URL in Document',
   notvalidoptiondocument = 'Select Document not valid option',
-  notsavedyet = "Already not saved"
+  notsavedyet = "Already not saved",
+  notsaved = "Not Saved!",
+  saved = "Saved"
 }
 
 export function WorkflowModal(props: ContainerProps) {
@@ -280,7 +282,8 @@ export function WorkflowModal(props: ContainerProps) {
     props.onClose();
   }, [props]);
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
+    // shows error message
     if (!validateForm(formularyData)) {
       return;
     }
@@ -289,8 +292,12 @@ export function WorkflowModal(props: ContainerProps) {
       ...formularyData,
     });
     // console.log("formData=" + JSON.stringify(formData))
-    setSizeModal('xl');
-    props.onSaveModal(formularyData, props.dataNode);
+    const updated = await props.onSaveModal(formularyData, props.dataNode);
+    if (!updated) {
+      showAlert(ERRORTEXT.notsaved, COLOR_ALERTS.failure);
+    } else {
+      showAlert(ERRORTEXT.saved, COLOR_ALERTS.ok);
+    }
   }, [props, formularyData]);
 
   function validateForm(formData: FormData): boolean {

@@ -491,7 +491,8 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
   function transformPollingData(data: ResponseSaveFormData): ResponseSaveFormData {
     try {
       const parsedData = JSON.parse(data.data) as ResponseSaveFormData;
-      const valuesRaw = JSON.parse(parsedData.data);
+      // TODO: need test for empty value
+      const valuesRaw = parsedData.data ? JSON.parse(parsedData.data).values : "";
       const transformedData = JSON.stringify(valuesRaw.values);
       return {
         status: 200,

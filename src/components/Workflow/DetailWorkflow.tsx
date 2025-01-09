@@ -213,16 +213,9 @@ export const DetailWorkflow = memo(function DetailWorkflow(
     const flowJSON = rfInstance.toObject() as ReactFlowJsonObject;
     const currentWorkflow = { ...workflow, ...flowJSON };
     const updated = await sendChangedWorkflow(currentWorkflow);
-    if (!updated) {
-      setMsgSaved({ text: 'Not Saved!', classText: savedStatus.alert });
-    } else {
-      setMsgSaved({ text: 'Saved', classText: savedStatus.done });
-    }
-    setTimeout(() => {
-      setMsgSaved({ text: '', classText: savedStatus.none });
-    }, 5000);
     setWorkflow({ ...currentWorkflow });
     console.log('Saving workflow:', currentWorkflow);
+    return updated;
   }, [rfInstance, workflow]);
 
   async function sendChangedWorkflow(currentWorkflow: Workflow) {
@@ -363,10 +356,6 @@ export const DetailWorkflow = memo(function DetailWorkflow(
 
   const handleSaveModal = useCallback(
     async (formData: FormData, dataNode: Node) => {
-      // update listcredentials ?
-      //
-
-
       const currentNode = {
         ...dataNode,
         data: {
@@ -380,7 +369,8 @@ export const DetailWorkflow = memo(function DetailWorkflow(
       const nodesUpdated = updateNodeByNodeID(nodes, currentNode);
       nodesDataRef.current = nodesUpdated;
       // setNodes(nodesUpdated);
-      await handleSaveWorkflow();
+      const updated = await handleSaveWorkflow();
+      return updated;
     },
     [nodes]
   );
