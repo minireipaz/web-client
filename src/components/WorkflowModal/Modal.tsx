@@ -169,32 +169,6 @@ export function WorkflowModal(props: ContainerProps) {
     [getRedirectURL]
   );
 
-  // const initialSetCredentialForNode = useCallback(() => {
-  //   if (!props.dataNode || !props.dataNode.data) return;
-
-  //   const { credential: selectedCredential, formdata: currentFormData } = props.dataNode.data as { credential: ModalCredentialData; formdata: FormData };
-  //   if (!currentFormData) {
-  //     setFormData(formData)
-  //   } else {
-  //     setFormData({ ...currentFormData });
-  //   }
-  //   if (selectedCredential && selectedCredential.id !== "none") {
-  //     setCurrentCredential(selectedCredential);
-  //     return;
-  //   }
-  //   // TODO: maybe not needed
-  //   const updatedCredential = updateCredentialProperties(defaultCredential,
-  //     props.dataNode.data as {
-  //       type: string;
-  //       nodeid: string;
-  //       workflowid: string;
-  //       credential: ModalCredentialData;
-  //       formdata: FormData;
-  //     }, userInfo
-  //   );
-  //   setCurrentCredential(updatedCredential);
-  // }, [props.dataNode, updateCredentialProperties, userInfo, formData]);
-
   // Update the initialSetCredentialForNode function
   const initialSetCredentialForNode = useCallback(() => {
     if (!props.dataNode || !props.dataNode.data) return;
@@ -207,7 +181,7 @@ export function WorkflowModal(props: ContainerProps) {
     // values with "" replaced with default value
     // default formdata gets from workflowdrawer.tsx
     // TODO: maybe later not necesary to do this
-    const mergedData = mergeFormData(formularyData, formdata);
+    const mergedData = mergeFormData(formularyData, formdata, credential);
     setFormularyData({ ...mergedData });
 
     // if already credential exist in nodedata
@@ -227,13 +201,18 @@ export function WorkflowModal(props: ContainerProps) {
     setCurrentCredential(updatedCredential);
   }, [props.dataNode, updateCredentialProperties, userInfo, formularyData]);
 
-  function mergeFormData(defaultValues: FormData, formdata: FormData) {
+  function mergeFormData(defaultValues: FormData, formdata: FormData, credential: ModalCredentialData) {
     const mergedData = { ...defaultValues };
     Object.keys(formdata).forEach((key) => {
       if (formdata[key] !== '') {
         mergedData[key] = formdata[key];
       }
     });
+    if (credential) {
+      if (credential.id !== "") {
+        mergedData["credentialid"] = credential.id;
+      }
+    }
     return mergedData;
   }
 
@@ -247,9 +226,7 @@ export function WorkflowModal(props: ContainerProps) {
       // setListCredentials(props.credentials);
     }
     initialSetCredentialForNode();
-  }, [props.dataNode
-    //  ,props.credentials
-    ]);
+  }, [props.dataNode]);
 
   const handleInputChange = useCallback((event: any) => {
     setFormularyData((prevFormData) => ({
@@ -260,7 +237,6 @@ export function WorkflowModal(props: ContainerProps) {
 
   const handleTest = useCallback((dataResponse: ResponseSaveFormData) => {
     setSizeModal('7xl');
-    // const valuesRaw = JSON.parse(dataResponse.data);
     console.log('response=' + JSON.stringify(dataResponse));
     setContentTest(
       <>
@@ -283,6 +259,9 @@ export function WorkflowModal(props: ContainerProps) {
   }, [props]);
 
   const handleSave = useCallback(async () => {
+    /// TODO: when workflow loaded and dobleclicked on node, credential NOT set in formulary if node has it
+    // -----
+
     // shows error message
     if (!validateForm(formularyData)) {
       return;
@@ -301,8 +280,6 @@ export function WorkflowModal(props: ContainerProps) {
   }, [props, formularyData]);
 
   function validateForm(formData: FormData): boolean {
-    /// TODO: when workflow loaded and dobleclicked on node, credential NOT set in formulary if node has it
-    // ----- 
     if (formData.credentialid === '' || formData.credentialid === "none") {
       showAlert('Select valid credential', COLOR_ALERTS.failure);
       return false;
