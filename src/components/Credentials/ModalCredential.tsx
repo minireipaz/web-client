@@ -15,7 +15,6 @@ import {
   ProcessGoogleOAuthMessage,
 } from './GoogleSheetsOAuth2Api';
 import { useRequest } from '../../utils/requests';
-// import { ERRORTEXT } from '../WorkflowModal/Modal';
 
 interface ContainerProps {
   isOpen: boolean;
@@ -26,7 +25,6 @@ interface ContainerProps {
     credential: ModalCredentialData;
     onChange: (field: keyof ModalCredentialData, value: any) => void;
   }>;
-  // showAlert: (title: string, color: string) => void;
 }
 
 export function ModalCredential(props: ContainerProps) {
@@ -85,9 +83,10 @@ export function ModalCredential(props: ContainerProps) {
       [field]: value,
     }));
   }
-
+  // this function in case cannot parse uniqueid
+  // from backend
   function generateTemporalUniqueId(): string {
-    //
+    // TODO: uuid more short?
     return `credential_${userInfo?.profile.sub}_${credential.workflowid}_${credential.nodeid}_${credential.type}`;
   }
 
@@ -160,7 +159,7 @@ export function ModalCredential(props: ContainerProps) {
   }
 
   function checkValidations(credential: ModalCredentialData) {
-    // dummy checks
+    // TODO: dummy checks
     if (credential.name.trim() === '') {
       showAlert('Custom Name Client OAuth is required', COLOR_ALERTS.failure);
       return false;
@@ -191,27 +190,6 @@ export function ModalCredential(props: ContainerProps) {
   }
 
   function showAlert(title: string, color: string) {
-    // maybe not necesary
-    // setCredential((prev) => ({
-    //   ...prev,
-    //   alertMessage: (
-    //     <>
-    //       <li className="w-full">
-    //         <Alert color={color} className="w-full">
-    //           <span className="font-medium">{title.toString()}.</span>
-    //         </Alert>
-    //       </li>
-    //     </>
-    //   ),
-    // }));
-
-    // setTimeout(() => {
-    //   setCredential((prev) => ({
-    //     ...prev,
-    //     alertMessage: <></>,
-    //   }));
-    // }, 1000);
-
     setMessageSaved(
       <>
         <Alert color={color} className="w-full">
@@ -222,11 +200,7 @@ export function ModalCredential(props: ContainerProps) {
 
     setTimeout(() => {
       setMessageSaved(<></>);
-    }, 2000);
-
-
-
-
+    }, 5000);
   }
 
   async function collectCredentials(
@@ -305,8 +279,6 @@ export function ModalCredential(props: ContainerProps) {
         code: credentialState.code,
         scopes: credentialState.scope,
         state: credentialState.state,
-        // token: '',
-        // tokenrefresh: '',
       },
     };
   }
@@ -321,7 +293,7 @@ export function ModalCredential(props: ContainerProps) {
     if (!credentialState) return;
     setDisabledButtonTest(false);
 
-    // decople insert and update
+    // TODO: decople insert and update
     // btw in credential datasource clickhouse use MergeTreeReplace
     // // new credential
     // if (credential.id === "none") {
@@ -362,8 +334,6 @@ export function ModalCredential(props: ContainerProps) {
         newCredential as ModalCredentialData,
         dataResponse as ModalCredentialData
       );
-      // showAlert('Saved', COLOR_ALERTS.ok);
-      // props.showAlert(ERRORTEXT.notsavedyet, COLOR_ALERTS.warning); // si esta no funciona ningun showalert
     } catch (error: any) {
       setDisabledButtonTest(false);
       if (error.name === 'AbortError') {
@@ -386,13 +356,11 @@ export function ModalCredential(props: ContainerProps) {
         ? credential.id
         : responseData.id as string;
 
-    // something went wrong because newid get from backend
-    // maybe client cannot parsed corretly
+    // in case not parsed correctly
     if (!newId || newId === "undefined") {
       newId = generateTemporalUniqueId();
     }
-    // newCredential.id = newId;
-    // newCredential.data = responseData.data;
+
     newCredential = {
       ...credential,
       id: newId,
@@ -450,10 +418,6 @@ export function ModalCredential(props: ContainerProps) {
       return [false, undefined, undefined];
     }
   }
-
-  // function showTextMessage(msg: string) {
-  //   setMessageSaved(msg);
-  // }
 
   if (credential.id == '') return <></>;
 
