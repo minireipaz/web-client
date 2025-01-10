@@ -259,9 +259,6 @@ export function WorkflowModal(props: ContainerProps) {
   }, [props]);
 
   const handleSave = useCallback(async () => {
-    /// TODO: when workflow loaded and dobleclicked on node, credential NOT set in formulary if node has it
-    // -----
-
     // shows error message
     if (!validateForm(formularyData)) {
       return;

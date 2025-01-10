@@ -20,13 +20,11 @@ import {
 } from '@xyflow/react';
 import {
   edgeTypes,
-  MsgSaved,
   NodeData,
   nodeTypes,
   offsetBottom,
   offsetRight,
   ResponseUpdateWorkflow,
-  savedStatus,
   Workflow,
 } from '../../models/Workflow';
 import '@xyflow/react/dist/style.css';
@@ -75,7 +73,6 @@ export const DetailWorkflow = memo(function DetailWorkflow(
   const { screenToFlowPosition, flowToScreenPosition } = useReactFlow();
   const [lastNodeID, setLastNodeID] = useState('');
   const [rfInstance, setRfInstance] = useState(null);
-  const [msgSaved, setMsgSaved] = useState<MsgSaved>({ text: '' });
   const [customDataNode, setCustomDataNode] = useState<Node>();
   const { userInfo } = useAuth();
   const nodeOrigin: NodeOrigin = useMemo(() => [2, 0], []);
@@ -404,7 +401,6 @@ export const DetailWorkflow = memo(function DetailWorkflow(
           workflow={workflow}
           onUpdate={handleWorkflowUpdate}
           onSave={handleSaveWorkflow}
-          msgSaved={msgSaved}
         />
         <div className="h-full w-full relative">
           <ReactFlow

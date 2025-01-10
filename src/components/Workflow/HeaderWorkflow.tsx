@@ -1,36 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, ToggleSwitch } from 'flowbite-react';
-import { MsgSaved, Workflow } from '../../models/Workflow';
+import {  MsgSaved, savedStatus, Workflow } from '../../models/Workflow';
 
 interface ContainerProps {
   workflow: Workflow;
   onUpdate: (updatedFields: Workflow) => void;
-  onSave: () => void;
-  msgSaved: MsgSaved;
+  onSave: () => Promise<boolean | undefined>;
 }
 
-export default function HeaderWorkflow({
-  workflow,
-  onUpdate,
-  onSave,
-  msgSaved,
-}: ContainerProps) {
-  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+export default function HeaderWorkflow(props: ContainerProps) {
+  const [msgSaved, setMsgSaved] = useState<MsgSaved>({ classText: "", text: "" });
+
+  function handleNameChange(event: React.ChangeEvent<HTMLInputElement>) {
     if (event.target.value === '') return;
     const tempWorkflow = {
-      ...workflow,
+      ...props.workflow,
       name: event.target.value,
     } satisfies Workflow;
-    onUpdate(tempWorkflow);
-  };
+    props.onUpdate(tempWorkflow);
+  }
 
-  const handleToggleChange = (checked: boolean) => {
+  function handleToggleChange(checked: boolean) {
     const tempWorkflow = {
-      ...workflow,
+      ...props.workflow,
       is_active: checked ? 1 : 2,
     } satisfies Workflow;
-    onUpdate(tempWorkflow);
-  };
+    props.onUpdate(tempWorkflow);
+  }
+
+  async function onSave() {
+    const saved = await props.onSave();
+    let msgSaved = { text: "Saved!" , classText: savedStatus.done };
+    if (!saved) {
+      msgSaved = { text: "Not Saved!", classText: savedStatus.alert };
+    }
+    setMsgSaved(msgSaved);
+  }
 
   return (
     <div className="sticky top-0 z-30 flex h-[71px] items-center gap-4 border-b bg-background px-6">
@@ -40,7 +45,7 @@ export default function HeaderWorkflow({
             className="renameworkflowname"
             id="name"
             type="text"
-            value={workflow.name}
+            value={props.workflow.name}
             onChange={handleNameChange}
             placeholder="Enter workflow name"
           />
@@ -59,7 +64,7 @@ export default function HeaderWorkflow({
             </label>
             <ToggleSwitch
               id="is_active"
-              checked={workflow.is_active === 1}
+              checked={props.workflow.is_active === 1}
               onChange={handleToggleChange}
             />
           </div>
