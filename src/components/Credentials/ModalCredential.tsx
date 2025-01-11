@@ -15,8 +15,10 @@ import {
   ProcessGoogleOAuthMessage,
 } from './GoogleSheetsOAuth2Api';
 import { useRequest } from '../../utils/requests';
+import { ReactFlowInstance, Node } from '@xyflow/react';
 
 interface ContainerProps {
+  flowInstance: ReactFlowInstance | null;
   isOpen: boolean;
   onClose: () => void;
   onSave: (credential: ModalCredentialData) => void;
@@ -293,15 +295,15 @@ export function ModalCredential(props: ContainerProps) {
     if (!credentialState) return;
     setDisabledButtonTest(false);
 
-    // TODO: decople insert and update
+    // logic decople insert and update commands set in backend
+    // if credential update backend logic needs to update worklfow
+    // also for client ???
     // btw in credential datasource clickhouse use MergeTreeReplace
-    // // new credential
     // if (credential.id === "none") {
 
     // } else {
     //   // update credential
     // }
-
     try {
       const result = await executeRequest(
         async (signal) => {
@@ -330,7 +332,8 @@ export function ModalCredential(props: ContainerProps) {
         showAlert('Cannot connect', COLOR_ALERTS.failure);
         return;
       }
-      handleUpdateCredential(
+      // update credential and workflow
+      await handleUpdateCredential(
         newCredential as ModalCredentialData,
         dataResponse as ModalCredentialData
       );
@@ -347,7 +350,6 @@ export function ModalCredential(props: ContainerProps) {
   async function handleUpdateCredential(
     newCredential: ModalCredentialData,
     responseData: ModalCredentialData
-
   ) {
     if (!checkValidations(credential)) return;
 
@@ -368,8 +370,41 @@ export function ModalCredential(props: ContainerProps) {
         ...responseData.data,
       },
     };
-
+    console.log("antes reactflow", JSON.stringify(props.flowInstance?.toObject()))
+    directUpdateNodes(newCredential);
+    console.log("despues reactflow" , JSON.stringify(props.flowInstance?.toObject()))
+    // called to update:
+    // listcredentials
+    // currentcredential
+    // formularydata
+    // updatenode
     props.onSave(newCredential);
+  }
+
+  // not necesarry fields for ModalCredentialData
+  // "oauthurl"
+  // "code"
+  // "codeverifier"
+  // "token"
+  // "tokenrefresh"
+  function directUpdateNodes(credential: ModalCredentialData) {
+    if (!props.flowInstance) return;
+    const originalNode = props.flowInstance.getNode(credential.nodeid);
+    if (!originalNode) return;
+    const updatedNode = updateNodeByNodeID(originalNode, credential);
+    if (!updatedNode) return;
+    props.flowInstance.updateNodeData(credential.nodeid, updatedNode, { replace: true });
+  }
+
+  function updateNodeByNodeID(originalNode: Node, credential: ModalCredentialData): Node | undefined {
+    if (originalNode.id !== credential.nodeid) return undefined;
+    return {
+      ...originalNode,
+      data: {
+        ...originalNode.data,
+        credential: { ...credential },
+      },
+    };
   }
 
   async function sendNewCredential(
