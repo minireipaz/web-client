@@ -16,7 +16,7 @@ import {
   NodeOrigin,
   applyNodeChanges,
   applyEdgeChanges,
-  // NodeChange,
+  ReactFlowInstance,
 } from '@xyflow/react';
 import {
   edgeTypes,
@@ -57,6 +57,7 @@ export const DetailWorkflow = memo(function DetailWorkflow(
   const [nodes, setNodes] = useState<Node[]>(transformedNodes);
   const nodesDataRef = useRef(nodes);
   nodesDataRef.current = nodes;
+  const rfInstanceRef = useRef<ReactFlowInstance | null>(null);
 
   // const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(
   //   props.workflow?.edges || []
@@ -72,7 +73,7 @@ export const DetailWorkflow = memo(function DetailWorkflow(
   const [clickPosition, setClickPosition] = useState({ x: 0, y: 0 });
   const { screenToFlowPosition, flowToScreenPosition } = useReactFlow();
   const [lastNodeID, setLastNodeID] = useState('');
-  const [rfInstance, setRfInstance] = useState(null);
+  // const [rfInstance, setRfInstance] = useState(null);
   const [customDataNode, setCustomDataNode] = useState<Node>();
   const { userInfo } = useAuth();
   const nodeOrigin: NodeOrigin = useMemo(() => [2, 0], []);
@@ -204,16 +205,17 @@ export const DetailWorkflow = memo(function DetailWorkflow(
   }, []);
 
   const handleSaveWorkflow = useCallback(async () => {
-    if (!rfInstance) return;
+    // if (!rfInstance) return;
+    if (!rfInstanceRef.current) return;
 
     // @ts-ignore ts(2339)
-    const flowJSON = rfInstance.toObject() as ReactFlowJsonObject;
+    const flowJSON = rfInstance.current.toObject() as ReactFlowJsonObject;
     const currentWorkflow = { ...workflow, ...flowJSON };
     const updated = await sendChangedWorkflow(currentWorkflow);
     setWorkflow({ ...currentWorkflow });
     console.log('Saving workflow:', currentWorkflow);
     return updated;
-  }, [rfInstance, workflow]);
+  }, [rfInstanceRef, workflow]);
 
   async function sendChangedWorkflow(currentWorkflow: Workflow) {
     try {
@@ -404,7 +406,8 @@ export const DetailWorkflow = memo(function DetailWorkflow(
         />
         <div className="h-full w-full relative">
           <ReactFlow
-            onInit={setRfInstance as any}
+            // onInit={rfInstanceRef.current as any}
+            onInit={(flowInstance) => { rfInstanceRef.current = flowInstance; }}
             nodes={nodes}
             edges={edges}
             onNodeDoubleClick={onDoubleClickNode}
@@ -440,6 +443,7 @@ export const DetailWorkflow = memo(function DetailWorkflow(
             <WorkflowModal
               onUpdateNode={handleUpdateNodes}
               onSaveModal={handleSaveModal}
+              flowInstance={rfInstanceRef.current as unknown as ReactFlowInstance}
               isOpen={isOpenModal}
               onClose={handleCloseModal}
               // dataNode={nodesDataRef.current}
