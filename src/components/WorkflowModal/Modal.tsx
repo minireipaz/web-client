@@ -5,7 +5,7 @@ import {
   GoogleSheetButton,
   GoogleSheetsModalContent,
 } from './GoogleSheetModal';
-import { Node } from '@xyflow/react';
+import { Node, ReactFlowInstance } from '@xyflow/react';
 import {
   COLOR_ALERTS,
   DEFAULT_CREDENTIAL_REDIRECT_PATH,
@@ -23,6 +23,7 @@ interface ContainerProps {
   onUpdateNode: (newCredentialData: ModalCredentialData) => void;
   onSaveModal: (formData: FormData, dataNode: Node) => Promise<boolean | undefined>;
   onClose: () => void;
+  flowInstance: ReactFlowInstance | null;
 }
 
 interface NodeData {
@@ -129,7 +130,6 @@ export function WorkflowModal(props: ContainerProps) {
   // already setted in WorkflowDrawer
   // TODO: maybe later can be removed
   const [formularyData, setFormularyData] = useState<FormData>(defaultFormModal);
-
   const [isModalCredentialOpen, setIsModalCredentialOpen] = useState(false);
 
   // default relative paths from diferent type providers
@@ -482,6 +482,7 @@ export function WorkflowModal(props: ContainerProps) {
             onSave={handleSaveModalCredential}
             initialCredential={currentCredential}
             renderBody={currentCredentialComponent as CredentialComponent}
+            flowInstance={props.flowInstance}
           />
         )}
       </form>
