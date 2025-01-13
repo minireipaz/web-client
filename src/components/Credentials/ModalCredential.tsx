@@ -295,15 +295,8 @@ export function ModalCredential(props: ContainerProps) {
     if (!credentialState) return;
     setDisabledButtonTest(false);
 
-    // logic decople insert and update commands set in backend
-    // if credential update backend logic needs to update worklfow
-    // also for client ???
-    // btw in credential datasource clickhouse use MergeTreeReplace
-    // if (credential.id === "none") {
-
-    // } else {
-    //   // update credential
-    // }
+    // logic inser/update decopled in backend logic
+    // here needs to modify if its needed decoupled from client side
     try {
       const result = await executeRequest(
         async (signal) => {
@@ -370,9 +363,7 @@ export function ModalCredential(props: ContainerProps) {
         ...responseData.data,
       },
     };
-    console.log("antes reactflow", JSON.stringify(props.flowInstance?.toObject()))
     directUpdateNodes(newCredential);
-    console.log("despues reactflow" , JSON.stringify(props.flowInstance?.toObject()))
     // called to update:
     // listcredentials
     // currentcredential
