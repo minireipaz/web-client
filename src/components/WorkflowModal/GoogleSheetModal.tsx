@@ -243,7 +243,7 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
             props.showAlert('Error testing credential', COLOR_ALERTS.failure);
           },
           onFinally: () => {
-            setDisabledButtonTest(false);
+            // setDisabledButtonTest(false);
           },
         }
       );
@@ -269,6 +269,7 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
       }
 
       await startPolling(dataResponse.data);
+      setDisabledButtonTest(false);
       return;
     } catch (error: any) {
       setDisabledButtonTest(false);
@@ -401,6 +402,7 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
       // incremental delay btw maybe not need +random offset
       await new Promise((resolve) => setTimeout(resolve, DELAY * attempt));
     }
+    // error path
     setDisabledButtonTest(false);
     props.showAlert('Error conection', COLOR_ALERTS.failure);
     abortController.abort();

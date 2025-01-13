@@ -311,7 +311,8 @@ export function ModalCredential(props: ContainerProps) {
             showAlert('Error testing credential', COLOR_ALERTS.failure);
           },
           onFinally: () => {
-            setDisabledButtonTest(false);
+            // removed for more granular control over button test
+            // setDisabledButtonTest(false);
           },
         }
       );
@@ -370,6 +371,7 @@ export function ModalCredential(props: ContainerProps) {
     // formularydata
     // updatenode
     props.onSave(newCredential);
+    setDisabledButtonTest(false);
   }
 
   // not necesarry fields for ModalCredentialData
