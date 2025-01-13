@@ -7,6 +7,11 @@ interface ContainerProps {
   onClick: (event: any, nodeData: NodeData) => void;
 }
 
+export const TypeNodes: Record<string, string> = {
+  'googlesheets': 'googlesheets',
+  'notiongetdatabase': 'notiongetdatabase',
+};
+
 export function WorkflowDrawer(props: ContainerProps) {
   const DefaultNode = (node: NodeData) => (
     <button
@@ -22,7 +27,7 @@ export function WorkflowDrawer(props: ContainerProps) {
       {node.label}
     </button>
   );
-
+  // hardcoded ListDefaultNodeS
   return (
     <>
       <Drawer open={props.isOpen} onClose={props.onClose} position="right">
@@ -33,10 +38,10 @@ export function WorkflowDrawer(props: ContainerProps) {
               Popular
             </h2>
             <DefaultNode
-              id="googlesheets"
+              id={TypeNodes.googlesheets} // new ids?
               description="Google Sheets bla bla bla"
               options="optin1"
-              type="googlesheets"
+              type={TypeNodes.googlesheets}
               label="Google Sheets"
               formdata={{
                 pollmode: 'none',
@@ -55,11 +60,11 @@ export function WorkflowDrawer(props: ContainerProps) {
               }}
             />
             <DefaultNode
-              id="id2"
-              description="node default"
+              id={TypeNodes.notiongetdatabase}
+              description="Notion Get Database"
               options="optin2"
-              type="default"
-              label="Nodo Default"
+              type={TypeNodes.notiongetdatabase}
+              label="Notion Get Database"
               formdata={{
                 pollmode: 'none',
                 selectdocument: 'byuri',
@@ -81,7 +86,7 @@ export function WorkflowDrawer(props: ContainerProps) {
               description="node output"
               options="optin3"
               type="output"
-              label="Nodo Output"
+              label="Notion Update Database"
               formdata={{
                 pollmode: 'none',
                 selectdocument: 'byuri',

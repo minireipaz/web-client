@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
-export type OAuthProvider = 'google' | 'github' | 'microsoft' | 'facebook';
+export type OAuthProvider = 'google' | 'github' | 'microsoft' | 'facebook' | 'notion';
 
 export const OAuthProviderPatterns: Record<OAuthProvider, string[]> = {
   google: ['google', 'accounts.google.com'],
   github: ['github', 'github.com'],
   microsoft: ['microsoft', 'login.microsoftonline.com'],
   facebook: ['facebook', 'facebook.com'],
+  notion: ['notion', 'notion.com']
 };
 
 export interface PostMessageData {

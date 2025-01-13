@@ -15,6 +15,7 @@ import {
 import { ModalCredential } from '../Credentials/ModalCredential';
 import { useAuth } from '../AuthProvider/indexAuthProvider';
 import { FormData } from '../../models/Workflow';
+import { RenderNotionApi } from '../Credentials/NotionInternalAuthApi';
 
 interface ContainerProps {
   isOpen: boolean;
@@ -222,8 +223,12 @@ export function WorkflowModal(props: ContainerProps) {
       setCurrentCredentialComponent(() => RenderGoogleSheetsOAuth2Api);
       setCurrentModalComponent(() => GoogleSheetsModalContent);
       setCurrentButtonComponent(() => GoogleSheetButton);
-      // if (listCredentials.length === 1 )
-      // setListCredentials(props.credentials);
+
+    }
+    if (props.dataNode.data.type === "notiongetdatabase") {
+      setCurrentCredentialComponent(() => RenderNotionApi);
+      setCurrentModalComponent(() => GoogleSheetsModalContent);
+      setCurrentButtonComponent(() => GoogleSheetButton);
     }
     initialSetCredentialForNode();
   }, [props.dataNode]);
@@ -437,7 +442,7 @@ export function WorkflowModal(props: ContainerProps) {
           show={props.isOpen}
           onClose={handleClose}
           size={sizeModal}
-          position="center-left"
+          position="top-left"
         >
           <Modal.Header className="h-[60px]">
             {props.dataNode.data.label as string}

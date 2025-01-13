@@ -16,6 +16,7 @@ import {
 } from './GoogleSheetsOAuth2Api';
 import { useRequest } from '../../utils/requests';
 import { ReactFlowInstance, Node } from '@xyflow/react';
+import { ProcessNotionToken } from './NotionInternalAuthApi';
 
 interface ContainerProps {
   flowInstance: ReactFlowInstance | null;
@@ -52,6 +53,7 @@ export function ModalCredential(props: ContainerProps) {
 
   const oauthHandlers: Record<OAuthProvider, Function> = {
     google: ProcessGoogleOAuthMessage,
+    notion: ProcessNotionToken, // for internal secret not used pattern oauth2
     github: () => { },
     microsoft: () => { },
     facebook: () => { },
@@ -107,7 +109,11 @@ export function ModalCredential(props: ContainerProps) {
         showAlert('Cannot connect', COLOR_ALERTS.failure);
         return
       }
-      openNewWindow(data.auth_url as string);
+      if (data.auth_url !== "") { // if oauthv2
+        openNewWindow(data.auth_url as string);
+        return;
+      }
+
       return;
     } catch (error: any) {
       setDisabledButtonTest(false);
@@ -118,7 +124,6 @@ export function ModalCredential(props: ContainerProps) {
       showAlert('Error testing credential', COLOR_ALERTS.failure);
       return;
     }
-    return;
   }
 
   function openNewWindow(url: string) {
@@ -137,13 +142,13 @@ export function ModalCredential(props: ContainerProps) {
       return;
     }
 
-    window.addEventListener('message', handleMessagesCredentials);
+    window.addEventListener('message', handleMessagesOAuthCredentials);
     setTimeout(() => {
       setDisabledButtonTest(false);
     }, 2000);
   }
 
-  async function handleMessagesCredentials(event: MessageEvent<any>) {
+  async function handleMessagesOAuthCredentials(event: MessageEvent<any>) {
     if (event.origin !== import.meta.env.VITE_EVENTS_ORIGIN) {
       // TODO: 401
       console.error('Not authorized', event.origin);
@@ -155,7 +160,7 @@ export function ModalCredential(props: ContainerProps) {
     if (!stateStr) return;
     const result = oauthHandlers[provider as OAuthProvider](stateStr);
     if (!result) return;
-    window.removeEventListener('message', handleMessagesCredentials);
+    window.removeEventListener('message', handleMessagesOAuthCredentials);
     await handleSaveCredentials(result);
     console.log('Mensaje recibido:', event.data);
   }
@@ -454,7 +459,7 @@ export function ModalCredential(props: ContainerProps) {
       <Modal
         show={props.isOpen}
         onClose={props.onClose}
-        position="center-right"
+        position="top-right"
         size="md"
       >
         <Modal.Header className="h-[60px]">Credential</Modal.Header>
