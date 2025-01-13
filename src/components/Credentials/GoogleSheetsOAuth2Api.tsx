@@ -1,7 +1,7 @@
 import { Alert, Button, Label, TextInput } from 'flowbite-react';
 import { ModalCredentialData, CredentialData } from '../../models/Credential';
 import { getLocalUri as getLocalRelativeUri } from '../../utils/getUriFrontend';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 export interface CredentialState {
   code: string;
@@ -16,6 +16,9 @@ export function RenderGoogleSheetsOAuth2Api({
   credential: ModalCredentialData;
   onChange: (field: keyof ModalCredentialData, value: any) => void; // info is sended to handleTemplateInputsChange in file ModalCredential.tsx
 }) {
+
+  const [copiedButton, setCopiedButton] = useState({ className: "", colorName: "green", text:"Copy"});
+
   function handleDataChange(field: keyof CredentialData, value: any) {
     onChange('data', {
       ...credential.data,
@@ -34,6 +37,14 @@ export function RenderGoogleSheetsOAuth2Api({
     return `${import.meta.env.VITE_EVENTS_ORIGIN}${redirectURI}`;
   }, [credential.data.redirectURL]);
 
+  function copyRedirectURL() {
+    navigator.clipboard.writeText(redirectURI as string);
+    setCopiedButton({ className: "", colorName: "success", text: "Copied!"});
+    setTimeout(() => {
+      setCopiedButton({ className: "", colorName: "green", text: "Copy" });
+    }, 5000);
+  }
+
   return (
     <ul className="ml-4 flex flex-col items-start justify-start gap-y-4 text-black ">
       <li className="flex flex-col justify-center w-full">
@@ -48,12 +59,12 @@ export function RenderGoogleSheetsOAuth2Api({
             readOnly
           />
           <Button
-            onClick={() => navigator.clipboard.writeText(redirectURI as string)}
-            color="green"
+            onClick={copyRedirectURL}
+            color={`${copiedButton.colorName}`}
             size="sm"
-            className="h-9"
+            className={`h-9 ${copiedButton.className}`}
           >
-            Copy
+            {copiedButton.text}
           </Button>
         </div>
       </li>

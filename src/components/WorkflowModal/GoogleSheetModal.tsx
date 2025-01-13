@@ -29,19 +29,6 @@ interface GoogleSheetButtonProps {
 }
 
 export function GoogleSheetsModalContent(props: GoogleSheetsModalProps) {
-  // const recentCredentials = useMemo(() => {
-  //   let recentCredentials = [];
-  //   for (let i = 0; i < props.listCredentials.length; i++) {
-  //     const element = props.listCredentials[i];
-  //     recentCredentials.push(
-  //       <option key={element.id} value={element.id}>
-  //         {element.name}
-  //       </option>
-  //     );
-  //   }
-  //   return recentCredentials;
-  // }, [props.listCredentials]);
-
   function transformCredentialsInOptions() {
     let recentCredentials = [];
     for (let i = 0; i < props.listCredentials.length; i++) {
@@ -53,7 +40,6 @@ export function GoogleSheetsModalContent(props: GoogleSheetsModalProps) {
       );
     }
     return recentCredentials;
-
   }
 
   const MemoizedLabelCredential = useMemo(
