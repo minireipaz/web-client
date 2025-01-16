@@ -7,9 +7,10 @@ interface ContainerProps {
   onClick: (event: any, nodeData: NodeData) => void;
 }
 
-export const TypeNodes: Record<string, string> = {
-  'googlesheets': 'googlesheets',
-  'notiongetdatabase': 'notiongetdatabase',
+export const TypeNodes = {
+  googlesheets: 'googlesheets',
+  notionoauth: 'notionoauth',
+  notiontoken: "notiontoken"
 };
 
 export function WorkflowDrawer(props: ContainerProps) {
@@ -38,7 +39,7 @@ export function WorkflowDrawer(props: ContainerProps) {
               Popular
             </h2>
             <DefaultNode
-              id={TypeNodes.googlesheets} // new ids?
+              id="googlesheets" // new ids?
               description="Google Sheets bla bla bla"
               options="optin1"
               type={TypeNodes.googlesheets}
@@ -60,10 +61,10 @@ export function WorkflowDrawer(props: ContainerProps) {
               }}
             />
             <DefaultNode
-              id={TypeNodes.notiongetdatabase}
+              id="notiongetdatabase"
               description="Notion Get Database"
               options="optin2"
-              type={TypeNodes.notiongetdatabase}
+              type={TypeNodes.notiontoken}
               label="Notion Get Database"
               formdata={{
                 pollmode: 'none',
