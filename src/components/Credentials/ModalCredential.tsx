@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   COLOR_ALERTS,
   CredentialData,
+  DEFAULT_CREDENTIAL_REDIRECT_PATH,
   ModalCredentialData,
   ResponseCreateCredential,
 } from '../../models/Credential';
@@ -182,11 +183,16 @@ export function ModalCredential(props: ContainerProps) {
       );
       return false;
     }
-
-    if (credential.data.clientId.trim() === '') {
-      showAlert('Client ID OAuth is required', COLOR_ALERTS.failure);
-      return false;
+    // checking with url redirects btw can be used options crdential.options
+    if (DEFAULT_CREDENTIAL_REDIRECT_PATH[credential.type] !== undefined && DEFAULT_CREDENTIAL_REDIRECT_PATH[credential.type] !== "" ) {
+      if (credential.data.clientId.trim() === '') {
+        showAlert('Client ID OAuth is required', COLOR_ALERTS.failure);
+        return false;
+      }
     }
+
+    // check OAUthURL
+
 
     if (credential.data.clientSecret.trim() === '') {
       showAlert('Client Secret OAuth is required', COLOR_ALERTS.failure);
@@ -210,15 +216,31 @@ export function ModalCredential(props: ContainerProps) {
     }, 5000);
   }
 
+  function checkRedirectURLOAuth(credential: ModalCredentialData) {
+    // DEFAULT_CREDENTIAL_REDIRECT_PATH only relative uris
+    const defaultPath = DEFAULT_CREDENTIAL_REDIRECT_PATH[credential.type] || DEFAULT_CREDENTIAL_REDIRECT_PATH.default;
+    if (defaultPath) {
+      return credential.data.redirectURL.trim() !== '';
+    }
+    return false;
+  }
+
   async function collectCredentials(
     credential: ModalCredentialData,
     signal?: AbortSignal
   ): Promise<[boolean, ResponseCreateCredential]> {
     try {
-      const [ok, uriFrontend] = getUriFrontend(`/api/v1/credentials`);
+      const isValidOAuth = checkRedirectURLOAuth(credential);
+      // select api path based in oauth validation
+      const apiPath = isValidOAuth
+        ? '/api/v1/oauth-credentials'
+        : '/api/v1/credentials';
+
+      const [ok, uriFrontend] = getUriFrontend(apiPath);
       if (!ok) {
         return [false, failConnection];
       }
+
       const body = createBodyForCredential(credential);
       const response = await fetch(uriFrontend, {
         method: 'POST',
@@ -247,6 +269,7 @@ export function ModalCredential(props: ContainerProps) {
       }
       return [true, data];
     } catch (error) {
+      console.error('cannot send credentials:', error);
       return [false, failConnection];
     }
   }
