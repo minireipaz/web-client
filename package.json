@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite --port 3010",
     "build": "tsc -b && vite build",
-    "lint": "eslint --fix --ext .js,.jsx,.tsx,.ts .",
-    "format": "prettier --write . && eslint . --fix --ext .js,.jsx,.tsx,.ts --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint --fix .",
+    "format": "prettier --write . && eslint . --fix --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -1,18 +1,17 @@
-import { defineConfig, loadEnv } from "vite"
-import react from "@vitejs/plugin-react"
-import { Redis } from "@upstash/redis"
+import { defineConfig, loadEnv } from "vite";
+import react from "@vitejs/plugin-react";
+import { Redis } from "@upstash/redis";
 
-export default defineConfig(async ({ _, mode }: any) => {
+export default defineConfig(async ({ mode }: any) => {
   let envs = loadEnv(mode, process.cwd(), "");
   const remoteEnvs = await getRemoteEnvs(envs);
   envs = { ...remoteEnvs };
   console.log("ENVS=" + JSON.stringify(envs));
   return {
     define: envs,
-    plugins: [react()]
-  }
-})
-
+    plugins: [react()],
+  };
+});
 
 async function getRemoteEnvs(envs: Record<string, string>) {
   const newEnvs = await getFromVault(envs);
@@ -26,7 +25,7 @@ async function getFromVault(envs: Record<string, string>) {
     token: envs["VAULT_REST_TOKEN"],
   });
 
-  const data = await redis.get(envs["VAULT_KEY_FRONTEND_ENVS"]) as string;
+  const data = (await redis.get(envs["VAULT_KEY_FRONTEND_ENVS"])) as string;
   const parsedEnvs = parseEnvString(data);
   return parsedEnvs;
 }

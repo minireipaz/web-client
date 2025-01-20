@@ -29,54 +29,54 @@ paths:
       summary: Ping the API
       description: A simple endpoint to check if the API is running.
       responses:
-        '200':
+        "200":
           description: API is running
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PingResponse'
-        '404':
+                $ref: "#/components/schemas/PingResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '406':
+                $ref: "#/components/schemas/NotFoundResponse"
+        "406":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NotAcceptableResponse'
-        '401':
+                $ref: "#/components/schemas/NotAcceptableResponse"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
-        '403':
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "403":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ForbiddenResponse'
-        '429':
+                $ref: "#/components/schemas/ForbiddenResponse"
+        "429":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TooManyRequestsResponse'
-        '500':
+                $ref: "#/components/schemas/TooManyRequestsResponse"
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
         default:
           description: Default
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+                $ref: "#/components/schemas/UnauthorizedResponse"
 
   /api/workflows:
     post:
@@ -90,53 +90,53 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/WorkflowFrontend'
+              $ref: "#/components/schemas/WorkflowFrontend"
       responses:
-        '201':
+        "201":
           description: Workflow created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Workflow'
-        '208':
+                $ref: "#/components/schemas/Workflow"
+        "208":
           description: Workflow name already exists for this user
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '406':
+                $ref: "#/components/schemas/ErrorResponse"
+        "406":
           description: >-
             Not Acceptable. The server cannot generate content that matches the
             Accept header.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NotAcceptableResponse'
-        '415':
+                $ref: "#/components/schemas/NotAcceptableResponse"
+        "415":
           description: Unsupported media type
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnsupportedMedia'
-        '429':
+                $ref: "#/components/schemas/UnsupportedMedia"
+        "429":
           description: Too Many Requests. The client has exceeded the rate limit.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TooManyRequestsResponse'
-        '500':
+                $ref: "#/components/schemas/TooManyRequestsResponse"
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
         default:
           description: Unexpected error occurred.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  '/api/workflows/{iduser}/{idworkflow}':
+                $ref: "#/components/schemas/ErrorResponse"
+  "/api/workflows/{iduser}/{idworkflow}":
     get:
       operationId: getWorkflow
       tags:
@@ -161,49 +161,49 @@ paths:
             pattern: ^[a-zA-Z0-9_-]$
             maxLength: 255
       responses:
-        '200':
+        "200":
           description: Workflow retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Workflow'
-        '404':
+                $ref: "#/components/schemas/Workflow"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
-        '403':
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "403":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ForbiddenResponse'
-        '429':
+                $ref: "#/components/schemas/ForbiddenResponse"
+        "429":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TooManyRequestsResponse'
+                $ref: "#/components/schemas/TooManyRequestsResponse"
         default:
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
-  '/api/workflows/{iduser}':
+                $ref: "#/components/schemas/UnauthorizedResponse"
+  "/api/workflows/{iduser}":
     get:
       operationId: getAllWorkflows
       tags:
@@ -220,51 +220,51 @@ paths:
             pattern: ^[a-zA-Z0-9_-]$
             maxLength: 255
       responses:
-        '200':
+        "200":
           description: Workflows retrieved successfully
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Workflow'
+                  $ref: "#/components/schemas/Workflow"
                 maxItems: 100
-        '404':
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
-        '403':
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "403":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ForbiddenResponse'
-        '429':
+                $ref: "#/components/schemas/ForbiddenResponse"
+        "429":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TooManyRequestsResponse'
+                $ref: "#/components/schemas/TooManyRequestsResponse"
         default:
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+                $ref: "#/components/schemas/UnauthorizedResponse"
   /api/users:
     post:
       operationId: syncUser
@@ -277,66 +277,66 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: "#/components/schemas/User"
       responses:
-        '200':
+        "200":
           description: User synchronized successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-        '404':
+                $ref: "#/components/schemas/User"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '406':
+                $ref: "#/components/schemas/ErrorResponse"
+        "406":
           description: >-
             Not Acceptable. The server cannot generate content that matches the
             Accept header.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NotAcceptableResponse'
-        '500':
+                $ref: "#/components/schemas/NotAcceptableResponse"
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
-        '403':
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "403":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ForbiddenResponse'
-        '429':
+                $ref: "#/components/schemas/ForbiddenResponse"
+        "429":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TooManyRequestsResponse'
-        '415':
+                $ref: "#/components/schemas/TooManyRequestsResponse"
+        "415":
           description: Unsupported media type
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnsupportedMedia'
+                $ref: "#/components/schemas/UnsupportedMedia"
         default:
           description: Default
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+                $ref: "#/components/schemas/UnauthorizedResponse"
 
-  '/api/users/{stub}':
+  "/api/users/{stub}":
     get:
       operationId: getUserByStub
       tags:
@@ -353,45 +353,45 @@ paths:
             pattern: ^[a-zA-Z0-9_-]$
             maxLength: 255
       responses:
-        '200':
+        "200":
           description: User retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-        '404':
+                $ref: "#/components/schemas/User"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '406':
+                $ref: "#/components/schemas/ErrorResponse"
+        "406":
           description: >-
             Not Acceptable. The server cannot generate content that matches the
             Accept header.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NotAcceptableResponse'
-        '429':
+                $ref: "#/components/schemas/NotAcceptableResponse"
+        "429":
           description: Too Many Requests. The client has exceeded the rate limit.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TooManyRequestsResponse'
-        '500':
+                $ref: "#/components/schemas/TooManyRequestsResponse"
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
         default:
           description: Unexpected error occurred.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  '/api/dashboard/{iduser}':
+                $ref: "#/components/schemas/ErrorResponse"
+  "/api/dashboard/{iduser}":
     get:
       operationId: getUserDashboardByID
       tags:
@@ -408,56 +408,56 @@ paths:
             pattern: ^[a-zA-Z0-9_-]$
             maxLength: 255
       responses:
-        '200':
+        "200":
           description: User dashboard retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Dashboard'
-        '404':
+                $ref: "#/components/schemas/Dashboard"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
-        '403':
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "403":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ForbiddenResponse'
-        '406':
+                $ref: "#/components/schemas/ForbiddenResponse"
+        "406":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NotAcceptableResponse'
-        '429':
+                $ref: "#/components/schemas/NotAcceptableResponse"
+        "429":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TooManyRequestsResponse'
+                $ref: "#/components/schemas/TooManyRequestsResponse"
         default:
           description: Default
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+                $ref: "#/components/schemas/UnauthorizedResponse"
 
-  '/api/auth/verify/{id}':
+  "/api/auth/verify/{id}":
     get:
       operationId: verifyUserToken
       tags:
@@ -474,55 +474,55 @@ paths:
             pattern: ^[a-zA-Z0-9_-]$
             maxLength: 255
       responses:
-        '200':
+        "200":
           description: Token verified successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TokenVerificationResponse'
-        '404':
+                $ref: "#/components/schemas/TokenVerificationResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
-        '406':
+        "406":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NotAcceptableResponse'
-        '401':
+                $ref: "#/components/schemas/NotAcceptableResponse"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
-        '403':
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "403":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ForbiddenResponse'
-        '429':
+                $ref: "#/components/schemas/ForbiddenResponse"
+        "429":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TooManyRequestsResponse'
+                $ref: "#/components/schemas/TooManyRequestsResponse"
         default:
           description: Default
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+                $ref: "#/components/schemas/UnauthorizedResponse"
 
   /api/google/credential:
     post:
@@ -536,62 +536,62 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Credential'
+              $ref: "#/components/schemas/Credential"
       responses:
-        '200':
+        "200":
           description: Credential created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Credential'
-        '404':
+                $ref: "#/components/schemas/Credential"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
-        '403':
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "403":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ForbiddenResponse'
-        '429':
+                $ref: "#/components/schemas/ForbiddenResponse"
+        "429":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TooManyRequestsResponse'
-        '406':
+                $ref: "#/components/schemas/TooManyRequestsResponse"
+        "406":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NotAcceptableResponse'
-        '415':
+                $ref: "#/components/schemas/NotAcceptableResponse"
+        "415":
           description: Unsupported media type
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnsupportedMedia'
+                $ref: "#/components/schemas/UnsupportedMedia"
         default:
           description: Default
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+                $ref: "#/components/schemas/UnauthorizedResponse"
 
   /api/google/exchange:
     post:
@@ -605,62 +605,62 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ExchangeRequest'
+              $ref: "#/components/schemas/ExchangeRequest"
       responses:
-        '200':
+        "200":
           description: Credentials exchanged successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Credential'
-        '404':
+                $ref: "#/components/schemas/Credential"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
-        '403':
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "403":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ForbiddenResponse'
-        '415':
+                $ref: "#/components/schemas/ForbiddenResponse"
+        "415":
           description: Unsupported media type
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnsupportedMedia'
-        '429':
+                $ref: "#/components/schemas/UnsupportedMedia"
+        "429":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TooManyRequestsResponse'
-        '406':
+                $ref: "#/components/schemas/TooManyRequestsResponse"
+        "406":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NotAcceptableResponse'
+                $ref: "#/components/schemas/NotAcceptableResponse"
         default:
           description: Default
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+                $ref: "#/components/schemas/UnauthorizedResponse"
 
   /oauth2-credentials/save:
     post:
@@ -674,68 +674,68 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CredentialExchangeRequest'
+              $ref: "#/components/schemas/CredentialExchangeRequest"
       responses:
-        '200':
+        "200":
           description: Credentials saved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Credential'
-        '400':
+                $ref: "#/components/schemas/Credential"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
-        '403':
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "403":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ForbiddenResponse'
-        '429':
+                $ref: "#/components/schemas/ForbiddenResponse"
+        "429":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TooManyRequestsResponse'
-        '404':
+                $ref: "#/components/schemas/TooManyRequestsResponse"
+        "404":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '406':
+                $ref: "#/components/schemas/NotFoundResponse"
+        "406":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NotAcceptableResponse'
-        '415':
+                $ref: "#/components/schemas/NotAcceptableResponse"
+        "415":
           description: Unsupported media type
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnsupportedMedia'
+                $ref: "#/components/schemas/UnsupportedMedia"
         default:
           description: Default
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+                $ref: "#/components/schemas/UnauthorizedResponse"
 
 security:
   - UserTokenAuth: []
@@ -799,12 +799,12 @@ components:
         CreatedAt:
           type: string
           format: date-time
-          example: '2023-10-01T12:00:00Z'
+          example: "2023-10-01T12:00:00Z"
           maxLength: 32
         UpdatedAt:
           type: string
           format: date-time
-          example: '2023-10-02T12:00:00Z'
+          example: "2023-10-02T12:00:00Z"
           maxLength: 32
         UserToken:
           type: string
@@ -821,12 +821,12 @@ components:
         WorkflowInit:
           type: string
           format: date-time
-          example: '2023-10-01T12:00:00Z'
+          example: "2023-10-01T12:00:00Z"
           maxLength: 32
         WorkflowCompleted:
           type: string
           format: date-time
-          example: '2023-10-01T12:00:00Z'
+          example: "2023-10-01T12:00:00Z"
           maxLength: 32
         Status:
           type: string
@@ -846,15 +846,15 @@ components:
         Nodes:
           type: array
           items:
-            $ref: '#/components/schemas/Node'
+            $ref: "#/components/schemas/Node"
           maxItems: 100
         Edges:
           type: array
           items:
-            $ref: '#/components/schemas/Edge'
+            $ref: "#/components/schemas/Edge"
           maxItems: 100
         Viewport:
-          $ref: '#/components/schemas/Viewport'
+          $ref: "#/components/schemas/Viewport"
       additionalProperties: false
     Workflow:
       type: object
@@ -894,22 +894,22 @@ components:
         CreatedAt:
           type: string
           format: date-time
-          example: '2023-10-01T12:00:00Z'
+          example: "2023-10-01T12:00:00Z"
           maxLength: 32
         UpdatedAt:
           type: string
           format: date-time
-          example: '2023-10-02T12:00:00Z'
+          example: "2023-10-02T12:00:00Z"
           maxLength: 32
         WorkflowInit:
           type: string
           format: date-time
-          example: '2023-10-01T12:00:00Z'
+          example: "2023-10-01T12:00:00Z"
           maxLength: 32
         WorkflowCompleted:
           type: string
           format: date-time
-          example: '2023-10-01T12:00:00Z'
+          example: "2023-10-01T12:00:00Z"
           maxLength: 32
         Status:
           type: string
@@ -936,15 +936,15 @@ components:
         Nodes:
           type: array
           items:
-            $ref: '#/components/schemas/Node'
+            $ref: "#/components/schemas/Node"
           maxItems: 100
         Edges:
           type: array
           items:
-            $ref: '#/components/schemas/Edge'
+            $ref: "#/components/schemas/Edge"
           maxItems: 100
         Viewport:
-          $ref: '#/components/schemas/Viewport'
+          $ref: "#/components/schemas/Viewport"
       additionalProperties: false
     WorkflowUpdateRequest:
       type: object
@@ -990,7 +990,7 @@ components:
         createdAt:
           type: string
           format: date-time
-          example: '2023-10-01T12:00:00Z'
+          example: "2023-10-01T12:00:00Z"
           maxLength: 32
       additionalProperties: false
     Dashboard:
@@ -1044,7 +1044,7 @@ components:
         expiresAt:
           type: string
           format: date-time
-          example: '2023-10-01T12:00:00Z'
+          example: "2023-10-01T12:00:00Z"
           maxLength: 32
       additionalProperties: false
     DataCredential:
@@ -1127,7 +1127,7 @@ components:
           maxLength: 255
           pattern: ^[a-zA-Z0-9_-]$
         data:
-          $ref: '#/components/schemas/DataCredential'
+          $ref: "#/components/schemas/DataCredential"
       required:
         - id
         - sub
@@ -1178,7 +1178,7 @@ components:
           type: string
           maxLength: 255
         data:
-          $ref: '#/components/schemas/DataCredential'
+          $ref: "#/components/schemas/DataCredential"
       required:
         - token
         - tokenrefresh
@@ -1197,7 +1197,7 @@ components:
         credentials:
           type: array
           items:
-            $ref: '#/components/schemas/ResponseExchangeCredential'
+            $ref: "#/components/schemas/ResponseExchangeCredential"
         status:
           type: integer
         error:
@@ -1218,7 +1218,7 @@ components:
           maxLength: 512
         redirectUri:
           type: string
-          example: 'http://localhost:8080/callback'
+          example: "http://localhost:8080/callback"
           pattern: ^[a-zA-Z0-9_-]$
           maxLength: 512
       additionalProperties: false
@@ -1236,11 +1236,11 @@ components:
           pattern: ^example-[0-9a-z]+$
           maxLength: 32
         Position:
-          $ref: '#/components/schemas/Position'
+          $ref: "#/components/schemas/Position"
         Data:
-          $ref: '#/components/schemas/DataNode'
+          $ref: "#/components/schemas/DataNode"
         Measured:
-          $ref: '#/components/schemas/Measured'
+          $ref: "#/components/schemas/Measured"
       additionalProperties: false
     Edge:
       type: object
@@ -1269,7 +1269,7 @@ components:
           type: boolean
           example: true
         Style:
-          $ref: '#/components/schemas/Style'
+          $ref: "#/components/schemas/Style"
       additionalProperties: false
     Position:
       type: object
@@ -1302,7 +1302,7 @@ components:
           pattern: ^[a-zA-Z0-9_-]$
         Options:
           type: string
-          example: 'option1, option2'
+          example: "option1, option2"
           maxLength: 512
           pattern: ^[a-zA-Z0-9_-]$
         Description:
@@ -1354,7 +1354,7 @@ components:
       properties:
         Stroke:
           type: string
-          example: '#000000'
+          example: "#000000"
       additionalProperties: false
 
     UnauthorizedResponse: # Esquema para la respuesta 401
@@ -1362,7 +1362,7 @@ components:
       properties:
         error:
           type: string
-          example: 'Unauthorized. The request requires user authentication.'
+          example: "Unauthorized. The request requires user authentication."
           pattern: ^[a-zA-Z0-9_-]$
         status:
           type: integer
@@ -1377,7 +1377,7 @@ components:
       properties:
         error:
           type: string
-          example: 'Forbidden. The server understood the request but refuses to authorize it.'
+          example: "Forbidden. The server understood the request but refuses to authorize it."
           pattern: ^[a-zA-Z0-9_-]$
           maxLength: 255
         status:
@@ -1393,7 +1393,7 @@ components:
       properties:
         error:
           type: string
-          example: 'Too Many Requests. The client has exceeded the rate limit.'
+          example: "Too Many Requests. The client has exceeded the rate limit."
           pattern: ^[a-zA-Z0-9_-]$
           maxLength: 255
         status:
@@ -1409,7 +1409,7 @@ components:
       properties:
         error:
           type: string
-          example: 'Not Found. The requested resource could not be found.'
+          example: "Not Found. The requested resource could not be found."
           pattern: ^[a-zA-Z0-9_-]$
           maxLength: 255
         status:
@@ -1425,7 +1425,7 @@ components:
       properties:
         error:
           type: string
-          example: 'Not Acceptable. The server cannot generate content that matches the Accept header.'
+          example: "Not Acceptable. The server cannot generate content that matches the Accept header."
           pattern: ^[a-zA-Z0-9_-]$
           maxLength: 255
         status:
@@ -1441,7 +1441,7 @@ components:
       properties:
         error:
           type: string
-          example: 'Not Supported media'
+          example: "Not Supported media"
           pattern: ^[a-zA-Z0-9_-]$
           maxLength: 255
         status:
