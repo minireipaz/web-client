@@ -21,7 +21,7 @@ func NewCredentialsController(credentialServ *services.CredentialsService, authS
 	}
 }
 
-func (c *CredentialsController) CreateCredentials(ctx *gin.Context) {
+func (c *CredentialsController) CreateOAuthCredentials(ctx *gin.Context) {
 	currentCredential := ctx.MustGet(models.CredentialCreateContextKey).(models.RequestCreateCredential)
 	serviceUserAccessToken, err := c.authService.GetServiceUserAccessToken()
 	if err != nil {
@@ -37,8 +37,42 @@ func (c *CredentialsController) CreateCredentials(ctx *gin.Context) {
 		Status: http.StatusOK,
 	}
 	switch currentCredential.Type {
-	case "googlesheets":
+	case models.Googlesheets:
 		response = c.service.CreateGoogleCredential(&currentCredential, serviceUserAccessToken)
+	default:
+		response.Error = "Type not acceptable"
+		response.Status = http.StatusInternalServerError
+	}
+	ctx.JSON(response.Status, response)
+}
+
+func (c *CredentialsController) CreateCredentials(ctx *gin.Context) {
+	currentCredential := ctx.MustGet(models.CredentialCreateContextKey).(models.RequestCreateCredential)
+	serviceUserAccessToken, err := c.authService.GetServiceUserAccessToken()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error":  fmt.Sprintf("Failed to authenticate: %v", err),
+			"status": http.StatusInternalServerError,
+		})
+		return
+	}
+	// optimistic
+	response := models.ResponseCreateCredential{
+		Error:  "",
+		Status: http.StatusOK,
+	}
+	// TODO: replace notiontoken
+	switch currentCredential.Type {
+	case "notiontoken":
+		saved, updatedCredentialStr := c.service.SaveNotionTokenCredential(&currentCredential, serviceUserAccessToken)
+		if !saved {
+			response.Error = fmt.Sprint("cannot save")
+			response.Status = http.StatusBadRequest
+		}
+    response.Data = ""
+    if updatedCredentialStr != nil {
+      response.Data = *updatedCredentialStr
+    }
 	default:
 		response.Error = "Type not acceptable"
 		response.Status = http.StatusInternalServerError
@@ -62,7 +96,7 @@ func (c *CredentialsController) CallbackCredentials(ctx *gin.Context) {
 		Status: http.StatusOK,
 	}
 	switch currentCredential.Type {
-	case "googlesheets":
+	case models.Googlesheets:
 		response = c.service.ExchangeOAuth(&currentCredential, serviceUserAccessToken)
 	default:
 		response.Error = "Type not acceptable"

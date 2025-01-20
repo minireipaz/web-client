@@ -1,8 +1,10 @@
 package services
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"minireipaz/pkg/config"
 	"minireipaz/pkg/domain/models"
 	"minireipaz/pkg/domain/repositories"
@@ -128,4 +130,33 @@ func (c *CredentialsService) GetAllCredentials(userID, userToken, serviceUserTok
 		}
 	}
 	return response
+}
+
+func (c *CredentialsService) SaveNotionTokenCredential(currentCredential *models.RequestCreateCredential, serviceUserAccessToken *string) (bool, *string) {
+  // normalize oauth credentials and no-oauth credentials
+  currentCredential = c.normalizeCredentialTokens(currentCredential)
+	updatedCredential := c.credentialsRepo.NewCredentialTokenNotion(currentCredential, serviceUserAccessToken)
+  if updatedCredential == nil {
+    return false, nil
+  }
+  credentialStr := c.transformToExchangeCredential(updatedCredential)
+	return true, credentialStr
+}
+
+func (c *CredentialsService) normalizeCredentialTokens(currentCredential *models.RequestCreateCredential) *models.RequestCreateCredential {
+  if (currentCredential.Data.Token == "" && currentCredential.Data.ClientSecret != "") {
+    currentCredential.Data.Token = currentCredential.Data.ClientSecret
+  }
+  return currentCredential
+}
+
+// can be moved to model
+func (c *CredentialsService) transformToExchangeCredential(credential *models.ResponseExchangeCredential) *string {
+  dataByte, err := json.Marshal(credential)
+    if err != nil {
+      log.Printf("ERROR | transformToExchangeCredential cannot parse exchangecredential %v", credential)
+      return nil
+    }
+  dataStr := string(dataByte)
+  return &dataStr
 }

@@ -114,7 +114,45 @@ func ValidateUpdateWorkflow() gin.HandlerFunc {
 	}
 }
 
-func ValidateCredential() gin.HandlerFunc {
+func ValidateOAuthCredential() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var currentReq models.RequestCreateCredential
+		if err := ctx.ShouldBindJSON(&currentReq); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": ErrorInvalidJSON})
+			ctx.Abort()
+			return
+		}
+
+		if strings.TrimSpace(currentReq.Data.ClientID) == "" {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": ErrorInvalidJSON})
+			ctx.Abort()
+			return
+		}
+
+		if strings.TrimSpace(currentReq.Data.ClientSecret) == "" {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": ErrorInvalidJSON})
+			ctx.Abort()
+			return
+		}
+
+		if strings.TrimSpace(currentReq.Data.RedirectURL) == "" {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": ErrorInvalidJSON})
+			ctx.Abort()
+			return
+		}
+
+		if err := validateCredentialOAuthFields(&currentReq); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			ctx.Abort()
+			return
+		}
+
+		ctx.Set(models.CredentialCreateContextKey, currentReq)
+		ctx.Next()
+	}
+}
+
+func ValidateTokenCredential() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var currentReq models.RequestCreateCredential
 		if err := ctx.ShouldBindJSON(&currentReq); err != nil {
@@ -143,7 +181,7 @@ func ValidateCredentialExchange() gin.HandlerFunc {
 			return
 		}
 
-		if err := validateCredentialFields(&currentReq); err != nil {
+		if err := validateCredentialOAuthFields(&currentReq); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			ctx.Abort()
 			return
@@ -173,6 +211,27 @@ func ValidateGetGoogleSheet() gin.HandlerFunc {
 		ctx.Next()
 	}
 }
+
+func ValidateNotionFields() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var currentReq models.RequestGoogleAction
+		if err := ctx.ShouldBindBodyWithJSON(&currentReq); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": ErrorInvalidJSON})
+			ctx.Abort()
+			return
+		}
+
+		if !models.ValidCredentialTypes[currentReq.Type] {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": ErrorInvalidJSON})
+			ctx.Abort()
+			return
+		}
+
+		ctx.Set(models.ActionNotionKey, currentReq)
+		ctx.Next()
+	}
+}
+
 
 func validateWorkflowFields(workflow *models.Workflow) error {
 	if strings.TrimSpace(workflow.Name) == "" {
@@ -213,6 +272,22 @@ func validateIDWorkflow(idWorkflow string) error {
 	}
 	if len(idWorkflow) < 3 {
 		return errors.New(ErrorInvalidWorkflowID)
+	}
+	return nil
+}
+
+func validateCredentialOAuthFields(credential models.Credential) error {
+	if strings.TrimSpace(credential.GetName()) == "" {
+		return errors.New(ErrorWorkflowNameRequired)
+	}
+	if len(credential.GetName()) < 3 || len(credential.GetName()) > 150 {
+		return errors.New(ErrorInvalidWorkflowName)
+	}
+	if strings.TrimSpace(credential.GetSub()) == "" {
+		return errors.New(ErrorDirectoryRequired)
+	}
+	if !models.ValidCredentialTypes[credential.GetType()] {
+		return errors.New(ErrorInvalidDrecDataType)
 	}
 	return nil
 }

@@ -12,9 +12,9 @@ type RequestCreateCredential struct {
 
 type DataCredential struct {
 	ID           string   `json:"id,omitempty"`
-	ClientID     string   `json:"clientId" binding:"required,max=255"`
-	ClientSecret string   `json:"clientSecret" binding:"required,max=255"`
-	RedirectURL  string   `json:"redirectURL" binding:"required,max=255"`
+	ClientID     string   `json:"clientId" binding:"max=255"`
+	ClientSecret string   `json:"clientSecret" binding:"max=255"`
+	RedirectURL  string   `json:"redirectURL" binding:"max=255"`
 	OAuthURL     string   `json:"oauthurl,omitempty"`
 	State        string   `json:"state,omitempty"`
 	Code         string   `json:"code,omitempty"`

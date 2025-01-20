@@ -82,3 +82,24 @@ func (c *CredentialsRepository) GetAllCredentials(userID, userToken, serviceUser
 
 	return newResponse, nil
 }
+
+func (c *CredentialsRepository) NewCredentialTokenNotion(credential *models.RequestCreateCredential, serviceUserAccessToken *string) *models.ResponseExchangeCredential {
+	url, err := getBackendURL("/api/v1/tokens/credential")
+	if err != nil {
+		log.Printf("ERROR | newcredentialtokennotion cannot parse url for /api/v1/tokens/credential %v", err)
+		return nil
+	}
+
+	body, err := c.client.DoRequest("POST", url, *serviceUserAccessToken, credential)
+	if err != nil {
+		log.Printf("ERROR | newcredentialtokennotion cannot connect to backend %v", err)
+		return nil
+	}
+
+	var createdCredential models.ResponseExchangeCredential
+	if err := json.Unmarshal(body, &createdCredential); err != nil {
+		log.Printf("ERROR | newcredentialtokennotion cannot unmarshal to backend %v body: %s", err, string(body))
+		return nil
+	}
+	return &createdCredential
+}
