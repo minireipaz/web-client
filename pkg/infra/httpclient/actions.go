@@ -34,6 +34,25 @@ func (a *ActionsRepository) CreateActionsGoogleSheet(newAction models.RequestGoo
 	return response
 }
 
+func (a *ActionsRepository) CreateActionsNotion(newAction models.RequestGoogleAction, serviceUser *string) *models.ResponseGetGoogleSheetByID {
+	url, err := getBackendURL("/api/v1/actions/notion") // maybe uri for oauth or same uri for both ?
+	if err != nil {
+		return nil
+	}
+
+	body, err := a.client.DoRequest("POST", url, *serviceUser, newAction)
+	if err != nil {
+		return nil
+	}
+
+	var response *models.ResponseGetGoogleSheetByID
+	if err := json.Unmarshal(body, &response); err != nil {
+		return nil
+	}
+
+	return response
+}
+
 func (a *ActionsRepository) GetGoogleSheetByID(actionID *string, userID *string, serviceUser *string) *string {
 	url, err := getPollingURL(fmt.Sprintf("/api/v1/polling/google/sheets/%s/%s", *userID, *actionID))
 	if err != nil {

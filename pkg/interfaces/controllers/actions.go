@@ -46,6 +46,32 @@ func (a *ActionsController) CreateActionsGoogleSheet(ctx *gin.Context) {
 	ctx.JSON(response.Status, response)
 }
 
+func (a *ActionsController) CreateNotionAction(ctx *gin.Context) {
+  newAction := ctx.MustGet(models.ActionNotionKey).(models.RequestGoogleAction)
+	serviceUserToken, err := a.authService.GetServiceUserAccessToken()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error":  fmt.Sprintf("Failed to authenticate: %v", err),
+			"status": http.StatusInternalServerError,
+		})
+		return
+	}
+
+	response := models.ResponseGetGoogleSheetByID{
+		Error:  models.NotAccept,
+		Status: http.StatusInternalServerError,
+	}
+	switch newAction.Type {
+	case models.NotionToken:
+		response = *a.service.CreateActionsNotion(newAction, serviceUserToken)
+  case models.NotionOAuth:
+    response = *a.service.CreateActionsNotion(newAction, serviceUserToken)
+	default:
+		log.Printf("ERROR | type not acceptable %v", newAction)
+	}
+	ctx.JSON(response.Status, response)
+}
+
 // not used retries
 func (a *ActionsController) PollingGetGoogleSheetByID(ctx *gin.Context) {
 	actionID := ctx.Param("idaction")

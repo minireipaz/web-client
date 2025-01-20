@@ -6,16 +6,22 @@ import (
 )
 
 type ActionsService struct {
-	actionsRepo repositories.ActionsRepository
+	actionsRepo repositories.ActionsHTTPRepository
 }
 
-func NewActionsService(repo repositories.ActionsRepository) *ActionsService {
+func NewActionsService(repo repositories.ActionsHTTPRepository) *ActionsService {
 	return &ActionsService{actionsRepo: repo}
 }
 
 func (a *ActionsService) CreateActionsGoogleSheet(newAction models.RequestGoogleAction, serviceUser *string) *models.ResponseGetGoogleSheetByID {
 	// model coupled
 	response := a.actionsRepo.CreateActionsGoogleSheet(newAction, serviceUser)
+	return response
+}
+
+func (a *ActionsService) CreateActionsNotion(newAction models.RequestGoogleAction, serviceUser *string) *models.ResponseGetGoogleSheetByID {
+	// model coupled
+	response := a.actionsRepo.CreateActionsNotion(newAction, serviceUser)
 	return response
 }
 

@@ -16,6 +16,8 @@ const (
 
 var ValidCredentialTypes = map[string]bool{
 	"googlesheets": true,
+  "notiontoken": true,
+  "notionoauth": true,
 }
 
 const (
@@ -25,6 +27,7 @@ const (
 	ValidateUserContextKey          = "user"
 	ValidateWorkflowContextKey      = "workflow"
 	ActionGoogleKey                 = "actiongoogle"
+  ActionNotionKey = "actionnotion"
 )
 
 var PermitedPathList = map[string]bool{
