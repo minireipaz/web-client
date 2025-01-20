@@ -1,21 +1,22 @@
-import { Button, Modal, TextInput, Label, Select } from 'flowbite-react';
-import { useState, memo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../AuthProvider/indexAuthProvider';
-import { ResponseGenerateWorkflow } from '../../models/QuickActions';
-import { getUriFrontend } from '../../utils/getUriFrontend';
-import { Workflow } from '../../models/Workflow';
+import { Button, Modal, TextInput, Label, Select, Alert } from "flowbite-react";
+import { useState, memo } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthProvider/indexAuthProvider";
+import { ResponseGenerateWorkflow } from "../../models/QuickActions";
+import { getUriFrontend } from "../../utils/getUriFrontend";
+import { Workflow } from "../../models/Workflow";
+import { COLOR_ALERTS } from "../../models/Credential";
 
 const emptyWorkflow: Workflow = {
-  name: '',
-  description: '',
-  directory_to_save: 'home',
-  id: '',
-  user_id: '',
-  created_at: '',
-  updated_at: '',
+  name: "",
+  description: "",
+  directory_to_save: "home",
+  id: "",
+  user_id: "",
+  created_at: "",
+  updated_at: "",
   status: 1,
-  start_time: '',
+  start_time: "",
   duration: 0,
   is_active: 1,
 };
@@ -23,12 +24,13 @@ const emptyWorkflow: Workflow = {
 export const QuickActions = memo(function QuickActions() {
   const [openModal, setOpenModal] = useState(false);
   const [workflow, setWorkflow] = useState<Workflow>(emptyWorkflow);
-  const [errorTitle, setErrorTitle] = useState<string>('');
+  // const [errorTitle, setErrorTitle] = useState<string>('');
   const [disabledButtonCreateWorkflow, setDisabledButtonCreateWorkflow] =
     useState(false);
+  const [messageSaved, setMessageSaved] = useState(<></>);
 
   const failConnection: ResponseGenerateWorkflow = {
-    error: 'Conexion error',
+    error: "Conexion error",
     status: 500,
   };
 
@@ -58,40 +60,42 @@ export const QuickActions = memo(function QuickActions() {
       setDisabledButtonCreateWorkflow(false);
       if (!isOk) {
         if (data.error) {
-          return showAlert(data.error);
+          return setConsoleAlert(data.error);
         }
-        setErrorTitle('Cannot connect');
-        return showAlert('Cannot connect');
+        showAlert("Cannot connect", COLOR_ALERTS.failure);
+        return setConsoleAlert("Cannot connect");
       }
-      setErrorTitle('');
       closeModal();
       navigate(`/workflow/${data?.workflow?.id}`, { state: data.workflow });
     } catch (error) {
-      console.error('Error creating workflow:', error);
-      return showAlert('Error creating workflow');
+      console.error("Error creating workflow:", error);
+      return setConsoleAlert("Error creating workflow");
     }
   }
 
   function checkValidations(workflow: Workflow) {
-    if (workflow.name.trim() === '') {
-      showAlert('Workflow name is required');
+    if (workflow.name.trim() === "") {
+      showAlert("Workflow name is required", COLOR_ALERTS.failure);
       return false;
     }
 
     if (workflow.name.length < 3 || workflow.name.length > 50) {
-      showAlert('Workflow name must be between 3 and 50 characters');
+      showAlert(
+        "Workflow name must be between 3 and 50 characters",
+        COLOR_ALERTS.failure,
+      );
       return false;
     }
 
-    if (workflow.directory_to_save.trim() === '') {
-      showAlert('Directory to save is required');
+    if (workflow.directory_to_save.trim() === "") {
+      showAlert("Directory to save is required", COLOR_ALERTS.failure);
       return false;
     }
     return true;
   }
 
   async function newWorkflow(
-    workflow: Workflow
+    workflow: Workflow,
   ): Promise<[boolean, ResponseGenerateWorkflow]> {
     try {
       const body: Workflow = {
@@ -99,9 +103,9 @@ export const QuickActions = memo(function QuickActions() {
         description: workflow.description,
         directory_to_save: workflow.directory_to_save,
         user_id: userInfo?.profile.sub,
-        id: '', // not set in user
+        id: "", // not set in client side
         status: 1,
-        created_at: '',
+        created_at: "",
         duration: 0,
         is_active: 1,
       };
@@ -111,15 +115,14 @@ export const QuickActions = memo(function QuickActions() {
         return [false, failConnection];
       }
       const response = await fetch(uriFrontend, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${userInfo?.access_token}`,
         },
         body: JSON.stringify(body),
       });
 
-      
       const data: ResponseGenerateWorkflow = await response.json();
       if (!data) {
         return [false, data];
@@ -129,13 +132,27 @@ export const QuickActions = memo(function QuickActions() {
       }
       return [true, data];
     } catch (error) {
-      console.error('Error creating workflow:', error);
+      console.error("Error creating workflow:", error);
       return [false, failConnection];
     }
   }
 
-  function showAlert(title: string) {
-    console.error('Alert title ', title);
+  function setConsoleAlert(title: string) {
+    console.error("Alert title ", title);
+  }
+
+  function showAlert(title: string, color: string) {
+    setMessageSaved(
+      <>
+        <Alert color={color} className="w-full">
+          <span className="font-medium">{title.toString()}.</span>
+        </Alert>
+      </>,
+    );
+
+    setTimeout(() => {
+      setMessageSaved(<></>);
+    }, 5000);
   }
 
   function closeModal() {
@@ -224,7 +241,7 @@ export const QuickActions = memo(function QuickActions() {
                 placeholder="Name of the workflow."
                 value={workflow.name}
                 onChange={onChangeWorkflowName}
-                maxLength={255}
+                maxLength={50}
                 required
               />
               <p className="text-xs text-black ">
@@ -238,7 +255,7 @@ export const QuickActions = memo(function QuickActions() {
                 placeholder="Description of the workflow."
                 value={workflow.description}
                 onChange={onChangeWorkflowDescription}
-                maxLength={255}
+                maxLength={50}
               />
               <p className="text-xs text-black ">
                 Enter description of the workflow.
@@ -252,7 +269,7 @@ export const QuickActions = memo(function QuickActions() {
                   className="w-full"
                   title="Select Folder"
                 >
-                  <option defaultValue={'home'} value="home">
+                  <option defaultValue={"home"} value="home">
                     Home
                   </option>
                 </Select>
@@ -269,7 +286,8 @@ export const QuickActions = memo(function QuickActions() {
             <Button color="gray" onClick={closeModal}>
               Close
             </Button>
-            <div className="text-black text-xs">{errorTitle}</div>
+            <span className="text-black">{messageSaved}</span>
+            {/* <div className="text-black text-xs">{errorTitle}</div> */}
             <Button
               onClick={onClickCreateWorkflow}
               disabled={disabledButtonCreateWorkflow}

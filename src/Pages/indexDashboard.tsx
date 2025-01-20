@@ -1,22 +1,22 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../components/AuthProvider/indexAuthProvider';
-import { NavDashboard } from '../components/Dashboard/NavDashboard';
-import { HeaderDashboard } from '../components/Header/Headers';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../components/AuthProvider/indexAuthProvider";
+import { NavDashboard } from "../components/Dashboard/NavDashboard";
+import { HeaderDashboard } from "../components/Header/Headers";
 import {
   DashboardData,
   ResponseDashboardData,
   WorkflowCounts,
-} from '../models/Dashboard';
-import { getUriFrontend } from '../utils/getUriFrontend';
-import { ContentDashboard } from '../components/Dashboard/ContentDashboard';
-import { Workflow } from '../models/Workflow';
-import { Node, Edge } from '@xyflow/react';
+} from "../models/Dashboard";
+import { getUriFrontend } from "../utils/getUriFrontend";
+import { ContentDashboard } from "../components/Dashboard/ContentDashboard";
+import { Workflow } from "../models/Workflow";
+import { Node, Edge } from "@xyflow/react";
 
 export default function Dashboard() {
   const { authenticated, handleTokenExpiration, userInfo } = useAuth();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
-    null
+    null,
   );
   const navigate = useNavigate();
   const fetchedRef = useRef(false);
@@ -28,16 +28,16 @@ export default function Dashboard() {
 
     try {
       const [ok, uriFrontend] = getUriFrontend(
-        `/api/v1/dashboard/${userInfo?.profile.sub}`
+        `/api/v1/dashboard/${userInfo?.profile.sub}`,
       );
       if (!ok) {
-        console.log('ERROR | cannot get uri frontend');
+        console.log("ERROR | cannot get uri frontend");
         return;
       }
       const response = await fetch(uriFrontend, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${userInfo?.access_token}`,
         },
       });
@@ -45,7 +45,7 @@ export default function Dashboard() {
       if (response.status === 401) {
         // Token has expired, handle expiration and redirect
         handleTokenExpiration();
-        navigate('/', { replace: true });
+        // navigate("/", { replace: true });
         return;
       }
 
@@ -55,21 +55,21 @@ export default function Dashboard() {
       }
 
       const data: ResponseDashboardData = await response.json();
-      if (data.error !== '' || data.status !== 200) {
-        console.log('ERROR | cannot get dashboard data');
+      if (data.error !== "" || data.status !== 200) {
+        console.log("ERROR | cannot get dashboard data");
         return;
       }
       let convertedDashboard: DashboardData = convertDashboardData(data);
       setDashboardData(convertedDashboard);
     } catch (error) {
       setDashboardData(null);
-      console.error('Error fetching dashboard data:', error);
+      console.error("Error fetching dashboard data:", error);
     }
   }, [handleTokenExpiration, navigate]);
 
   useEffect(() => {
     if (!authenticated) {
-      navigate('/', { replace: true });
+      navigate("/", { replace: true });
       return;
     }
 
@@ -87,15 +87,15 @@ export default function Dashboard() {
       }
     };
 
-    window.addEventListener('popstate', handlePopState);
+    window.addEventListener("popstate", handlePopState);
 
     return () => {
-      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener("popstate", handlePopState);
     };
   }, [fetchDashboardData, dashboardData]);
 
   function convertDashboardData(
-    responseData: ResponseDashboardData
+    responseData: ResponseDashboardData,
   ): DashboardData {
     let dashboard: DashboardData = {
       workflow_counts: [],

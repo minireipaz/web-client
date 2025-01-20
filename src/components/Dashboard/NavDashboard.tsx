@@ -1,5 +1,5 @@
-import { Link, useLocation } from 'react-router-dom';
-import { memo } from 'react';
+import { Link, useLocation } from "react-router-dom";
+import { memo } from "react";
 
 export const NavDashboard = memo(function NavDashboard() {
   const location = useLocation();
@@ -36,7 +36,7 @@ export const NavDashboard = memo(function NavDashboard() {
               <Link
                 to="/dashboard"
                 className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors
-                ${isActive('/dashboard') ? 'bg-blue-500 text-white' : 'hover:bg-[rgba(255,255,255,0.1)]'}
+                ${isActive("/dashboard") ? "bg-blue-500 text-white" : "hover:bg-[rgba(255,255,255,0.1)]"}
                 `}
               >
                 <svg
@@ -60,7 +60,7 @@ export const NavDashboard = memo(function NavDashboard() {
               <Link
                 to="/workflows"
                 className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors
-                ${isActive('/workflow') ? 'bg-blue-500 text-white' : 'hover:bg-[rgba(255,255,255,0.1)]'}
+                ${isActive("/workflow") ? "bg-blue-500 text-white" : "hover:bg-[rgba(255,255,255,0.1)]"}
                 `}
               >
                 <svg
@@ -85,7 +85,7 @@ export const NavDashboard = memo(function NavDashboard() {
               <Link
                 to="/credentials"
                 className={`flex items-cente gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors
-                ${isActive('/credentials') ? 'bg-blue-500 text-white' : 'hover:bg-[rgba(255,255,255,0.1)]'}
+                ${isActive("/credentials") ? "bg-blue-500 text-white" : "hover:bg-[rgba(255,255,255,0.1)]"}
                 `}
               >
                 <svg
@@ -104,7 +104,7 @@ export const NavDashboard = memo(function NavDashboard() {
               <Link
                 to="/history"
                 className={`flex items-cente gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors
-                ${isActive('/history') ? 'bg-blue-500 text-white' : 'hover:bg-[rgba(255,255,255,0.1)]'}
+                ${isActive("/history") ? "bg-blue-500 text-white" : "hover:bg-[rgba(255,255,255,0.1)]"}
                 `}
               >
                 <svg
@@ -129,7 +129,7 @@ export const NavDashboard = memo(function NavDashboard() {
               <Link
                 to="/settings"
                 className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors
-                ${isActive('/settings') ? 'bg-blue-500 text-white' : 'hover:bg-[rgba(255,255,255,0.1)]'}
+                ${isActive("/settings") ? "bg-blue-500 text-white" : "hover:bg-[rgba(255,255,255,0.1)]"}
                 `}
               >
                 <svg

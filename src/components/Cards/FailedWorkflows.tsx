@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
-import { DashboardData } from '../../models/Dashboard';
-import { Spinner } from 'flowbite-react';
+import { useMemo } from "react";
+import { DashboardData } from "../../models/Dashboard";
+import { Spinner } from "flowbite-react";
 
 interface ContainerProps {
   dashboardData: DashboardData | null;
@@ -15,7 +15,7 @@ export function FailedWorkflows(props: ContainerProps) {
   }, [props.dashboardData]);
 
   const displayFailedWorkflows = useMemo(() => {
-    return Number.isInteger(failedWorkflows) ? failedWorkflows : '--';
+    return Number.isInteger(failedWorkflows) ? failedWorkflows : "--";
   }, [failedWorkflows]);
 
   return (

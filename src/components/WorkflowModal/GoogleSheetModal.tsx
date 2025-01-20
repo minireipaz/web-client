@@ -1,11 +1,11 @@
-import { Label, Select, TextInput, Button } from 'flowbite-react';
-import { COLOR_ALERTS, ModalCredentialData } from '../../models/Credential';
-import React, { useMemo, useState } from 'react';
-import { useRequest } from '../../utils/requests';
-import { getUriFrontend } from '../../utils/getUriFrontend';
-import { ERRORTEXT, ResponseSaveFormData } from './Modal';
-import { useAuth } from '../AuthProvider/indexAuthProvider';
-import { FormData } from '../../models/Workflow';
+import { Label, Select, TextInput, Button } from "flowbite-react";
+import { COLOR_ALERTS, ModalCredentialData } from "../../models/Credential";
+import React, { useMemo, useState } from "react";
+import { useRequest } from "../../utils/requests";
+import { getUriFrontend } from "../../utils/getUriFrontend";
+import { ERRORTEXT, ResponseSaveFormData } from "./Modal";
+import { useAuth } from "../AuthProvider/indexAuthProvider";
+import { FormData } from "../../models/Workflow";
 
 interface GoogleSheetsModalProps {
   currentCredential: ModalCredentialData;
@@ -36,7 +36,7 @@ export function GoogleSheetsModalContent(props: GoogleSheetsModalProps) {
       recentCredentials.push(
         <option key={element.id} value={element.id}>
           {element.name}
-        </option>
+        </option>,
       );
     }
     return recentCredentials;
@@ -44,7 +44,7 @@ export function GoogleSheetsModalContent(props: GoogleSheetsModalProps) {
 
   const MemoizedLabelCredential = useMemo(
     () => <Label htmlFor="credential" value="Credential to connect with" />,
-    []
+    [],
   );
 
   const MemoizedButtonCredential = useMemo(
@@ -53,30 +53,30 @@ export function GoogleSheetsModalContent(props: GoogleSheetsModalProps) {
         className="whitespace-nowrap w-max"
         onClick={props.onOpenCredential}
       >
-        {props.currentCredential?.id !== 'none' ? 'Edit' : 'New'} Credential
+        {props.currentCredential?.id !== "none" ? "Edit" : "New"} Credential
       </Button>
     ),
-    [props.onOpenCredential, props.currentCredential?.id]
+    [props.onOpenCredential, props.currentCredential?.id],
   );
 
   const MemoizedLabelPollMode = useMemo(
     () => <Label htmlFor="pollMode" value="Poll Times" />,
-    []
+    [],
   );
 
   const MemoizedLabelOperation = useMemo(
     () => <Label htmlFor="document" value="Operation" />,
-    []
+    [],
   );
 
   const MemoizedLabelDocument = useMemo(
     () => <Label htmlFor="document" value="Document" />,
-    []
+    [],
   );
 
   const MemoizedLabelSheet = useMemo(
     () => <Label htmlFor="sheet" value="Sheet" />,
-    []
+    [],
   );
 
   return (
@@ -155,7 +155,7 @@ export function GoogleSheetsModalContent(props: GoogleSheetsModalProps) {
               id="selectdocument"
               name="selectdocument"
               className="w-1/3"
-              value={props.formData.selectdocument || 'byuri'}
+              value={props.formData.selectdocument || "byuri"}
               onChange={props.onSelectDocumentChange}
             >
               <option value="byuri">By URL</option>
@@ -168,9 +168,9 @@ export function GoogleSheetsModalContent(props: GoogleSheetsModalProps) {
               value={props.formData.document as string}
               onChange={props.onDocumentChange}
               placeholder={
-                props.formData.selectdocument === 'byuri'
-                  ? 'Enter URL'
-                  : 'Not Implemented'
+                props.formData.selectdocument === "byuri"
+                  ? "Enter URL"
+                  : "Not Implemented"
               }
             />
           </div>
@@ -196,9 +196,9 @@ export function GoogleSheetsModalContent(props: GoogleSheetsModalProps) {
               value={props.formData.sheet}
               onChange={props.onSheetChange}
               placeholder={
-                props.formData.selectsheet === 'byname'
-                  ? 'Enter Name'
-                  : 'Not Implemented'
+                props.formData.selectsheet === "byname"
+                  ? "Enter Name"
+                  : "Not Implemented"
               }
             />
           </div>
@@ -213,58 +213,59 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
   const [disabledButtonTest, setDisabledButtonTest] = useState(false);
   const { executeRequest } = useRequest();
   const failConnection: ResponseSaveFormData = {
-    error: 'Conexion error',
+    error: "Conexion error",
     status: 500,
-    data: '',
+    data: "",
   };
   const MAX_ATTEMPTS = 11;
   const DELAY = 1_000; // 1sec
 
   async function handleSubmitTest(event: any) {
     event.preventDefault();
-    if (props.dataNode.type !== 'googlesheets') return;
+    if (props.dataNode.type !== "googlesheets") return;
     if (!validateForm(props.formData)) return;
     setDisabledButtonTest(true);
     try {
       const result = await executeRequest(
-        async (signal) => {
+        async signal => {
           return await sendFormData(
             props.formData,
             props.dataNode as Record<string, ModalCredentialData>,
-            signal
+            signal,
           );
         },
         {
           onSuccess: () => {
-            console.log('ok');
+            console.log("ok");
           },
-          onError: (error) => {
-            console.error('Error Testing:', error);
-            props.showAlert('Error testing credential', COLOR_ALERTS.failure);
+          onError: error => {
+            console.error("Error Testing:", error);
+            props.showAlert("Error testing credential", COLOR_ALERTS.failure);
           },
           onFinally: () => {
             // setDisabledButtonTest(false);
           },
-        }
+        },
       );
 
       if (!result) {
         setDisabledButtonTest(false);
-        console.error('Error Testing:', JSON.stringify(result));
-        props.showAlert('Error testing', COLOR_ALERTS.failure);
+        console.error("Error Testing:", JSON.stringify(result));
+        props.showAlert("Error testing", COLOR_ALERTS.failure);
         return;
       }
 
       const [isOk, dataResponse] = result as [boolean, ResponseSaveFormData];
       if (!isOk) {
-        props.showAlert('Cannot connect', COLOR_ALERTS.failure);
+        setDisabledButtonTest(false);
+        props.showAlert("Cannot connect", COLOR_ALERTS.failure);
         return;
       }
 
-      if (dataResponse.data === '') {
+      if (dataResponse.data === "") {
         setDisabledButtonTest(false);
-        console.error('Error Testing:', JSON.stringify(result));
-        props.showAlert('Error testing', COLOR_ALERTS.failure);
+        console.error("Error Testing:", JSON.stringify(result));
+        props.showAlert("Error testing", COLOR_ALERTS.failure);
         return;
       }
 
@@ -273,35 +274,35 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
       return;
     } catch (error: any) {
       setDisabledButtonTest(false);
-      if (error.name === 'AbortError') {
-        return console.log('canceled');
+      if (error.name === "AbortError") {
+        return console.log("canceled");
       }
-      console.error('Error Testing:', error);
-      return props.showAlert('Error testing', COLOR_ALERTS.failure);
+      console.error("Error Testing:", error);
+      return props.showAlert("Error testing", COLOR_ALERTS.failure);
     }
   }
 
   async function sendFormData(
     formData: FormData,
     node: Record<string, ModalCredentialData>,
-    signal: AbortSignal | undefined
+    signal: AbortSignal | undefined,
   ): Promise<[boolean, ResponseSaveFormData]> {
     try {
-      const [ok, uriFrontend] = getUriFrontend('/actions/google/sheets');
+      const [ok, uriFrontend] = getUriFrontend("/actions/google/sheets");
       if (!ok) {
         return [false, failConnection];
       }
       const body: FormData = createBodySendFormData(formData, node);
       const response = await fetch(uriFrontend, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${userInfo?.access_token}`,
         },
         body: JSON.stringify(body),
         signal,
       });
-
+      // TODO: token expiration
       if (response.status === 401) {
         // Token maybe has expired, handle expiration and redirect
         // handleTokenExpiration();
@@ -319,13 +320,14 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
       }
       return [true, data];
     } catch (error) {
+      console.log("error", error);
       return [false, failConnection];
     }
   }
 
   function createBodySendFormData(
     formData: FormData,
-    node: Record<string, ModalCredentialData>
+    node: Record<string, ModalCredentialData>,
   ): FormData {
     return {
       pollmode: formData.pollmode,
@@ -345,8 +347,8 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
   }
 
   function validateForm(formdata: FormData): boolean {
-    if (formdata.credentialid === '' || formdata.credentialid === "none") {
-      props.showAlert('Select valid credential', COLOR_ALERTS.failure);
+    if (formdata.credentialid === "" || formdata.credentialid === "none") {
+      props.showAlert("Select valid credential", COLOR_ALERTS.failure);
       return false;
     }
 
@@ -355,25 +357,26 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
       return false;
     }
 
-    if (formdata.document.trim() !== '') {
+    if (formdata.document.trim() !== "") {
       try {
         if (!URL.canParse(formdata.document)) {
           props.showAlert(ERRORTEXT.notvalidurl, COLOR_ALERTS.failure);
           return false;
         }
-        if (formdata.sheet !== '') {
+        if (formdata.sheet !== "") {
           props.showAlert("sheet name not implemented", COLOR_ALERTS.failure);
           return false;
         }
       } catch (error) {
+        console.log("error", error);
         props.showAlert(ERRORTEXT.notvalidurl, COLOR_ALERTS.failure);
         return false;
       }
     }
 
     if (
-      formdata.selectdocument !== 'byuri' &&
-      formdata.selectdocument !== 'byothers'
+      formdata.selectdocument !== "byuri" &&
+      formdata.selectdocument !== "byothers"
     ) {
       props.showAlert(ERRORTEXT.notvalidoptiondocument, COLOR_ALERTS.failure);
       return false;
@@ -383,7 +386,7 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
   }
 
   async function startPolling(actionID: string) {
-    if (actionID === '') return;
+    if (actionID === "") return;
 
     let abortController = new AbortController();
 
@@ -391,26 +394,26 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
       try {
         const success = await pollingActionTest(
           actionID,
-          abortController.signal
+          abortController.signal,
         );
         if (success) {
           return;
         }
       } catch (error) {
-        console.error('Error: ', error);
+        console.error("Error: ", error);
       }
       // incremental delay btw maybe not need +random offset
-      await new Promise((resolve) => setTimeout(resolve, DELAY * attempt));
+      await new Promise(resolve => setTimeout(resolve, DELAY * attempt));
     }
     // error path
     setDisabledButtonTest(false);
-    props.showAlert('Error conection', COLOR_ALERTS.failure);
+    props.showAlert("Error conection", COLOR_ALERTS.failure);
     abortController.abort();
   }
 
   async function pollingActionTest(
     actionID: string,
-    signal: AbortSignal
+    signal: AbortSignal,
   ): Promise<boolean> {
     try {
       const result = await executeRequest(
@@ -418,45 +421,45 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
           return await pollTest(actionID, signal as AbortSignal);
         },
         {
-          onSuccess: () => console.log('Request successful.'),
-          onError: (error) => console.error('Request error:', error),
+          onSuccess: () => console.log("Request successful."),
+          onError: error => console.error("Request error:", error),
           onFinally: () => setDisabledButtonTest(false),
-        }
+        },
       );
 
       if (!result) return false;
 
       const [isOk, dataResponse] = result as [boolean, ResponseSaveFormData];
-      if (!isOk || dataResponse.data === '') return false;
+      if (!isOk || dataResponse.data === "") return false;
 
       props.handleTest(dataResponse);
       return true;
     } catch (error) {
-      console.error('Error in pollingActionTest:', error);
+      console.error("Error in pollingActionTest:", error);
       return false;
     }
   }
 
   async function pollTest(
     actionID: string,
-    signal: AbortSignal
+    signal: AbortSignal,
   ): Promise<[boolean, ResponseSaveFormData]> {
     try {
       const [ok, uriFrontend] = getUriFrontend(
-        `/actions/google/sheets/${userInfo?.profile.sub}/${actionID}`
+        `/actions/google/sheets/${userInfo?.profile.sub}/${actionID}`,
       );
       if (!ok) return [false, failConnection];
 
       // const body = createBodySendFormData(formData, node);
       const response = await fetch(uriFrontend, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${userInfo?.access_token}`,
         },
         signal,
       });
-
+      // TODO: token expiration
       if (response.status === 401) {
         // Token maybe has expired, handle expiration and redirect
         // handleTokenExpiration();
@@ -466,21 +469,26 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
       if (!response.ok) return [false, failConnection];
 
       const data: ResponseSaveFormData = await response.json();
-      if (!data || (data.status !== 200 && data.status !== 202)) return [false, failConnection];
+      if (!data || (data.status !== 200 && data.status !== 202))
+        return [false, failConnection];
 
       const values = transformPollingData(data);
       return [true, values];
     } catch (error) {
-      console.error('Error in pollTest:', error);
+      console.error("Error in pollTest:", error);
       return [false, failConnection];
     }
   }
 
-  function transformPollingData(data: ResponseSaveFormData): ResponseSaveFormData {
+  function transformPollingData(
+    data: ResponseSaveFormData,
+  ): ResponseSaveFormData {
     try {
       const parsedData = JSON.parse(data.data) as ResponseSaveFormData;
       // TODO: need test for empty value
-      const valuesRaw = parsedData.data ? JSON.parse(parsedData.data).values : "";
+      const valuesRaw = parsedData.data
+        ? JSON.parse(parsedData.data).values
+        : "";
       const transformedData = JSON.stringify(valuesRaw.values);
       return {
         status: 200,
@@ -488,6 +496,7 @@ export function GoogleSheetButton(props: GoogleSheetButtonProps) {
         data: transformedData,
       };
     } catch (error) {
+      console.log("error", error);
       return {
         status: 500,
         error: "",

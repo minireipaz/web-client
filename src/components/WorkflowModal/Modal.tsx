@@ -1,28 +1,33 @@
-import { Alert, Button, Modal } from 'flowbite-react';
-import React, { useEffect, useState, useCallback } from 'react';
-import { RenderGoogleSheetsOAuth2Api } from '../Credentials/GoogleSheetsOAuth2Api';
+import { Alert, Button, Modal } from "flowbite-react";
+import React, { useEffect, useState, useCallback } from "react";
+import { RenderGoogleSheetsOAuth2Api } from "../Credentials/GoogleSheetsOAuth2Api";
 import {
   GoogleSheetButton,
   GoogleSheetsModalContent,
-} from './GoogleSheetModal';
-import { Node, ReactFlowInstance } from '@xyflow/react';
+} from "./GoogleSheetModal";
+import { Node, ReactFlowInstance } from "@xyflow/react";
 import {
   COLOR_ALERTS,
   DEFAULT_CREDENTIAL_REDIRECT_PATH,
   DEFAULT_CREDENTIAL_TITLES,
   ModalCredentialData,
-} from '../../models/Credential';
-import { ModalCredential } from '../Credentials/ModalCredential';
-import { useAuth } from '../AuthProvider/indexAuthProvider';
-import { FormData } from '../../models/Workflow';
-import { RenderNotionApi } from '../Credentials/NotionInternalAuthApi';
+} from "../../models/Credential";
+import { ModalCredential } from "../Credentials/ModalCredential";
+import { useAuth } from "../AuthProvider/indexAuthProvider";
+import { FormData } from "../../models/Workflow";
+import { RenderNotionApi } from "../Credentials/NotionInternalAuthApi";
+import { TypeNodes } from "../Workflow/WorkflowDrawer";
+import { NotionButton, NotionModal } from "./NotionModal";
 
 interface ContainerProps {
   isOpen: boolean;
   dataNode: Node;
   credentials: ModalCredentialData[];
   onUpdateNode: (newCredentialData: ModalCredentialData) => void;
-  onSaveModal: (formData: FormData, dataNode: Node) => Promise<boolean | undefined>;
+  onSaveModal: (
+    formData: FormData,
+    dataNode: Node,
+  ) => Promise<boolean | undefined>;
   onClose: () => void;
   flowInstance: ReactFlowInstance | null;
 }
@@ -36,36 +41,36 @@ interface NodeData {
 }
 
 export const defaultFormModal: FormData = {
-  pollmode: 'none',
-  selectdocument: 'byuri',
-  document: '',
-  selectsheet: 'byname',
-  sheet: '',
-  operation: 'getallcontent',
-  credentialid: '',
-  sub: '',
-  type: '',
-  workflowid: '',
-  nodeid: '',
-  redirecturl: '',
+  pollmode: "none",
+  selectdocument: "byuri",
+  document: "",
+  selectsheet: "byname",
+  sheet: "",
+  operation: "getallcontent",
+  credentialid: "",
+  sub: "",
+  type: "",
+  workflowid: "",
+  nodeid: "",
+  redirecturl: "",
   testmode: false,
 };
 
 export const defaultCredential: ModalCredentialData = {
-  id: 'none',
-  type: 'none',
+  id: "none",
+  type: "none",
   alertMessage: <></>,
-  workflowid: '',
-  nodeid: '',
-  sub: '',
-  name: 'Select credential',
+  workflowid: "",
+  nodeid: "",
+  sub: "",
+  name: "Select credential",
   data: {
-    clientId: '',
-    clientSecret: '',
-    redirectURL: '',
-    code: '',
-    scopes: [''],
-    state: '',
+    clientId: "",
+    clientSecret: "",
+    redirectURL: "",
+    code: "",
+    scopes: [""],
+    state: "",
     // token: '',
     // tokenrefresh: '',
   },
@@ -104,18 +109,18 @@ export interface ResponseSaveFormData {
 }
 
 export const enum ERRORTEXT {
-  notvalidurl = 'Not valid URL in Document',
-  notvalidoptiondocument = 'Select Document not valid option',
+  notvalidurl = "Not valid URL in Document",
+  notvalidoptiondocument = "Select Document not valid option",
   notsavedyet = "Already not saved",
   notsaved = "Not Saved!",
-  saved = "Saved"
+  saved = "Saved",
 }
 
 export function WorkflowModal(props: ContainerProps) {
   const [currentCredential, setCurrentCredential] =
     useState<ModalCredentialData>(defaultCredential);
   const [listCredentials, setListCredentials] = useState<ModalCredentialData[]>(
-    [...props.credentials]
+    [...props.credentials],
   );
   const [currentCredentialComponent, setCurrentCredentialComponent] =
     useState<CredentialComponent | null>(null);
@@ -124,13 +129,14 @@ export function WorkflowModal(props: ContainerProps) {
   const [CurrentButtonComponent, setCurrentButtonComponent] =
     useState<ModalButtonComponent | null>(null);
   const [contentTest, setContentTest] = useState<React.ReactElement>();
-  const [sizeModal, setSizeModal] = useState('xl');
+  const [sizeModal, setSizeModal] = useState("xl");
   const { userInfo } = useAuth();
   const [alertMessage, setAlertMessage] = useState(<></>);
   // set default values from formularyData btw
   // already setted in WorkflowDrawer
   // TODO: maybe later can be removed
-  const [formularyData, setFormularyData] = useState<FormData>(defaultFormModal);
+  const [formularyData, setFormularyData] =
+    useState<FormData>(defaultFormModal);
   const [isModalCredentialOpen, setIsModalCredentialOpen] = useState(false);
 
   // default relative paths from diferent type providers
@@ -145,7 +151,7 @@ export function WorkflowModal(props: ContainerProps) {
     (
       prevCredential: ModalCredentialData,
       nodeData: { type: string; nodeid: string; workflowid: string },
-      userInfo?: any
+      userInfo?: any,
     ): ModalCredentialData => {
       // extract the node type, node ID, and workflow ID from the node data
       // this data is used to override necessary data to maintain cohesion
@@ -167,7 +173,7 @@ export function WorkflowModal(props: ContainerProps) {
         },
       };
     },
-    [getRedirectURL]
+    [getRedirectURL],
   );
 
   // Update the initialSetCredentialForNode function
@@ -187,7 +193,7 @@ export function WorkflowModal(props: ContainerProps) {
 
     // if already credential exist in nodedata
     if (credential.id) {
-      if (credential && credential.id !== 'none') {
+      if (credential && credential.id !== "none") {
         setCurrentCredential(credential);
         return;
       }
@@ -197,18 +203,24 @@ export function WorkflowModal(props: ContainerProps) {
     const updatedCredential = updateCredentialProperties(
       defaultCredential,
       nodeData,
-      userInfo
+      userInfo,
     );
     setCurrentCredential(updatedCredential);
   }, [props.dataNode, updateCredentialProperties, userInfo, formularyData]);
 
-  function mergeFormData(defaultValues: FormData, formdata: FormData, credential: ModalCredentialData) {
+  function mergeFormData(
+    defaultValues: FormData,
+    formdata: FormData,
+    credential: ModalCredentialData,
+  ) {
     const mergedData = { ...defaultValues };
-    Object.keys(formdata).forEach((key) => {
-      if (formdata[key] !== '') {
-        mergedData[key] = formdata[key];
-      }
-    });
+    if (formdata) {
+      Object.keys(formdata).forEach(key => {
+        if (formdata[key] !== "") {
+          mergedData[key] = formdata[key];
+        }
+      });
+    }
     if (credential) {
       if (credential.id !== "") {
         mergedData["credentialid"] = credential.id;
@@ -219,30 +231,32 @@ export function WorkflowModal(props: ContainerProps) {
 
   useEffect(() => {
     if (!props.dataNode) return;
-    if (props.dataNode.data.type === 'googlesheets') {
+    if (props.dataNode.data.type === TypeNodes.googlesheets) {
       setCurrentCredentialComponent(() => RenderGoogleSheetsOAuth2Api);
       setCurrentModalComponent(() => GoogleSheetsModalContent);
       setCurrentButtonComponent(() => GoogleSheetButton);
-
     }
-    if (props.dataNode.data.type === "notiongetdatabase") {
+    if (
+      props.dataNode.data.type === TypeNodes.notiontoken ||
+      props.dataNode.data.type === TypeNodes.notionoauth
+    ) {
       setCurrentCredentialComponent(() => RenderNotionApi);
-      setCurrentModalComponent(() => GoogleSheetsModalContent);
-      setCurrentButtonComponent(() => GoogleSheetButton);
+      setCurrentModalComponent(() => NotionModal);
+      setCurrentButtonComponent(() => NotionButton);
     }
     initialSetCredentialForNode();
   }, [props.dataNode]);
 
   const handleInputChange = useCallback((event: any) => {
-    setFormularyData((prevFormData) => ({
+    setFormularyData(prevFormData => ({
       ...prevFormData,
       [event.target.name]: event.target.value,
     }));
   }, []);
 
   const handleTest = useCallback((dataResponse: ResponseSaveFormData) => {
-    setSizeModal('7xl');
-    console.log('response=' + JSON.stringify(dataResponse));
+    setSizeModal("7xl");
+    console.log("response=" + JSON.stringify(dataResponse));
     setContentTest(
       <>
         <div
@@ -252,12 +266,12 @@ export function WorkflowModal(props: ContainerProps) {
         >
           {dataResponse.data}
         </div>
-      </>
+      </>,
     );
   }, []);
 
   const handleClose = useCallback(() => {
-    setSizeModal('xl');
+    setSizeModal("xl");
     setContentTest(<></>);
     setFormularyData(defaultFormModal);
     props.onClose();
@@ -282,25 +296,25 @@ export function WorkflowModal(props: ContainerProps) {
   }, [props, formularyData]);
 
   function validateForm(formData: FormData): boolean {
-    if (formData.credentialid === '' || formData.credentialid === "none") {
-      showAlert('Select valid credential', COLOR_ALERTS.failure);
+    if (formData.credentialid === "" || formData.credentialid === "none") {
+      showAlert("Select valid credential", COLOR_ALERTS.failure);
       return false;
     }
 
-    if (formData.sheet !== '') {
+    if (formData.sheet !== "") {
       showAlert("sheet name not implemented", COLOR_ALERTS.failure);
       return false;
     }
 
     if (
-      formData.selectdocument !== 'byuri' &&
-      formData.selectdocument !== 'byothers'
+      formData.selectdocument !== "byuri" &&
+      formData.selectdocument !== "byothers"
     ) {
       showAlert(ERRORTEXT.notvalidoptiondocument, COLOR_ALERTS.failure);
       return false;
     }
 
-    if (formData.document !== '') {
+    if (formData.document !== "") {
       try {
         if (!URL.canParse(formData.document)) {
           showAlert(ERRORTEXT.notvalidurl, COLOR_ALERTS.failure);
@@ -311,6 +325,7 @@ export function WorkflowModal(props: ContainerProps) {
         //   return false;
         // }
       } catch (error) {
+        console.log("error", error);
         showAlert(ERRORTEXT.notvalidurl, COLOR_ALERTS.failure);
         return false;
       }
@@ -320,7 +335,7 @@ export function WorkflowModal(props: ContainerProps) {
   }
 
   const changeCredentialProperties = useCallback(() => {
-    if (currentCredential.id !== 'none') return;
+    if (currentCredential.id !== "none") return;
     if (!props.dataNode.data) return;
 
     const updatedCredential = updateCredentialProperties(
@@ -332,7 +347,7 @@ export function WorkflowModal(props: ContainerProps) {
         credential: ModalCredentialData;
         formdata: FormData;
       },
-      userInfo
+      userInfo,
     );
 
     setFormularyData({
@@ -360,7 +375,7 @@ export function WorkflowModal(props: ContainerProps) {
     (newCredential: ModalCredentialData) => {
       const updatedListCredentials = [...listCredentials];
       const index = updatedListCredentials.findIndex(
-        (cred) => cred.id === newCredential.id
+        cred => cred.id === newCredential.id,
       );
       if (index !== -1) {
         updatedListCredentials[index] = {
@@ -372,12 +387,13 @@ export function WorkflowModal(props: ContainerProps) {
       }
       return updatedListCredentials;
     },
-    [listCredentials]
+    [listCredentials],
   );
 
   const handleSaveModalCredential = useCallback(
     (newCredential: ModalCredentialData) => {
-      const updatedListCredentials = handleInsertCredentialInList(newCredential);
+      const updatedListCredentials =
+        handleInsertCredentialInList(newCredential);
       setListCredentials(updatedListCredentials);
       setCurrentCredential(newCredential);
       setFormularyData({
@@ -392,7 +408,7 @@ export function WorkflowModal(props: ContainerProps) {
       setIsModalCredentialOpen(false);
       props.onUpdateNode(newCredential);
     },
-    [handleInsertCredentialInList, props, formularyData]
+    [handleInsertCredentialInList, props, formularyData],
   );
 
   const handleSetCredential = useCallback(
@@ -412,7 +428,7 @@ export function WorkflowModal(props: ContainerProps) {
         redirecturl: newCredential.data.redirectURL,
       });
     },
-    [listCredentials, formularyData]
+    [listCredentials, formularyData],
   );
 
   const showAlert = useCallback((title: string, color: string) => {
@@ -421,7 +437,7 @@ export function WorkflowModal(props: ContainerProps) {
         <Alert color={color} className="w-full">
           <span className="font-medium">{title.toString()}.</span>
         </Alert>
-      </>
+      </>,
     );
     setTimeout(() => {
       setAlertMessage(<></>);

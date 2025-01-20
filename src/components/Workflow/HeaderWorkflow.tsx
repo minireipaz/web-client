@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Button, ToggleSwitch } from 'flowbite-react';
-import {  MsgSaved, savedStatus, Workflow } from '../../models/Workflow';
+import React, { useState } from "react";
+import { Button, ToggleSwitch } from "flowbite-react";
+import { MsgSaved, savedStatus, Workflow } from "../../models/Workflow";
 
 interface ContainerProps {
   workflow: Workflow;
@@ -9,10 +9,13 @@ interface ContainerProps {
 }
 
 export default function HeaderWorkflow(props: ContainerProps) {
-  const [msgSaved, setMsgSaved] = useState<MsgSaved>({ classText: "", text: "" });
+  const [msgSaved, setMsgSaved] = useState<MsgSaved>({
+    classText: "",
+    text: "",
+  });
 
   function handleNameChange(event: React.ChangeEvent<HTMLInputElement>) {
-    if (event.target.value === '') return;
+    if (event.target.value === "") return;
     const tempWorkflow = {
       ...props.workflow,
       name: event.target.value,
@@ -30,7 +33,7 @@ export default function HeaderWorkflow(props: ContainerProps) {
 
   async function onSave() {
     const saved = await props.onSave();
-    let msgSaved = { text: "Saved!" , classText: savedStatus.done };
+    let msgSaved = { text: "Saved!", classText: savedStatus.done };
     if (!saved) {
       msgSaved = { text: "Not Saved!", classText: savedStatus.alert };
     }

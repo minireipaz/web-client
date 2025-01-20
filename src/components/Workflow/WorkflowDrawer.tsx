@@ -1,5 +1,5 @@
-import { Drawer } from 'flowbite-react';
-import { NodeData } from '../../models/Workflow';
+import { Drawer } from "flowbite-react";
+import { NodeData } from "../../models/Workflow";
 
 interface ContainerProps {
   isOpen: boolean;
@@ -8,9 +8,9 @@ interface ContainerProps {
 }
 
 export const TypeNodes = {
-  googlesheets: 'googlesheets',
-  notionoauth: 'notionoauth',
-  notiontoken: "notiontoken"
+  googlesheets: "googlesheets",
+  notionoauth: "notionoauth",
+  notiontoken: "notiontoken",
 };
 
 export function WorkflowDrawer(props: ContainerProps) {
@@ -45,18 +45,18 @@ export function WorkflowDrawer(props: ContainerProps) {
               type={TypeNodes.googlesheets}
               label="Google Sheets"
               formdata={{
-                pollmode: 'none',
-                selectdocument: 'byuri',
-                document: '',
-                selectsheet: 'byname',
-                sheet: '',
-                operation: 'getallcontent',
-                credentialid: '',
-                sub: '',
-                type: '',
-                workflowid: '',
-                nodeid: '',
-                redirecturl: '',
+                pollmode: "none",
+                selectdocument: "byuri",
+                document: "",
+                selectsheet: "byname",
+                sheet: "",
+                operation: "getallcontent",
+                credentialid: "",
+                sub: "",
+                type: "",
+                workflowid: "",
+                nodeid: "",
+                redirecturl: "",
                 testmode: false,
               }}
             />
@@ -67,18 +67,18 @@ export function WorkflowDrawer(props: ContainerProps) {
               type={TypeNodes.notiontoken}
               label="Notion Get Database"
               formdata={{
-                pollmode: 'none',
-                selectdocument: 'byuri',
-                document: '',
-                selectsheet: 'byname',
-                sheet: '',
-                operation: 'getallcontent',
-                credentialid: '',
-                sub: '',
-                type: '',
-                workflowid: '',
-                nodeid: '',
-                redirecturl: '',
+                pollmode: "none",
+                selectdocument: "byuri",
+                document: "",
+                selectsheet: "byname",
+                sheet: "",
+                operation: "getallcontent",
+                credentialid: "",
+                sub: "",
+                type: "",
+                workflowid: "",
+                nodeid: "",
+                redirecturl: "",
                 testmode: false,
               }}
             />
@@ -89,18 +89,18 @@ export function WorkflowDrawer(props: ContainerProps) {
               type="output"
               label="Notion Update Database"
               formdata={{
-                pollmode: 'none',
-                selectdocument: 'byuri',
-                document: '',
-                selectsheet: 'byname',
-                sheet: '',
-                operation: 'getallcontent',
-                credentialid: '',
-                sub: '',
-                type: '',
-                workflowid: '',
-                nodeid: '',
-                redirecturl: '',
+                pollmode: "none",
+                selectdocument: "byuri",
+                document: "",
+                selectsheet: "byname",
+                sheet: "",
+                operation: "getallcontent",
+                credentialid: "",
+                sub: "",
+                type: "",
+                workflowid: "",
+                nodeid: "",
+                redirecturl: "",
                 testmode: false,
               }}
             />

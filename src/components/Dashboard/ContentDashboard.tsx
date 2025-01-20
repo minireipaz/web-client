@@ -1,18 +1,18 @@
-import React from 'react';
-import { DashboardData } from '../../models/Dashboard';
-import { FailedWorkflows } from '../Cards/FailedWorkflows';
-import { PendingWorkflows } from '../Cards/PendingWorkflows';
-import { QuickActions } from '../Cards/QuickActions';
-import { RecentActivity } from '../Cards/RecentActivity';
-import { RecentWorkflows } from '../Cards/RecentWorkflows';
-import { SuccessWorkflows } from '../Cards/SuccessWorkflows';
-import { TotalWorkflows } from '../Cards/TotalWorkflows';
+import React from "react";
+import { DashboardData } from "../../models/Dashboard";
+import { FailedWorkflows } from "../Cards/FailedWorkflows";
+import { PendingWorkflows } from "../Cards/PendingWorkflows";
+import { QuickActions } from "../Cards/QuickActions";
+import { RecentActivity } from "../Cards/RecentActivity";
+import { RecentWorkflows } from "../Cards/RecentWorkflows";
+import { SuccessWorkflows } from "../Cards/SuccessWorkflows";
+import { TotalWorkflows } from "../Cards/TotalWorkflows";
 
 interface ContainerProps {
   dashboardData: DashboardData | null;
 }
 export const ContentDashboard = React.memo(function ContentDashboard(
-  props: ContainerProps
+  props: ContainerProps,
 ) {
   return (
     <>

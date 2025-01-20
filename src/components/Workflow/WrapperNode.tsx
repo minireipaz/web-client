@@ -1,4 +1,4 @@
-import { Handle, Position } from '@xyflow/react';
+import { Handle, Position } from "@xyflow/react";
 
 interface WrapperNodeProps {
   data: {
@@ -21,7 +21,7 @@ export function WrapperNode(props: WrapperNodeProps) {
     props.data.onClickFromNode(
       clientX + offsetRight,
       clientY + offsetBottom,
-      props.data.id
+      props.data.id,
     );
   }
 

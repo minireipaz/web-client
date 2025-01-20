@@ -1,7 +1,7 @@
-import { Alert, Button, Label, TextInput } from 'flowbite-react';
-import { ModalCredentialData, CredentialData } from '../../models/Credential';
-import { getLocalUri as getLocalRelativeUri } from '../../utils/getUriFrontend';
-import { useMemo, useState } from 'react';
+import { Alert, Button, Label, TextInput } from "flowbite-react";
+import { ModalCredentialData, CredentialData } from "../../models/Credential";
+import { getLocalUri as getLocalRelativeUri } from "../../utils/getUriFrontend";
+import { useMemo, useState } from "react";
 
 export interface CredentialState {
   code: string;
@@ -16,11 +16,14 @@ export function RenderGoogleSheetsOAuth2Api({
   credential: ModalCredentialData;
   onChange: (field: keyof ModalCredentialData, value: any) => void; // info is sended to handleTemplateInputsChange in file ModalCredential.tsx
 }) {
-
-  const [copiedButton, setCopiedButton] = useState({ className: "", colorName: "green", text:"Copy"});
+  const [copiedButton, setCopiedButton] = useState({
+    className: "",
+    colorName: "green",
+    text: "Copy",
+  });
 
   function handleDataChange(field: keyof CredentialData, value: any) {
-    onChange('data', {
+    onChange("data", {
       ...credential.data,
       [field]: value,
     });
@@ -29,8 +32,8 @@ export function RenderGoogleSheetsOAuth2Api({
   const redirectURI = useMemo(() => {
     let redirectURI = credential.data.redirectURL;
 
-    if (redirectURI.includes('localhost:3010')) {
-      const [ok, relURI] = getLocalRelativeUri(redirectURI);
+    if (redirectURI.includes("localhost:3010")) {
+      const { ok, relURI } = getLocalRelativeUri(redirectURI);
       if (!ok) return null;
       redirectURI = relURI;
     }
@@ -39,7 +42,7 @@ export function RenderGoogleSheetsOAuth2Api({
 
   function copyRedirectURL() {
     navigator.clipboard.writeText(redirectURI as string);
-    setCopiedButton({ className: "", colorName: "success", text: "Copied!"});
+    setCopiedButton({ className: "", colorName: "success", text: "Copied!" });
     setTimeout(() => {
       setCopiedButton({ className: "", colorName: "green", text: "Copy" });
     }, 5000);
@@ -77,7 +80,7 @@ export function RenderGoogleSheetsOAuth2Api({
           sizing="sm"
           value={credential.name}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            onChange('name', e.target.value)
+            onChange("name", e.target.value)
           }
           placeholder="Custom Name Client OAuth"
           maxLength={150}
@@ -98,7 +101,7 @@ export function RenderGoogleSheetsOAuth2Api({
           sizing="sm"
           // onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange("clientId", e.target.value)}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            handleDataChange('clientId', e.target.value)
+            handleDataChange("clientId", e.target.value)
           }
           placeholder="Client ID OAuth"
           required
@@ -116,7 +119,7 @@ export function RenderGoogleSheetsOAuth2Api({
           sizing="sm"
           value={credential.data.clientSecret}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            handleDataChange('clientSecret', e.target.value)
+            handleDataChange("clientSecret", e.target.value)
           }
           placeholder="Client Secret OAuth"
           required
@@ -131,11 +134,12 @@ export function RenderGoogleSheetsOAuth2Api({
                 Google Cloud Console:
               </li>
               <li className="flex flex-row gap-x-1">
-                -{' '}
+                -{" "}
                 <a
                   href="https://console.cloud.google.com/apis/library/drive.googleapis.com"
                   target="_blank"
                   className="flex flex-row items-center gap-x-1 "
+                  rel="noreferrer"
                 >
                   Google Drive API
                   <svg
@@ -153,11 +157,12 @@ export function RenderGoogleSheetsOAuth2Api({
                 </a>
               </li>
               <li className="flex flex-row gap-x-1">
-                -{' '}
+                -{" "}
                 <a
                   href="https://console.cloud.google.com/apis/library/sheets.googleapis.com"
                   target="_blank"
                   className="flex flex-row items-center gap-x-1 "
+                  rel="noreferrer"
                 >
                   Google Sheets API
                   <svg
@@ -179,6 +184,7 @@ export function RenderGoogleSheetsOAuth2Api({
                   href="https://console.cloud.google.com/apis/credentials/consent"
                   target="_blank"
                   className="flex flex-row items-center gap-x-1 "
+                  rel="noreferrer"
                 >
                   Configured OAuth consent screen
                   <svg
@@ -200,6 +206,7 @@ export function RenderGoogleSheetsOAuth2Api({
                   href="https://console.cloud.google.com/apis/credentials"
                   target="_blank"
                   className="flex flex-row items-center gap-x-1 "
+                  rel="noreferrer"
                 >
                   Created Credentials OAuth 2.0 Client IDs
                   <svg
@@ -226,22 +233,22 @@ export function RenderGoogleSheetsOAuth2Api({
 }
 
 export function ProcessGoogleOAuthMessage(
-  data: string
+  data: string,
 ): CredentialState | undefined {
   if (
-    !data.includes('?state=') &&
-    !data.includes('?code=') &&
-    !data.includes('?scope=')
+    !data.includes("?state=") &&
+    !data.includes("?code=") &&
+    !data.includes("?scope=")
   )
     return undefined;
 
   const params = new URLSearchParams(data);
-  const scopesStr = params.get('scope');
-  const scopes = scopesStr?.split(',');
+  const scopesStr = params.get("scope");
+  const scopes = scopesStr?.split(",");
 
   return {
-    code: params.get('code') || '',
-    state: params.get('state') || '',
-    scope: scopes || [''],
+    code: params.get("code") || "",
+    state: params.get("state") || "",
+    scope: scopes || [""],
   };
 }

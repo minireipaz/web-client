@@ -1,8 +1,8 @@
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { User, UserManager } from 'oidc-client-ts';
-import { ensureUserExists } from '../Callback/authUserBackend';
-import { authConfig } from '../../authConfig.ts';
-import { createZitadelAuth } from '@zitadel/react';
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { User, UserManager } from "oidc-client-ts";
+import { ensureUserExists } from "../Callback/authUserBackend";
+import { authConfig } from "../../authConfig.ts";
+import { createZitadelAuth } from "@zitadel/react";
 
 interface AuthContextType {
   authenticated: boolean | null;
@@ -24,8 +24,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [userInfo, setUserInfo] = useState<User | null>(null);
   const [_, setUserValidated] = useState(false); // not implemented int this block
-  const [userManager, ] = useState<UserManager | null>(
-    zitadel.userManager as unknown as UserManager
+  const [userManager] = useState<UserManager | null>(
+    zitadel.userManager as unknown as UserManager,
   );
   const fetchedRef = useRef(false);
 
@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       return isValid;
     } catch (error) {
-      console.error('Error validating user:', error);
+      console.error("Error validating user:", error);
       return false;
     }
   };
@@ -60,6 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setAuthenticated(false);
         }
       } catch (error) {
+        console.log("error:", error);
         setAuthenticated(false);
       } finally {
         setLoading(false);
@@ -74,6 +75,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const handleLogout = async () => {
+    // extra clean
+    localStorage.clear();
+    sessionStorage.clear();
     setAuthenticated(false);
     setUserInfo(null);
     setUserValidated(false);
@@ -84,6 +88,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   function handleTokenExpiration() {
     handleLogout();
+    userManager?.signoutRedirect({
+      post_logout_redirect_uri: window.location.origin, // go to /
+    });
   }
 
   return (
@@ -108,7 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

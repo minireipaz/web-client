@@ -1,16 +1,16 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { HeaderDashboard } from '../components/Header/Headers';
-import { NavDashboard } from '../components/Dashboard/NavDashboard';
-import { useAuth } from '../components/AuthProvider/indexAuthProvider';
-import { Link, useNavigate } from 'react-router-dom';
-import { getUriFrontend } from '../utils/getUriFrontend';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { HeaderDashboard } from "../components/Header/Headers";
+import { NavDashboard } from "../components/Dashboard/NavDashboard";
+import { useAuth } from "../components/AuthProvider/indexAuthProvider";
+import { Link, useNavigate } from "react-router-dom";
+import { getUriFrontend } from "../utils/getUriFrontend";
 import {
   customTooltipTheme,
   ResponseGetAllWorkflows,
   Workflow,
-} from '../models/Workflow';
-import { Dropdown, Tooltip } from 'flowbite-react';
-import { activeMap, statusMap } from '../models/Dashboard';
+} from "../models/Workflow";
+import { Dropdown, Tooltip } from "flowbite-react";
+import { activeMap, statusMap } from "../models/Dashboard";
 
 export function Workflows() {
   const { authenticated, handleTokenExpiration, userInfo } = useAuth();
@@ -24,24 +24,24 @@ export function Workflows() {
 
     try {
       const [ok, uriFrontend] = getUriFrontend(
-        `/api/v1/workflows/${userInfo?.profile.sub}`
+        `/api/v1/workflows/${userInfo?.profile.sub}`,
       );
       if (!ok) {
-        console.log('ERROR | cannot get uri frontend');
+        console.log("ERROR | cannot get uri frontend");
         return;
       }
       const response = await fetch(uriFrontend, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${userInfo?.access_token}`,
         },
       });
-
+      // TODO: token expiration
       if (response.status === 401) {
         // Token has expired, handle expiration and redirect
         handleTokenExpiration();
-        navigate('/', { replace: true });
+        // navigate("/", { replace: true });
         return;
       }
 
@@ -51,21 +51,21 @@ export function Workflows() {
       }
 
       const data: ResponseGetAllWorkflows = await response.json();
-      if (data.error !== '' || data.status !== 200) {
-        console.log('ERROR | cannot get dashboard data');
+      if (data.error !== "" || data.status !== 200) {
+        console.log("ERROR | cannot get dashboard data");
         return;
       }
       // let convertedDashboard: DashboardData = convertWorkflowData(data);
       setWorkflowsData(data.workflow);
     } catch (error) {
       setWorkflowsData(null);
-      console.error('Error fetching dashboard data:', error);
+      console.error("Error fetching dashboard data:", error);
     }
   }, [handleTokenExpiration, navigate]);
 
   useEffect(() => {
     if (!authenticated) {
-      navigate('/', { replace: true });
+      navigate("/", { replace: true });
       return;
     }
 
@@ -77,7 +77,7 @@ export function Workflows() {
   }, [userInfo, authenticated, fetchAllWorkflows, navigate]);
 
   function formatDuration(durati: number): string {
-    if (!durati) return 'N/A';
+    if (!durati) return "N/A";
 
     const duration = Number.parseInt(durati.toString() as string);
     if (
@@ -85,7 +85,7 @@ export function Workflows() {
       duration === undefined ||
       !Number.isInteger(duration)
     ) {
-      return 'N/A';
+      return "N/A";
     }
 
     if (duration >= 60) {
@@ -98,15 +98,15 @@ export function Workflows() {
   }
 
   function formatStartTime(startTime: string): string {
-    if (!startTime) return 'Not Started';
+    if (!startTime) return "Not Started";
 
-    if (startTime.startsWith('1970') || startTime.startsWith('0001')) {
-      return 'Not Started';
+    if (startTime.startsWith("1970") || startTime.startsWith("0001")) {
+      return "Not Started";
     }
     return new Date(startTime).toLocaleString();
   }
 
-  function formatTextIsActive(isActive: Number) {
+  function formatTextIsActive(isActive: number) {
     const index: string = isActive.toString();
     let activeText = activeMap[Number.parseInt(index)].text;
     if (!activeText) {
@@ -117,7 +117,7 @@ export function Workflows() {
 
   function formatDescription(desp: string) {
     if (!desp || desp === null) {
-      return '--';
+      return "--";
     }
     return desp;
   }
@@ -163,7 +163,7 @@ export function Workflows() {
                           <div className="px-4">
                             <Link
                               to={`/workflow/${workflow.id}`}
-                              className="w-fit font-medium flex flex-shrink-0 cursor-pointer items-center underline underline-offset-4 "
+                              className=" font-medium flex flex-shrink-0 cursor-pointer items-center underline underline-offset-4 "
                             >
                               <span>
                                 <svg
@@ -179,17 +179,20 @@ export function Workflows() {
                                     cy="25"
                                     r="25"
                                     fill={formatTextIsActive(
-                                      workflow.is_active
+                                      workflow.is_active,
                                     )}
                                   ></circle>
                                 </svg>
                               </span>
-                              <span
-                                title={workflow.name}
-                                className="overflow-ellipsis overflow-hidden whitespace-nowrap ml-2  "
+                              <Tooltip
+                                theme={customTooltipTheme}
+                                placement="top"
+                                content={workflow.name}
                               >
-                                {workflow.name}
-                              </span>
+                                <div className="w-32 text-sm overflow-ellipsis overflow-hidden whitespace-nowrap ml-2  ">
+                                  {workflow.name}
+                                </div>
+                              </Tooltip>
                             </Link>
                           </div>
                           <div className="px-4 flex items-center">

@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
-import { UserManager, User } from 'oidc-client-ts';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../AuthProvider/indexAuthProvider';
+import { useEffect } from "react";
+import { UserManager, User } from "oidc-client-ts";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthProvider/indexAuthProvider";
 
 interface Props {
   authenticated: boolean | null;
@@ -30,7 +30,7 @@ export default function Callback({
         if (user) {
           const isValid = await setUserAndValidate(user);
           if (isValid) {
-            navigate('/dashboard', { state: { userInfo: user } });
+            navigate("/dashboard", { state: { userInfo: user } });
           } else {
             handleLogout();
           }
@@ -39,6 +39,7 @@ export default function Callback({
         }
       }
     } catch (error) {
+      console.log("error", error);
       setAuth(false);
     }
   }

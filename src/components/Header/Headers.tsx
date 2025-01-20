@@ -1,4 +1,4 @@
-import { MyAccount } from '../MyAccount/indexMyaccount';
+import { MyAccount } from "../MyAccount/indexMyaccount";
 
 interface Props {
   title: string;

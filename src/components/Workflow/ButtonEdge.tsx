@@ -4,7 +4,7 @@ import {
   EdgeProps,
   getBezierPath,
   useReactFlow,
-} from '@xyflow/react';
+} from "@xyflow/react";
 
 export default function CustomEdge({
   id,
@@ -27,7 +27,7 @@ export default function CustomEdge({
   });
 
   const onEdgeClick = () => {
-    setEdges((edges) => edges.filter((edge) => edge.id !== id));
+    setEdges(edges => edges.filter(edge => edge.id !== id));
   };
 
   return (
@@ -37,7 +37,7 @@ export default function CustomEdge({
         <div
           style={{
             transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
-            pointerEvents: 'all',
+            pointerEvents: "all",
           }}
           className="absolute"
         >

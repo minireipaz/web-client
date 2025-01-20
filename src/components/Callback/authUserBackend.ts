@@ -1,31 +1,31 @@
-import { User } from 'oidc-client-ts';
-import { getUriFrontend } from '../../utils/getUriFrontend';
-import { ResponseSyncUser } from '../../models/Users';
+import { User } from "oidc-client-ts";
+import { getUriFrontend } from "../../utils/getUriFrontend";
+import { ResponseSyncUser } from "../../models/Users";
 let calling = 0;
-const userTokenExpired = 'token expired';
+const userTokenExpired = "token expired";
 
 export async function ensureUserExists(
-  userInfo: User | null
+  userInfo: User | null,
 ): Promise<[boolean, boolean]> {
   if (
     !userInfo ||
     !userInfo?.profile.sub ||
-    userInfo?.profile.sub == '' ||
-    userInfo.access_token == ''
+    userInfo?.profile.sub === "" ||
+    userInfo.access_token === ""
   ) {
     return [false, true];
   }
   try {
-    console.log('calling=' + calling);
+    console.log("calling=" + calling);
     calling++;
-    const [ok, uriFrontend] = getUriFrontend('/api/v1/users');
+    const [ok, uriFrontend] = getUriFrontend("/api/v1/users");
     if (!ok) {
       return [false, true];
     }
     const response = await fetch(uriFrontend, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${userInfo?.access_token}`,
       },
       body: JSON.stringify({
@@ -47,17 +47,16 @@ export async function ensureUserExists(
     }
 
     const data: ResponseSyncUser = await response.json();
-    console.log('User response:', JSON.stringify(data));
+    console.log("User response:", JSON.stringify(data));
     if (data.status === 401 && data.error === userTokenExpired) {
       return [data.exist, data.expired];
     }
-    if (data.error !== '') {
+    if (data.error !== "") {
       return [false, true];
     }
     return [data.exist, data.expired];
   } catch (error) {
-    console.error('Error registering user in backend:', error);
+    console.error("Error registering user in backend:", error);
     return [false, true];
   }
-  return [false, true];
 }

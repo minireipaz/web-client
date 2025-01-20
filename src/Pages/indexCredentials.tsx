@@ -1,23 +1,21 @@
-import { Tooltip, Dropdown } from 'flowbite-react';
-import { useNavigate } from 'react-router-dom';
-import { NavDashboard } from '../components/Dashboard/NavDashboard';
-import { HeaderDashboard } from '../components/Header/Headers';
-import { activeMap, statusMap } from '../models/Dashboard';
-import { customTooltipTheme } from '../models/Workflow';
-import { getUriFrontend } from '../utils/getUriFrontend';
+import { Tooltip, Dropdown } from "flowbite-react";
+import { useNavigate } from "react-router-dom";
+import { NavDashboard } from "../components/Dashboard/NavDashboard";
+import { HeaderDashboard } from "../components/Header/Headers";
+import { activeMap, statusMap } from "../models/Dashboard";
+import { customTooltipTheme } from "../models/Workflow";
+import { getUriFrontend } from "../utils/getUriFrontend";
 import {
   ModalCredentialData,
   ResponseGetAllCredentials,
-} from '../models/Credential';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useAuth } from '../components/AuthProvider/indexAuthProvider';
-import { ModalCredential } from '../components/Credentials/ModalCredential';
-import { CredentialComponent } from '../components/WorkflowModal/Modal';
-import { RenderGoogleSheetsOAuth2Api } from '../components/Credentials/GoogleSheetsOAuth2Api';
+} from "../models/Credential";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useAuth } from "../components/AuthProvider/indexAuthProvider";
+import { ModalCredential } from "../components/Credentials/ModalCredential";
+import { CredentialComponent } from "../components/WorkflowModal/Modal";
+import { RenderGoogleSheetsOAuth2Api } from "../components/Credentials/GoogleSheetsOAuth2Api";
 
-interface ContainerProps {}
-
-export function Credentials(_: ContainerProps) {
+export function Credentials() {
   const { authenticated, handleTokenExpiration, userInfo } = useAuth();
   const navigate = useNavigate();
   const fetchedRef = useRef(false);
@@ -38,16 +36,16 @@ export function Credentials(_: ContainerProps) {
 
     try {
       const [ok, uriFrontend] = getUriFrontend(
-        `/api/v1/credentials/${userInfo?.profile.sub}`
+        `/api/v1/credentials/${userInfo?.profile.sub}`,
       );
       if (!ok) {
-        console.log('ERROR | cannot get uri frontend');
+        console.log("ERROR | cannot get uri frontend");
         return;
       }
       const response = await fetch(uriFrontend, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${userInfo?.access_token}`,
         },
       });
@@ -55,7 +53,7 @@ export function Credentials(_: ContainerProps) {
       if (response.status === 401) {
         // Token has expired, handle expiration and redirect
         handleTokenExpiration();
-        navigate('/', { replace: true });
+        // navigate("/", { replace: true });
         return;
       }
 
@@ -64,21 +62,21 @@ export function Credentials(_: ContainerProps) {
       }
 
       const data: ResponseGetAllCredentials = await response.json();
-      if (data.error !== '' || data.status !== 200) {
-        console.log('ERROR | cannot get dashboard data');
+      if (data.error !== "" || data.status !== 200) {
+        console.log("ERROR | cannot get dashboard data");
         return;
       }
 
       setListCredentials(data.credentials);
       return;
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      console.error("Error fetching dashboard data:", error);
     }
   }, [handleTokenExpiration, navigate]);
 
   useEffect(() => {
     if (!authenticated) {
-      navigate('/', { replace: true });
+      navigate("/", { replace: true });
       return;
     }
 
@@ -87,7 +85,7 @@ export function Credentials(_: ContainerProps) {
     }
   }, [userInfo, authenticated, fetchAllCredentials, navigate]);
 
-  function formatTextIsActive(isActive: Number) {
+  function formatTextIsActive(isActive: number) {
     const index: string = isActive.toString();
     let activeText = activeMap[Number.parseInt(index)].text;
     if (!activeText) {
@@ -108,7 +106,7 @@ export function Credentials(_: ContainerProps) {
       ...(listCredentials as ModalCredentialData[]),
     ];
     const index = updatedListCredentials.findIndex(
-      (cred) => cred.id === newCredential.id
+      cred => cred.id === newCredential.id,
     );
     if (index !== -1) {
       updatedListCredentials[index] = {
@@ -128,7 +126,7 @@ export function Credentials(_: ContainerProps) {
     setIsModalCredentialOpen(!isModalCredentialOpen);
     setCurrentCredential(selectedCredential);
 
-    if (selectedCredential.type === 'googlesheets') {
+    if (selectedCredential.type === "googlesheets") {
       setCurrentCredentialComponent(() => RenderGoogleSheetsOAuth2Api);
     }
   }
@@ -154,6 +152,7 @@ export function Credentials(_: ContainerProps) {
         onSave={handleSaveModalCredential}
         initialCredential={currentCredential as ModalCredentialData}
         renderBody={currentCredentialComponent as CredentialComponent}
+        flowInstance={null}
       />
       <div className="grid min-h-screen w-full grid-cols-[240px_1fr] overflow-hidden">
         <NavDashboard />
@@ -258,7 +257,7 @@ export function Credentials(_: ContainerProps) {
                             </div>
                           </div>
                         </li>
-                      )
+                      ),
                     )
                   )}
                 </ul>

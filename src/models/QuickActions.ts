@@ -1,4 +1,4 @@
-import { Workflow } from './Workflow';
+import { Workflow } from "./Workflow";
 
 export interface ResponseGenerateWorkflow {
   error: string;

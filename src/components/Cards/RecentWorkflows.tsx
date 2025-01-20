@@ -1,15 +1,15 @@
-import { Link } from 'react-router-dom';
-import { DashboardData, statusMap, activeMap } from '../../models/Dashboard';
-import { Dropdown, Tooltip } from 'flowbite-react';
-import { customTooltipTheme } from '../../models/Workflow';
+import { Link } from "react-router-dom";
+import { DashboardData, statusMap, activeMap } from "../../models/Dashboard";
+import { Dropdown, Tooltip } from "flowbite-react";
+import { customTooltipTheme } from "../../models/Workflow";
 
 interface ContainerProps {
   dashboardData: DashboardData | null;
 }
 
 export function RecentWorkflows(props: ContainerProps) {
-  function formatDuration(durati: Number): string {
-    if (!durati || durati.toString() === 'NaN') return 'N/A';
+  function formatDuration(durati: number): string {
+    if (!durati || durati.toString() === "NaN") return "N/A";
 
     const duration = Number.parseInt(durati.toString() as string);
     if (
@@ -17,7 +17,7 @@ export function RecentWorkflows(props: ContainerProps) {
       duration === undefined ||
       !Number.isInteger(duration)
     ) {
-      return 'N/A';
+      return "N/A";
     }
 
     if (duration >= 60) {
@@ -30,16 +30,16 @@ export function RecentWorkflows(props: ContainerProps) {
   }
 
   function formatStartTime(startTime: string): string {
-    if (!startTime) return 'Not Started';
+    if (!startTime) return "Not Started";
 
-    if (startTime.startsWith('1970') || startTime.startsWith('0001')) {
-      return 'Not Started';
+    if (startTime.startsWith("1970") || startTime.startsWith("0001")) {
+      return "Not Started";
     }
     return new Date(startTime).toLocaleString();
   }
 
-  function formatTextIsActive(isActive: Number) {
-    if (isActive.toString() === 'NaN') {
+  function formatTextIsActive(isActive: number) {
+    if (isActive.toString() === "NaN") {
       return activeMap[3].text;
     }
     const index: string = isActive.toString();
@@ -52,7 +52,7 @@ export function RecentWorkflows(props: ContainerProps) {
 
   function formatDescription(desp: string) {
     if (!desp || desp === null) {
-      return '--';
+      return "--";
     }
     return desp;
   }

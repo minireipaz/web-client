@@ -1,13 +1,13 @@
-import { Dropdown } from 'flowbite-react';
-import React from 'react';
-import { useAuth } from '../AuthProvider/indexAuthProvider';
+import { Dropdown } from "flowbite-react";
+import React from "react";
+import { useAuth } from "../AuthProvider/indexAuthProvider";
 
 export const MyAccount = React.memo(function MyAccount() {
   const { handleLogout, userInfo } = useAuth();
 
-  let name = userInfo?.profile.name || 'demo';
-  let email = userInfo?.profile.email || 'demo';
-  let verified = userInfo?.profile.email_verified ? 'Yes' : 'No';
+  let name = userInfo?.profile.name || "demo";
+  let email = userInfo?.profile.email || "demo";
+  let verified = userInfo?.profile.email_verified ? "Yes" : "No";
 
   return (
     <>
@@ -19,7 +19,7 @@ export const MyAccount = React.memo(function MyAccount() {
               Email: {email}
             </span>
             <span className="block italic truncate text-xs font-medium">
-              Email Verified: {verified ? 'Yes' : 'No'}
+              Email Verified: {verified ? "Yes" : "No"}
             </span>
           </Dropdown.Header>
           <Dropdown.Divider />

@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback } from "react";
 
 interface UseRequestOptions {
   onSuccess?: () => void;
@@ -13,10 +13,10 @@ export function useRequest() {
   const executeRequest = useCallback(
     async <T>(
       requestFn: (signal?: AbortSignal) => Promise<T>,
-      options?: UseRequestOptions
+      options?: UseRequestOptions,
     ) => {
       if (isRequestInProgressRef.current) {
-        console.log('Request already in progress');
+        console.log("Request already in progress");
         return;
       }
 
@@ -33,8 +33,8 @@ export function useRequest() {
         options?.onSuccess?.();
         return result;
       } catch (error: any) {
-        if (error.name === 'AbortError') {
-          console.log('Request canceled');
+        if (error.name === "AbortError") {
+          console.log("Request canceled");
           return;
         }
         options?.onError?.(error);
@@ -45,7 +45,7 @@ export function useRequest() {
         options?.onFinally?.();
       }
     },
-    []
+    [],
   );
 
   const cancelRequest = useCallback(() => {

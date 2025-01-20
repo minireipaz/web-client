@@ -1,5 +1,5 @@
-import { User } from 'oidc-client-ts';
-import { Navigate } from 'react-router-dom';
+import { User } from "oidc-client-ts";
+import { Navigate } from "react-router-dom";
 
 interface Props {
   handleLogin: () => void;

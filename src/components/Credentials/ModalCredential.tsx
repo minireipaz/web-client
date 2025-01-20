@@ -1,23 +1,23 @@
-import { Alert, Button, Modal } from 'flowbite-react';
-import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Alert, Button, Modal } from "flowbite-react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   COLOR_ALERTS,
   CredentialData,
   DEFAULT_CREDENTIAL_REDIRECT_PATH,
   ModalCredentialData,
   ResponseCreateCredential,
-} from '../../models/Credential';
-import { getUriFrontend } from '../../utils/getUriFrontend';
-import { useAuth } from '../AuthProvider/indexAuthProvider';
-import { OAuthProvider, PostMessageData } from '../Callback/oauthCallback';
+} from "../../models/Credential";
+import { getUriFrontend } from "../../utils/getUriFrontend";
+import { useAuth } from "../AuthProvider/indexAuthProvider";
+import { OAuthProvider, PostMessageData } from "../Callback/oauthCallback";
 import {
   CredentialState,
   ProcessGoogleOAuthMessage,
-} from './GoogleSheetsOAuth2Api';
-import { useRequest } from '../../utils/requests';
-import { ReactFlowInstance, Node } from '@xyflow/react';
-import { ProcessNotionToken } from './NotionInternalAuthApi';
+} from "./GoogleSheetsOAuth2Api";
+import { useRequest } from "../../utils/requests";
+import { ReactFlowInstance, Node } from "@xyflow/react";
+import { ProcessNotionToken } from "./NotionInternalAuthApi";
 
 interface ContainerProps {
   flowInstance: ReactFlowInstance | null;
@@ -35,29 +35,30 @@ export function ModalCredential(props: ContainerProps) {
   const { userInfo, handleTokenExpiration } = useAuth();
   const navigate = useNavigate();
   const [credential, setCredential] = useState<ModalCredentialData>({
-    id: '',
-    type: '',
+    id: "",
+    type: "",
     alertMessage: <></>,
-    nodeid: '',
-    workflowid: '',
-    sub: '',
-    name: '',
+    nodeid: "",
+    workflowid: "",
+    sub: "",
+    name: "",
     data: {
-      clientId: '',
-      clientSecret: '',
-      redirectURL: 'https://example.com/oauth/redirect',
-      code: '',
-      scopes: [''],
-      state: '',
+      clientId: "",
+      clientSecret: "",
+      redirectURL: "https://example.com/oauth/redirect",
+      code: "",
+      scopes: [""],
+      state: "",
     } as CredentialData,
   });
 
-  const oauthHandlers: Record<OAuthProvider, Function> = {
+  type OAuthHandler = (param: string) => CredentialState | undefined;
+  const oauthHandlers: Record<OAuthProvider, OAuthHandler> = {
     google: ProcessGoogleOAuthMessage,
     notion: ProcessNotionToken, // for internal secret not used pattern oauth2
-    github: () => { },
-    microsoft: () => { },
-    facebook: () => { },
+    // github: () => {},
+    // microsoft: () => {},
+    // facebook: () => {},
   };
 
   const [disabledButtonTest, setDisabledButtonTest] = useState(false);
@@ -66,7 +67,7 @@ export function ModalCredential(props: ContainerProps) {
   const [messageSaved, setMessageSaved] = useState(<></>);
 
   const failConnection: ResponseCreateCredential = {
-    error: 'Conexion error',
+    error: "Conexion error",
     status: 500,
   };
 
@@ -81,9 +82,9 @@ export function ModalCredential(props: ContainerProps) {
 
   function handleTemplateInputsChange(
     field: keyof ModalCredentialData,
-    value: any
+    value: any,
   ) {
-    setCredential((prev) => ({
+    setCredential(prev => ({
       ...prev,
       [field]: value,
     }));
@@ -100,50 +101,69 @@ export function ModalCredential(props: ContainerProps) {
     setDisabledButtonTest(true);
     try {
       abortControllerRef.current = new AbortController();
-      const [isOk, data] = await collectCredentials(
+      const [isOk, response] = await collectCredentials(
         credential,
-        abortControllerRef.current.signal
+        abortControllerRef.current.signal,
       );
 
       if (!isOk) {
         setDisabledButtonTest(false);
-        showAlert('Cannot connect', COLOR_ALERTS.failure);
-        return
-      }
-      if (data.auth_url !== "") { // if oauthv2
-        openNewWindow(data.auth_url as string);
+        showAlert("Cannot connect", COLOR_ALERTS.failure);
         return;
       }
-
+      // oauth redirect
+      if (response.auth_url !== undefined && response.auth_url !== "") {
+        openNewWindow(response.auth_url as string);
+        return;
+      }
+      // token credential
+      if (!response.data) {
+        setDisabledButtonTest(false);
+        showAlert("Cannot connect", COLOR_ALERTS.failure);
+        return;
+      }
+      const ok = await handleTokenCredential(response.data);
+      if (!ok) {
+        console.error("Cannot parse token credential:", response.data);
+        showAlert("Error testing credential", COLOR_ALERTS.failure);
+        return;
+      }
       return;
     } catch (error: any) {
       setDisabledButtonTest(false);
-      if (error.name === 'AbortError') {
-        return console.log('canceled');
+      if (error.name === "AbortError") {
+        return console.log("canceled");
       }
-      console.error('Error Testing:', error);
-      showAlert('Error testing credential', COLOR_ALERTS.failure);
+      console.error("Error Testing:", error);
+      showAlert("Error testing credential", COLOR_ALERTS.failure);
       return;
     }
   }
 
+  async function handleTokenCredential(data: string): Promise<boolean> {
+    const parsedData = parseDataResponseFromTokenCredential(data as string);
+    if (!parsedData) return false;
+    await handleUpdateCredential(credential, parsedData as ModalCredentialData);
+    return true;
+  }
+
   function openNewWindow(url: string) {
-    if (!url || url === '') {
+    if (!url || url === "") {
       return;
     }
 
     const authWindow = window.open(
       url,
-      'popup',
-      'width=400,height=600,left=100,top=0'
+      "popup",
+      "width=400,height=600,left=100,top=0",
     );
     if (!authWindow) {
-      console.error('Cannot open window');
+      console.error("Cannot open window");
       setDisabledButtonTest(false);
       return;
     }
 
-    window.addEventListener('message', handleMessagesOAuthCredentials);
+    window.addEventListener("message", handleMessagesOAuthCredentials);
     setTimeout(() => {
       setDisabledButtonTest(false);
     }, 2000);
@@ -152,24 +172,31 @@ export function ModalCredential(props: ContainerProps) {
   async function handleMessagesOAuthCredentials(event: MessageEvent<any>) {
     if (event.origin !== import.meta.env.VITE_EVENTS_ORIGIN) {
       // TODO: 401
-      console.error('Not authorized', event.origin);
+      console.error("Not authorized", event.origin);
       return;
     }
-    if (!window.location.href.includes('/workflow/')) return;
+    if (!window.location.href.includes("/workflow/")) return;
     const { type, data: stateStr, provider } = event.data as PostMessageData;
-    if (type != 'oauthmessage') return;
+    if (type !== "oauthmessage") return;
     if (!stateStr) return;
     const result = oauthHandlers[provider as OAuthProvider](stateStr);
     if (!result) return;
-    window.removeEventListener('message', handleMessagesOAuthCredentials);
+    window.removeEventListener("message", handleMessagesOAuthCredentials);
     await handleSaveCredentials(result);
-    console.log('Mensaje recibido:', event.data);
+    console.log("Mensaje recibido:", event.data);
+  }
+
+  function parseDataResponseFromTokenCredential(
+    dataStr: string,
+  ): ModalCredentialData {
+    const data: ModalCredentialData = JSON.parse(dataStr);
+    return data;
   }
 
   function checkValidations(credential: ModalCredentialData) {
     // TODO: dummy checks
-    if (credential.name.trim() === '') {
-      showAlert('Custom Name Client OAuth is required', COLOR_ALERTS.failure);
+    if (credential.name.trim() === "") {
+      showAlert("Custom Name Client OAuth is required", COLOR_ALERTS.failure);
       return false;
     }
 
@@ -178,24 +205,26 @@ export function ModalCredential(props: ContainerProps) {
       credential.name.trim().length > 150
     ) {
       showAlert(
-        'Custom Name Client OAuth must be between 3 and 150 characters',
-        COLOR_ALERTS.failure
+        "Custom Name Client OAuth must be between 3 and 150 characters",
+        COLOR_ALERTS.failure,
       );
       return false;
     }
     // checking with url redirects btw can be used options crdential.options
-    if (DEFAULT_CREDENTIAL_REDIRECT_PATH[credential.type] !== undefined && DEFAULT_CREDENTIAL_REDIRECT_PATH[credential.type] !== "" ) {
-      if (credential.data.clientId.trim() === '') {
-        showAlert('Client ID OAuth is required', COLOR_ALERTS.failure);
+    if (
+      DEFAULT_CREDENTIAL_REDIRECT_PATH[credential.type] !== undefined &&
+      DEFAULT_CREDENTIAL_REDIRECT_PATH[credential.type] !== ""
+    ) {
+      if (credential.data.clientId.trim() === "") {
+        showAlert("Client ID OAuth is required", COLOR_ALERTS.failure);
         return false;
       }
     }
 
     // check OAUthURL
 
-
-    if (credential.data.clientSecret.trim() === '') {
-      showAlert('Client Secret OAuth is required', COLOR_ALERTS.failure);
+    if (credential.data.clientSecret.trim() === "") {
+      showAlert("Client Secret OAuth is required", COLOR_ALERTS.failure);
       return false;
     }
 
@@ -208,7 +237,7 @@ export function ModalCredential(props: ContainerProps) {
         <Alert color={color} className="w-full">
           <span className="font-medium">{title.toString()}.</span>
         </Alert>
-      </>
+      </>,
     );
 
     setTimeout(() => {
@@ -218,23 +247,25 @@ export function ModalCredential(props: ContainerProps) {
 
   function checkRedirectURLOAuth(credential: ModalCredentialData) {
     // DEFAULT_CREDENTIAL_REDIRECT_PATH only relative uris
-    const defaultPath = DEFAULT_CREDENTIAL_REDIRECT_PATH[credential.type] || DEFAULT_CREDENTIAL_REDIRECT_PATH.default;
+    const defaultPath =
+      DEFAULT_CREDENTIAL_REDIRECT_PATH[credential.type] ||
+      DEFAULT_CREDENTIAL_REDIRECT_PATH.default;
     if (defaultPath) {
-      return credential.data.redirectURL.trim() !== '';
+      return credential.data.redirectURL.trim() !== "";
     }
     return false;
   }
 
   async function collectCredentials(
     credential: ModalCredentialData,
-    signal?: AbortSignal
+    signal?: AbortSignal,
   ): Promise<[boolean, ResponseCreateCredential]> {
     try {
       const isValidOAuth = checkRedirectURLOAuth(credential);
       // select api path based in oauth validation
       const apiPath = isValidOAuth
-        ? '/api/v1/oauth-credentials'
-        : '/api/v1/credentials';
+        ? "/api/v1/oauth-credentials"
+        : "/api/v1/credentials";
 
       const [ok, uriFrontend] = getUriFrontend(apiPath);
       if (!ok) {
@@ -243,20 +274,20 @@ export function ModalCredential(props: ContainerProps) {
 
       const body = createBodyForCredential(credential);
       const response = await fetch(uriFrontend, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${userInfo?.access_token}`,
         },
         body: JSON.stringify(body),
         signal,
       });
-
+      // contaiminated context
       if (response.status === 401) {
-        // Token maybe has expired, handle expiration and redirect
         handleTokenExpiration();
-        navigate('/', { replace: true });
         return [false, failConnection];
+        //   navigate("/", { replace: true });
+        //   return [false, failConnection];
       }
 
       if (!response.ok) {
@@ -269,7 +300,7 @@ export function ModalCredential(props: ContainerProps) {
       }
       return [true, data];
     } catch (error) {
-      console.error('cannot send credentials:', error);
+      console.error("cannot send credentials:", error);
       return [false, failConnection];
     }
   }
@@ -292,7 +323,7 @@ export function ModalCredential(props: ContainerProps) {
 
   function createBodySaveCredential(
     credential: ModalCredentialData,
-    credentialState: CredentialState
+    credentialState: CredentialState,
   ): ModalCredentialData {
     return {
       id: credential.id, // currently is setted temp to none when saved will change ID
@@ -317,7 +348,7 @@ export function ModalCredential(props: ContainerProps) {
   // this state will send to frontend to recreate credential
   // throught state
   async function handleSaveCredentials(
-    credentialState: CredentialState | undefined
+    credentialState: CredentialState | undefined,
   ) {
     if (!checkValidations(credential)) return;
     if (!credentialState) return;
@@ -327,22 +358,22 @@ export function ModalCredential(props: ContainerProps) {
     // here needs to modify if its needed decoupled from client side
     try {
       const result = await executeRequest(
-        async (signal) => {
+        async signal => {
           return await sendNewCredential(credential, credentialState, signal);
         },
         {
           onSuccess: () => {
-            console.log('ok');
+            console.log("ok");
           },
-          onError: (error) => {
-            console.error('Error Testing:', error);
-            showAlert('Error testing credential', COLOR_ALERTS.failure);
+          onError: error => {
+            console.error("Error Testing:", error);
+            showAlert("Error testing credential", COLOR_ALERTS.failure);
           },
           onFinally: () => {
             // removed for more granular control over button test
             // setDisabledButtonTest(false);
           },
-        }
+        },
       );
 
       if (!result) {
@@ -351,55 +382,78 @@ export function ModalCredential(props: ContainerProps) {
 
       const [isOk, dataResponse, newCredential] = result;
       if (!isOk) {
-        showAlert('Cannot connect', COLOR_ALERTS.failure);
+        showAlert("Cannot connect", COLOR_ALERTS.failure);
         return;
       }
       // update credential and workflow
       await handleUpdateCredential(
         newCredential as ModalCredentialData,
-        dataResponse as ModalCredentialData
+        dataResponse as ModalCredentialData,
       );
     } catch (error: any) {
       setDisabledButtonTest(false);
-      if (error.name === 'AbortError') {
-        return console.log('canceled');
+      if (error.name === "AbortError") {
+        return console.log("canceled");
       }
-      console.error('Error Testing:', error);
-      return showAlert('Error testing credential', 'failure');
+      console.error("Error Testing:", error);
+      return showAlert("Error testing credential", "failure");
     }
   }
 
   async function handleUpdateCredential(
     newCredential: ModalCredentialData,
-    responseData: ModalCredentialData
+    responseData: ModalCredentialData,
   ) {
     if (!checkValidations(credential)) return;
 
     let newId =
-      credential.id && credential.id !== 'none'
+      credential.id && credential.id !== "none"
         ? credential.id
-        : responseData.id as string;
+        : (responseData.id as string);
 
     // in case not parsed correctly
     if (!newId || newId === "undefined") {
       newId = generateTemporalUniqueId();
     }
+    // merge returned credential and client credential
+    const mergedCredential = mergeCredentials(
+      newCredential,
+      responseData,
+      newId,
+    );
 
-    newCredential = {
-      ...credential,
-      id: newId,
-      data: {
-        ...responseData.data,
-      },
-    };
-    directUpdateNodes(newCredential);
+    directUpdateNodes(mergedCredential);
     // called to update:
     // listcredentials
     // currentcredential
     // formularydata
     // updatenode
-    props.onSave(newCredential);
+    props.onSave(mergedCredential);
     setDisabledButtonTest(false);
+  }
+
+  function mergeCredentials(
+    newCredential: ModalCredentialData,
+    responseData: ModalCredentialData,
+    newId: string,
+  ) {
+    let mergedCredential = {
+      ...newCredential,
+      id: newId,
+      data: {
+        ...responseData.data,
+      },
+    };
+    if (responseData.data.redirectURL === "") {
+      mergedCredential = {
+        ...newCredential,
+        id: newId,
+        data: {
+          ...newCredential.data,
+        },
+      };
+    }
+    return mergedCredential;
   }
 
   // not necesarry fields for ModalCredentialData
@@ -414,10 +468,15 @@ export function ModalCredential(props: ContainerProps) {
     if (!originalNode) return;
     const updatedNode = updateNodeByNodeID(originalNode, credential);
     if (!updatedNode) return;
-    props.flowInstance.updateNodeData(credential.nodeid, updatedNode, { replace: true });
+    props.flowInstance.updateNodeData(credential.nodeid, updatedNode, {
+      replace: true,
+    });
   }
 
-  function updateNodeByNodeID(originalNode: Node, credential: ModalCredentialData): Node | undefined {
+  function updateNodeByNodeID(
+    originalNode: Node,
+    credential: ModalCredentialData,
+  ): Node | undefined {
     if (originalNode.id !== credential.nodeid) return undefined;
     return {
       ...originalNode,
@@ -431,7 +490,7 @@ export function ModalCredential(props: ContainerProps) {
   async function sendNewCredential(
     credential: ModalCredentialData,
     credentialState: CredentialState,
-    signal?: AbortSignal
+    signal?: AbortSignal,
   ): Promise<
     [boolean, ModalCredentialData | undefined, ModalCredentialData | undefined]
   > {
@@ -442,12 +501,12 @@ export function ModalCredential(props: ContainerProps) {
       }
       const body: ModalCredentialData = createBodySaveCredential(
         credential,
-        credentialState
+        credentialState,
       );
       const response = await fetch(uriFrontend, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${userInfo?.access_token}`,
         },
         body: JSON.stringify(body),
@@ -455,10 +514,10 @@ export function ModalCredential(props: ContainerProps) {
       });
 
       if (response.status === 401) {
-        // Token maybe has expired, handle expiration and redirect
         handleTokenExpiration();
-        navigate('/', { replace: true });
         return [false, undefined, undefined];
+        //   navigate("/", { replace: true });
+        //   return [false, undefined, undefined];
       }
 
       if (!response.ok) {
@@ -471,11 +530,12 @@ export function ModalCredential(props: ContainerProps) {
       }
       return [true, data, body];
     } catch (error) {
+      console.log("error", error);
       return [false, undefined, undefined];
     }
   }
 
-  if (credential.id == '') return <></>;
+  if (credential.id === "") return <></>;
 
   return (
     <>

@@ -1,8 +1,8 @@
-import { Node, Edge, NodeTypes } from '@xyflow/react';
-import { WrapperNode } from '../components/Workflow/WrapperNode';
-import ButtonEdge from '../components/Workflow/ButtonEdge';
-import { CustomFlowbiteTheme } from 'flowbite-react';
-import { ModalCredentialData } from './Credential';
+import { Node, Edge, NodeTypes } from "@xyflow/react";
+import { WrapperNode } from "../components/Workflow/WrapperNode";
+import ButtonEdge from "../components/Workflow/ButtonEdge";
+import { CustomFlowbiteTheme } from "flowbite-react";
+import { ModalCredentialData } from "./Credential";
 
 export interface FormData {
   [key: string]: any;
@@ -71,7 +71,7 @@ export interface WrapperNodeProps {
 export interface ResponseSyncWorkflow {
   error: string;
   status: number;
-  data: {};
+  data: any;
 }
 
 export interface ResponseUpdateWorkflow {
@@ -99,13 +99,13 @@ export interface MsgSaved {
 }
 
 export const savedStatus: Record<string, string> = {
-  warn: 'text-sm bg-orange-100 text-yellow-800 select-none',
-  notice: 'text-sm text-gray-400 select-none',
-  done: 'text-sm text-green-800 select-none',
-  alert: 'text-sm bg-red-100 text-red-800 select-none',
-  none: '',
+  warn: "text-sm bg-orange-100 text-yellow-800 select-none",
+  notice: "text-sm text-gray-400 select-none",
+  done: "text-sm text-green-800 select-none",
+  alert: "text-sm bg-red-100 text-red-800 select-none",
+  none: "",
 };
 
-export const customTooltipTheme: CustomFlowbiteTheme['tooltip'] = {
-  target: 'w-[-webkit-fill-available]',
+export const customTooltipTheme: CustomFlowbiteTheme["tooltip"] = {
+  target: "w-[-webkit-fill-available]",
 };

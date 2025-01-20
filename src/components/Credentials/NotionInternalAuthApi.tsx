@@ -7,8 +7,7 @@ export interface CredentialState {
   scope: string[];
 }
 
-
-export function ProcessNotionToken(_: string): CredentialState | undefined {
+export function ProcessNotionToken(): CredentialState | undefined {
   // not implemented
   return undefined;
 }
@@ -21,7 +20,7 @@ export function RenderNotionApi({
   onChange: (field: keyof ModalCredentialData, value: any) => void; // info is sended to handleTemplateInputsChange in file ModalCredential.tsx
 }) {
   function handleDataChange(field: keyof CredentialData, value: any) {
-    onChange('data', {
+    onChange("data", {
       ...credential.data,
       [field]: value,
     });
@@ -30,7 +29,10 @@ export function RenderNotionApi({
   return (
     <ul className="ml-4 flex flex-col items-start justify-start gap-y-4 text-black ">
       <li className="flex flex-col justify-center w-full">
-        <Label htmlFor="titleoauth" value="Custom Name Token" />
+        <span className="flex flex-row gap-x-[2px]">
+          <Label htmlFor="titleoauth" value="Custom Name Token" />
+          <span className="text-[#cc2d17]">*</span>
+        </span>
         <TextInput
           id="name"
           className="w-full"
@@ -38,7 +40,7 @@ export function RenderNotionApi({
           sizing="sm"
           value={credential.name}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            onChange('name', e.target.value)
+            onChange("name", e.target.value)
           }
           placeholder="Custom Name Token"
           maxLength={150}
@@ -59,7 +61,7 @@ export function RenderNotionApi({
           sizing="sm"
           value={credential.data.clientSecret}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            handleDataChange('clientSecret', e.target.value)
+            handleDataChange("clientSecret", e.target.value)
           }
           placeholder="Internal Integration Secret"
           required
@@ -69,15 +71,14 @@ export function RenderNotionApi({
         <Alert color="info">
           <span className="font-medium">
             <ul className="flex flex-col gap-y-1">
-              <li>
-                Make sure you have configured:
-              </li>
+              <li>Make sure you have configured:</li>
               <li className="flex flex-row gap-x-1">
-                -{' '}
+                -{" "}
                 <a
                   href="https://www.notion.so/profile/integrations"
                   target="_blank"
                   className="flex flex-row items-center gap-x-1 "
+                  rel="noreferrer"
                 >
                   Secret Notion Integration API
                   <svg
@@ -95,11 +96,12 @@ export function RenderNotionApi({
                 </a>
               </li>
               <li className="flex flex-row gap-x-1">
-                -{' '}
+                -{" "}
                 <a
                   href="https://www.notion.so/profile/integrations"
                   target="_blank"
                   className="flex flex-row items-center gap-x-1 "
+                  rel="noreferrer"
                 >
                   Needed Permisions
                   <svg
