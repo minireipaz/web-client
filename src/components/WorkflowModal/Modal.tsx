@@ -18,6 +18,7 @@ import { FormData } from "../../models/Workflow";
 import { RenderNotionApi } from "../Credentials/NotionInternalAuthApi";
 import { TypeNodes } from "../Workflow/WorkflowDrawer";
 import { NotionButton, NotionModal } from "./NotionModal";
+import { RESPONSE_MESSAGES } from "../../models/Modal";
 
 interface ContainerProps {
   isOpen: boolean;
@@ -257,6 +258,7 @@ export function WorkflowModal(props: ContainerProps) {
   const handleTest = useCallback((dataResponse: ResponseSaveFormData) => {
     setSizeModal("7xl");
     console.log("response=" + JSON.stringify(dataResponse));
+    // TODO: better messages for empty response
     setContentTest(
       <>
         <div
@@ -264,7 +266,9 @@ export function WorkflowModal(props: ContainerProps) {
           id="content"
           aria-hidden="true"
         >
-          {dataResponse.data}
+          {dataResponse.data && dataResponse.data.trim() !== ""
+            ? dataResponse.data
+            : RESPONSE_MESSAGES.empty}
         </div>
       </>,
     );
