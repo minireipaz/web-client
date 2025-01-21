@@ -101,3 +101,33 @@ func (a *ActionsController) PollingGetGoogleSheetByID(ctx *gin.Context) {
 	response.Data = *data
 	ctx.JSON(response.Status, response)
 }
+
+func (a *ActionsController) PollingGetNotionByID(ctx *gin.Context) {
+  actionID := ctx.Param("idaction")
+	userID := ctx.Param("iduser")
+  typeNotion := ctx.Param("type")
+	serviceUserToken, err := a.authService.GetServiceUserAccessToken()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error":  fmt.Sprintf("Failed to authenticate: %v", err),
+			"status": http.StatusInternalServerError,
+		})
+		return
+	}
+	response := models.ResponseGetGoogleSheetByID{
+		Error:  "",
+		Status: http.StatusOK,
+	}
+	// coupled response
+	data := a.service.GetGoogleSheetByID(&actionID, &userID, serviceUserToken)
+	if data == nil {
+		response = models.ResponseGetGoogleSheetByID{
+			Error:  models.NotAccept,
+			Status: http.StatusInternalServerError,
+		}
+		ctx.JSON(http.StatusInternalServerError, response)
+		return
+	}
+	response.Data = *data
+	ctx.JSON(response.Status, response)
+}

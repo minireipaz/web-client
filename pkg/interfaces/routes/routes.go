@@ -43,6 +43,7 @@ func Register(app *gin.Engine,
 		actions.POST("/google/sheets", middlewares.ValidateGetGoogleSheet(), actionsController.CreateActionsGoogleSheet)
 		actions.GET("/google/sheets/:iduser/:idaction", middlewares.ValidateUserID(), middlewares.ValidateIDAction(), actionsController.PollingGetGoogleSheetByID)
     actions.POST("/notion", middlewares.ValidateNotionFields(), actionsController.CreateNotionAction )
+    actions.GET("/notion/:type:/:iduser/:idaction", middlewares.ValidateUserID(), middlewares.ValidateIDAction(), actionsController.PollingGetNotionByID)
 	}
 }
 
