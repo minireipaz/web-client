@@ -193,8 +193,10 @@ export function NotionButton(props: NotionButtonProps) {
     if (
       props.dataNode.type !== TypeNodes.notiontoken &&
       props.dataNode.type !== TypeNodes.notionoauth
-    )
+    ) {
       return;
+    }
+
     if (!validateForm(props.formData)) return;
     setDisabledButtonTest(true);
     try {
@@ -241,7 +243,7 @@ export function NotionButton(props: NotionButtonProps) {
         return;
       }
 
-      await startPolling(dataResponse.data);
+      await startPolling(dataResponse.data, props.dataNode.type);
       setDisabledButtonTest(false);
       return;
     } catch (error: any) {
@@ -353,7 +355,7 @@ export function NotionButton(props: NotionButtonProps) {
     return true;
   }
 
-  async function startPolling(actionID: string) {
+  async function startPolling(actionID: string, type: string) {
     if (actionID === "") return;
 
     let abortController = new AbortController();
@@ -362,6 +364,7 @@ export function NotionButton(props: NotionButtonProps) {
       try {
         const success = await pollingActionTest(
           actionID,
+          type,
           abortController.signal,
         );
         if (success) {
@@ -381,12 +384,13 @@ export function NotionButton(props: NotionButtonProps) {
 
   async function pollingActionTest(
     actionID: string,
+    type: string,
     signal: AbortSignal,
   ): Promise<boolean> {
     try {
       const result = await executeRequest(
         async () => {
-          return await pollTest(actionID, signal as AbortSignal);
+          return await pollTest(actionID, type, signal as AbortSignal);
         },
         {
           onSuccess: () => console.log("Request successful."),
@@ -410,11 +414,12 @@ export function NotionButton(props: NotionButtonProps) {
 
   async function pollTest(
     actionID: string,
+    type: string,
     signal: AbortSignal,
   ): Promise<[boolean, ResponseSaveFormData]> {
     try {
       const [ok, uriFrontend] = getUriFrontend(
-        `/actions/google/sheets/${userInfo?.profile.sub}/${actionID}`,
+        `/actions/notion/${type}/${userInfo?.profile.sub}/${actionID}`,
       );
       if (!ok) return [false, failConnection];
 
