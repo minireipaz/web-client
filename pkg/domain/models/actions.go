@@ -2,9 +2,8 @@ package models
 
 const (
 	Googlesheets = "googlesheets"
-  NotionOAuth = "notionoauth"
-  NotionToken = "notiontoken"
-	NotAccept    = "Type not acceptable"
+	NotionOAuth  = "notionoauth"
+	NotionToken  = "notiontoken"
 )
 
 type RequestGoogleAction struct {
@@ -18,11 +17,11 @@ type RequestGoogleAction struct {
 	Credentialid   string `json:"credentialid"`
 	Sub            string `json:"sub"`
 	// Type           string `json:"type"`
-  Type           string `json:"type" binding:"oneof=googlesheets notiontoken notionoauth"`
-	Workflowid     string `json:"workflowid"`
-	Nodeid         string `json:"nodeid"`
-	Redirecturl    string `json:"redirecturl"`
-	Testmode       bool   `json:"testmode"`
+	Type        string `json:"type" binding:"oneof=googlesheets notiontoken notionoauth"`
+	Workflowid  string `json:"workflowid"`
+	Nodeid      string `json:"nodeid"`
+	Redirecturl string `json:"redirecturl"`
+	Testmode    bool   `json:"testmode"`
 }
 
 type ResponseGetGoogleSheetByID struct {

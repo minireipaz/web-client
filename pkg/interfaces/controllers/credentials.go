@@ -40,7 +40,7 @@ func (c *CredentialsController) CreateOAuthCredentials(ctx *gin.Context) {
 	case models.Googlesheets:
 		response = c.service.CreateGoogleCredential(&currentCredential, serviceUserAccessToken)
 	default:
-		response.Error = "Type not acceptable"
+		response.Error = models.TypeNotAceptable
 		response.Status = http.StatusInternalServerError
 	}
 	ctx.JSON(response.Status, response)
@@ -66,15 +66,15 @@ func (c *CredentialsController) CreateCredentials(ctx *gin.Context) {
 	case "notiontoken":
 		saved, updatedCredentialStr := c.service.SaveNotionTokenCredential(&currentCredential, serviceUserAccessToken)
 		if !saved {
-			response.Error = fmt.Sprint("cannot save")
+			response.Error = "cannot save"
 			response.Status = http.StatusBadRequest
 		}
-    response.Data = ""
-    if updatedCredentialStr != nil {
-      response.Data = *updatedCredentialStr
-    }
+		response.Data = ""
+		if updatedCredentialStr != nil {
+			response.Data = *updatedCredentialStr
+		}
 	default:
-		response.Error = "Type not acceptable"
+		response.Error = models.TypeNotAceptable
 		response.Status = http.StatusInternalServerError
 	}
 	ctx.JSON(response.Status, response)
@@ -99,7 +99,7 @@ func (c *CredentialsController) CallbackCredentials(ctx *gin.Context) {
 	case models.Googlesheets:
 		response = c.service.ExchangeOAuth(&currentCredential, serviceUserAccessToken)
 	default:
-		response.Error = "Type not acceptable"
+		response.Error = models.TypeNotAceptable
 		response.Status = http.StatusInternalServerError
 	}
 	ctx.JSON(response.Status, response)

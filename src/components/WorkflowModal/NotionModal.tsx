@@ -457,22 +457,43 @@ export function NotionButton(props: NotionButtonProps) {
     data: ResponseSaveFormData,
   ): ResponseSaveFormData {
     try {
-      const parsedData = JSON.parse(data.data) as ResponseSaveFormData;
+      if (!data) {
+        return {
+          status: 500,
+          error: "",
+          data: "",
+        };
+      }
+
+      const firstLevelParse = JSON.parse(data.data) as ResponseSaveFormData;
       // TODO: need test for empty value
-      const valuesRaw = parsedData.data
-        ? JSON.parse(parsedData.data).values
-        : "";
-      const transformedData = JSON.stringify(valuesRaw.values);
+      if (!firstLevelParse.data) {
+        return {
+          status: 200,
+          error: "",
+          data: "",
+        };
+      }
+      const secondLevelParse = JSON.parse(firstLevelParse.data);
+      if (!secondLevelParse.values) {
+        return {
+          status: 200,
+          error: "",
+          data: firstLevelParse.data,
+        };
+      }
+
       return {
         status: 200,
         error: "",
-        data: transformedData,
+        data: JSON.stringify(secondLevelParse.values),
       };
     } catch (error) {
       console.log("error", error);
+      console.error("data transform failed:", error);
       return {
         status: 500,
-        error: "",
+        error: "transform failed",
         data: "",
       };
     }

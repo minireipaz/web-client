@@ -12,12 +12,13 @@ const (
 	TwoDays               = 172_800 * time.Second
 	TimeoutRequest        = 5 * time.Minute
 	TimeoutIDLEConnection = 0 * time.Second
+	TypeNotAceptable      = "Type not acceptable"
 )
 
 var ValidCredentialTypes = map[string]bool{
 	"googlesheets": true,
-  "notiontoken": true,
-  "notionoauth": true,
+	"notiontoken":  true,
+	"notionoauth":  true,
 }
 
 const (
@@ -27,7 +28,7 @@ const (
 	ValidateUserContextKey          = "user"
 	ValidateWorkflowContextKey      = "workflow"
 	ActionGoogleKey                 = "actiongoogle"
-  ActionNotionKey = "actionnotion"
+	ActionNotionKey                 = "actionnotion"
 )
 
 var PermitedPathList = map[string]bool{

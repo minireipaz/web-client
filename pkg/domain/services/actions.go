@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"minireipaz/pkg/domain/models"
 	"minireipaz/pkg/domain/repositories"
 )
@@ -27,6 +28,16 @@ func (a *ActionsService) CreateActionsNotion(newAction models.RequestGoogleActio
 
 func (a *ActionsService) GetGoogleSheetByID(actionID *string, userID *string, serviceUser *string) *string {
 	// model coupled
-	data := a.actionsRepo.GetGoogleSheetByID(actionID, userID, serviceUser)
+	// not needed to retry because polling from frontend
+	uriPolling := fmt.Sprintf("/api/v1/polling/google/sheets/%s/%s", *userID, *actionID)
+	data := a.actionsRepo.GetActionByID(&uriPolling, actionID, userID, serviceUser)
+	return data
+}
+
+func (a *ActionsService) GetNotionActionByID(actionID *string, userID *string, serviceUser *string) *string {
+	// model coupled
+	// not needed to retry because polling from frontend
+	uriPolling := fmt.Sprintf("/api/v1/polling/notion/%s/%s", *userID, *actionID)
+	data := a.actionsRepo.GetActionByID(&uriPolling, actionID, userID, serviceUser)
 	return data
 }

@@ -1,6 +1,5 @@
 import { Alert, Button, Modal } from "flowbite-react";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   COLOR_ALERTS,
   CredentialData,
@@ -33,7 +32,6 @@ interface ContainerProps {
 
 export function ModalCredential(props: ContainerProps) {
   const { userInfo, handleTokenExpiration } = useAuth();
-  const navigate = useNavigate();
   const [credential, setCredential] = useState<ModalCredentialData>({
     id: "",
     type: "",

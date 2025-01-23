@@ -34,7 +34,7 @@ func (a *ActionsController) CreateActionsGoogleSheet(ctx *gin.Context) {
 	}
 
 	response := models.ResponseGetGoogleSheetByID{
-		Error:  models.NotAccept,
+		Error:  models.TypeNotAceptable,
 		Status: http.StatusInternalServerError,
 	}
 	switch newAction.Type {
@@ -47,7 +47,7 @@ func (a *ActionsController) CreateActionsGoogleSheet(ctx *gin.Context) {
 }
 
 func (a *ActionsController) CreateNotionAction(ctx *gin.Context) {
-  newAction := ctx.MustGet(models.ActionNotionKey).(models.RequestGoogleAction)
+	newAction := ctx.MustGet(models.ActionNotionKey).(models.RequestGoogleAction)
 	serviceUserToken, err := a.authService.GetServiceUserAccessToken()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -58,14 +58,14 @@ func (a *ActionsController) CreateNotionAction(ctx *gin.Context) {
 	}
 
 	response := models.ResponseGetGoogleSheetByID{
-		Error:  models.NotAccept,
+		Error:  models.TypeNotAceptable,
 		Status: http.StatusInternalServerError,
 	}
 	switch newAction.Type {
 	case models.NotionToken:
 		response = *a.service.CreateActionsNotion(newAction, serviceUserToken)
-  case models.NotionOAuth:
-    response = *a.service.CreateActionsNotion(newAction, serviceUserToken)
+	case models.NotionOAuth:
+		response = *a.service.CreateActionsNotion(newAction, serviceUserToken)
 	default:
 		log.Printf("ERROR | type not acceptable %v", newAction)
 	}
@@ -92,7 +92,7 @@ func (a *ActionsController) PollingGetGoogleSheetByID(ctx *gin.Context) {
 	data := a.service.GetGoogleSheetByID(&actionID, &userID, serviceUserToken)
 	if data == nil {
 		response = models.ResponseGetGoogleSheetByID{
-			Error:  models.NotAccept,
+			Error:  models.TypeNotAceptable,
 			Status: http.StatusInternalServerError,
 		}
 		ctx.JSON(http.StatusInternalServerError, response)
@@ -103,9 +103,9 @@ func (a *ActionsController) PollingGetGoogleSheetByID(ctx *gin.Context) {
 }
 
 func (a *ActionsController) PollingGetNotionByID(ctx *gin.Context) {
-  actionID := ctx.Param("idaction")
+	actionID := ctx.Param("idaction")
 	userID := ctx.Param("iduser")
-  typeNotion := ctx.Param("type")
+	// typeNotion := ctx.Param("type")
 	serviceUserToken, err := a.authService.GetServiceUserAccessToken()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -119,10 +119,10 @@ func (a *ActionsController) PollingGetNotionByID(ctx *gin.Context) {
 		Status: http.StatusOK,
 	}
 	// coupled response
-	data := a.service.GetGoogleSheetByID(&actionID, &userID, serviceUserToken)
+	data := a.service.GetNotionActionByID(&actionID, &userID, serviceUserToken)
 	if data == nil {
 		response = models.ResponseGetGoogleSheetByID{
-			Error:  models.NotAccept,
+			Error:  models.TypeNotAceptable,
 			Status: http.StatusInternalServerError,
 		}
 		ctx.JSON(http.StatusInternalServerError, response)

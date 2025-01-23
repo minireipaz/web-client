@@ -232,7 +232,6 @@ func ValidateNotionFields() gin.HandlerFunc {
 	}
 }
 
-
 func validateWorkflowFields(workflow *models.Workflow) error {
 	if strings.TrimSpace(workflow.Name) == "" {
 		return errors.New(ErrorWorkflowNameRequired)

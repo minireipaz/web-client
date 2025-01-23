@@ -32,7 +32,7 @@ func Register(app *gin.Engine,
 		route.GET("/credentials/:iduser", middlewares.ValidateUserID(), credentialController.GetAllCredentials)
 		// route.GET("/credentials/:iduser/:idcredential", middlewares.ValidateGetCredential(), credentialController.GetCredentialsByID)
 	}
-  // paths outside /api/v1/...
+	// paths outside /api/v1/...
 	creds := app.Group("/oauth2-credentials")
 	{
 		creds.POST("/save", middlewares.ValidateCredentialExchange(), credentialController.CallbackCredentials)
@@ -42,8 +42,8 @@ func Register(app *gin.Engine,
 	{
 		actions.POST("/google/sheets", middlewares.ValidateGetGoogleSheet(), actionsController.CreateActionsGoogleSheet)
 		actions.GET("/google/sheets/:iduser/:idaction", middlewares.ValidateUserID(), middlewares.ValidateIDAction(), actionsController.PollingGetGoogleSheetByID)
-    actions.POST("/notion", middlewares.ValidateNotionFields(), actionsController.CreateNotionAction )
-    actions.GET("/notion/:type:/:iduser/:idaction", middlewares.ValidateUserID(), middlewares.ValidateIDAction(), actionsController.PollingGetNotionByID)
+		actions.POST("/notion", middlewares.ValidateNotionFields(), actionsController.CreateNotionAction)
+		actions.GET("/notion/notiontoken/:iduser/:idaction", middlewares.ValidateUserID(), middlewares.ValidateIDAction(), actionsController.PollingGetNotionByID)
 	}
 }
 

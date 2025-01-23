@@ -2,7 +2,6 @@ package httpclient
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"minireipaz/pkg/domain/models"
 )
@@ -53,8 +52,8 @@ func (a *ActionsRepository) CreateActionsNotion(newAction models.RequestGoogleAc
 	return response
 }
 
-func (a *ActionsRepository) GetGoogleSheetByID(actionID *string, userID *string, serviceUser *string) *string {
-	url, err := getPollingURL(fmt.Sprintf("/api/v1/polling/google/sheets/%s/%s", *userID, *actionID))
+func (a *ActionsRepository) GetActionByID(uriPolling *string, actionID *string, userID *string, serviceUser *string) *string {
+	url, err := getPollingURL(*uriPolling)
 	if err != nil {
 		return nil
 	}
