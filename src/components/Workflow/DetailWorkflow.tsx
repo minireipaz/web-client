@@ -205,8 +205,7 @@ export const DetailWorkflow = memo(function DetailWorkflow(
     // if (!rfInstance) return;
     if (!rfInstanceRef.current) return;
 
-    // @ts-expect-error ts(2339)
-    const flowJSON = rfInstance.current.toObject() as ReactFlowJsonObject;
+    const flowJSON = rfInstanceRef.current.toObject() as ReactFlowJsonObject;
     const currentWorkflow = { ...workflow, ...flowJSON };
     const updated = await sendChangedWorkflow(currentWorkflow);
     setWorkflow({ ...currentWorkflow });
